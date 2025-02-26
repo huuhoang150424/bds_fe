@@ -9,25 +9,10 @@ import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { FcGoogle } from 'react-icons/fc';
-
-
-const formSchema = z
-  .object({
-    email: z.string().email({ message: 'Email không hợp lệ' }),
-    fullName: z.string().min(1, { message: 'Tên ít nhất 1 ký tự' }),
-    passWord: z.string().min(6, { message: 'Mật khẩu ít nhất 6 ký tự' }),
-    confirmPassword: z.string().min(6, { message: 'Mật khẩu ít nhất 6 ký tự' }),
-  })
-  .refine((data) => data.passWord === data.confirmPassword, {
-    message: 'Mật khẩu không khớp',
-    path: ['confirmPassword'],
-  });
+import formSchema from './schemas/schema-register';
 
 function Register() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,13 +40,13 @@ function Register() {
         <div className='bg-[url(/public/register2.jpg)] bg-cover bg-no-repeat bg-center w-1/2 p-8 hidden md:block '></div> {/* Phần trống bên trái */}
         <div className='w-full md:w-1/2 p-8'>
           <div className='mb-[15px]'>
-            <p className='text-gray-600 text-[20px]'>Xin chào bạn</p>
-            <span className='block text-xl font-bold'>Đăng ký tài khoản mới</span>
+            <p className='text-gray-600 text-[15px]'>Xin chào bạn</p>
+            <span className='block text-xl font-[600]'>Đăng ký tài khoản mới</span>
           </div>
           <div className='bg-[#fff]  rounded-[20px] mb-[15px]'>
-            <a href='#' className='flex items-center space-x-4 p-[10px] bg-[#E9F1FF] rounded-[10px] '>
+            <a href='#' className='flex items-center space-x-4 p-[10px]  rounded-[10px] border-[1px] '>
               <FcGoogle className="text-2xl" />
-              <p className='text-[#4285F4] '>Đăng nhập bằng Google</p>
+              <p className=' '>Đăng nhập bằng Google</p>
             </a>
           </div>
           <div>
@@ -120,7 +105,7 @@ function Register() {
                 )}
               />
               <div className='flex justify-center'>
-                <Button type='submit' className='w-[40%] bg-blue-500 hover:bg-blue-600 text-white font-semibold py-[15px] px-[15px] rounded-md'>
+                <Button type='submit' className='w-[40%] bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md'>
                   Đăng Ký
                 </Button>
               </div>

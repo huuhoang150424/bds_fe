@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
-import Register from './screen/auth/register/register';
+import Register from './screen/auth/register/Register';
+import Footer from './components/common/Footer/Footer';
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
   const smallDot = useRef<HTMLDivElement | null>(null); 
@@ -48,6 +49,7 @@ function App() {
       ></div>
       <Router /> */}
       <Register />
+      <Footer />
     </div>
   );
 }
