@@ -3,6 +3,7 @@ import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
 import Register from './screen/auth/register/Register';
 import Footer from './components/common/Footer/Footer';
+import LoginScreen from './screen/auth/login/LoginScreen';
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
   const smallDot = useRef<HTMLDivElement | null>(null); 
@@ -49,6 +50,7 @@ function App() {
       ></div>
       <Router /> */}
       <Register />
+      <LoginScreen />
       <Footer />
     </div>
   );
