@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { FcGoogle } from 'react-icons/fc';
 import formSchemaLogin from './schema/schema-login';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-
+import { Checkbox } from '@/components/ui/checkbox';
+import { Link } from 'react-router-dom';
 function LoginScreen() {
   const form = useForm<z.infer<typeof formSchemaLogin>>({
     resolver: zodResolver(formSchemaLogin),

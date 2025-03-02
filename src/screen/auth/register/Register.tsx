@@ -11,6 +11,7 @@ import { FcGoogle } from 'react-icons/fc';
 import formSchema from './schemas/schema-register';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
+
 function Register() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
