@@ -1,12 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
-import Register from './screen/auth/register/Register';
-import Footer from './components/common/Footer/Footer';
-import LoginScreen from './screen/auth/login/LoginScreen';
-import Header from './components/common/Header/Header';
-import AuthRouter from './router/authRouter';
-import Home from './screen/user/home/Home';
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
   const smallDot = useRef<HTMLDivElement | null>(null);
@@ -39,10 +33,9 @@ function App() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
-
   return (
     <div className=''>
-      {/* <Toaster/>
+      <Toaster/>
       <div
         ref={cursorMouse}
         className='w-[40px] h-[40px] rounded-full bg-transparent border-[2px] border-primaryColor absolute left-0 top-0 z-[999998] transition-transform duration-1000 ease-out pointer-events-none'
@@ -51,16 +44,8 @@ function App() {
         ref={smallDot}
         className='w-2 h-2 rounded-full bg-primaryColor absolute left-[17px] top-[17px] z-[999999] transition-transform duration-500 ease-out pointer-events-none'
       ></div>
-      <Router /> */}
-      <Header />
-      <div className='pt-[80px]'></div>
-      {/* <Register />
-      <LoginScreen /> */}
-      <Home />
-      {/* <Footer /> */}
-      {/* < AuthRouter /> */}
+      <Router />
     </div>
   );
 }
-
 export default App;
