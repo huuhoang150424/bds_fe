@@ -13,8 +13,8 @@ interface CustomImageProps {
 const CustomImage: React.FC<CustomImageProps> = ({
   src,
   alt,
-  width = "100%",
-  height = "auto",
+  width = "",
+  height = "",
   className = "",
   loading = "lazy",
   placeholder = "",
@@ -51,8 +51,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
         }`}
         onLoad={() => setLoaded(true)}
         style={{
-          width: "100%",
-          height: "100%",
           objectFit: "cover",
         }}
       />
