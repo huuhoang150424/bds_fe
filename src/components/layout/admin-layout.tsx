@@ -9,7 +9,7 @@ interface Props {
 export default function AdminLayout({children}:Props) {
   return (
     <div className="">
-
+      {children}
     </div>
   )
 }

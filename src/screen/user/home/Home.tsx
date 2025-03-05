@@ -21,9 +21,10 @@ import CustomImage from '@/components/common/images';
 import { MessageSquare } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
+import { CiHeart } from 'react-icons/ci';
 
 interface NewsItem {
   title: string;
@@ -44,13 +45,13 @@ function Home() {
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20]);
-  const [selectedPriceOption, setSelectedPriceOption] = useState<string>("all");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [showAreaFilter, setShowAreaFilter] = useState(false);
-  const [selectedAreaOption, setSelectedAreaOption] = useState<string>("all");
-  const [minArea, setMinArea] = useState("");
-  const [maxArea, setMaxArea] = useState("");
+  const [selectedAreaOption, setSelectedAreaOption] = useState<string>('all');
+  const [minArea, setMinArea] = useState('');
+  const [maxArea, setMaxArea] = useState('');
   const [activeTab, setActiveTab] = useState('nha-dat-ban');
 
   const featuredCities = [
@@ -159,7 +160,7 @@ function Home() {
       {
         id: 'dat-ban',
         label: 'Các loại đất bán',
-        icon: '🏗️'
+        icon: '🏗️',
       },
       {
         id: 'dat-nen',
@@ -172,7 +173,7 @@ function Home() {
       {
         id: 'trang-trai',
         label: 'Trang trại, khu nghỉ dưỡng',
-        icon: '🏡'
+        icon: '🏡',
       },
       {
         id: 'condotel',
@@ -181,126 +182,182 @@ function Home() {
       {
         id: 'kho-xuong',
         label: 'Kho, nhà xưởng',
-        icon: '🏭'
+        icon: '🏭',
       },
       {
         id: 'bat-dong-san-khac',
         label: 'Bất động sản khác',
-        icon: '🏢'
-      }
+        icon: '🏢',
+      },
     ],
     'nha-dat-cho-thue': [
       {
         id: 'can-ho-chung-cu',
         label: 'Căn hộ chung cư',
-        icon: '🏢'
+        icon: '🏢',
       },
       {
         id: 'nha-rieng',
         label: 'Nhà riêng',
-        icon: '🏠'
+        icon: '🏠',
       },
       {
         id: 'nha-mat-pho',
         label: 'Nhà mặt phố',
-        icon: '🏪'
+        icon: '🏪',
       },
       {
         id: 'nha-tro-phong-tro',
         label: 'Nhà trọ, phòng trọ',
-        icon: '🏘️'
+        icon: '🏘️',
       },
       {
         id: 'van-phong',
         label: 'Văn phòng',
-        icon: '🏢'
+        icon: '🏢',
       },
       {
         id: 'cua-hang',
         label: 'Cửa hàng, ki ốt',
-        icon: '🏪'
+        icon: '🏪',
       },
       {
         id: 'kho-xuong',
         label: 'Kho, xưởng',
-        icon: '🏭'
+        icon: '🏭',
       },
       {
         id: 'dat',
         label: 'Đất',
-        icon: '🏞️'
+        icon: '🏞️',
       },
       {
         id: 'khac',
         label: 'Khác',
-        icon: '🏢'
-      }
+        icon: '🏢',
+      },
     ],
     'du-an': [
       {
         id: 'tat-ca-loai-hinh',
         label: 'Tất cả loại hình',
-        icon: '🏢'
+        icon: '🏢',
       },
       {
         id: 'can-ho-chung-cu',
         label: 'Căn hộ chung cư',
-        icon: '🏢'
+        icon: '🏢',
       },
       {
         id: 'cao-oc-van-phong',
         label: 'Cao ốc văn phòng',
-        icon: '🏢'
+        icon: '🏢',
       },
       {
         id: 'trung-tam-thuong-mai',
         label: 'Trung tâm thương mại',
-        icon: '🏬'
+        icon: '🏬',
       },
       {
         id: 'khu-do-thi-moi',
         label: 'Khu đô thị mới',
-        icon: '🌆'
+        icon: '🌆',
       },
       {
         id: 'khu-phuc-hop',
         label: 'Khu phức hợp',
-        icon: '🏙️'
+        icon: '🏙️',
       },
       {
         id: 'nha-o-xa-hoi',
         label: 'Nhà ở xã hội',
-        icon: '🏘️'
+        icon: '🏘️',
       },
       {
         id: 'khu-nghi-duong',
         label: 'Khu nghỉ dưỡng, Sinh thái',
-        icon: '🌳'
+        icon: '🌳',
       },
       {
         id: 'khu-cong-nghiep',
         label: 'Khu công nghiệp',
-        icon: '🏭'
-      }
-    ]
+        icon: '🏭',
+      },
+    ],
   };
+
+  interface Property {
+    id: string;
+    title: string;
+    price: string;
+    area: string;
+    location: string;
+    images: string[];
+    pricePerMonth?: string;
+    isFavorite?: boolean;
+  }
+
+  // Thêm vào trong component Home, sau phần News
+  const recommendedProperties: Property[] = [
+    {
+      id: '1',
+      title: 'Chung cư cao cấp Gemory Định giá 4,5 tỷ rẻ nhất thị trường khi mua',
+      price: '4.5 tỷ',
+      area: '62 m²',
+      location: 'Nam Từ Liêm, Hà Nội',
+      images: [
+        'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg',
+        '/images/property1-2.jpg',
+        '/images/property1-3.jpg',
+      ],
+      isFavorite: false,
+    },
+    {
+      id: '2',
+      title: 'Cho thuê căn hộ studio - 1 PN - 2 PN tại Ecolife Capitol với giá r',
+      price: '11 triệu/tháng',
+      area: '75 m²',
+      location: 'Nam Từ Liêm, Hà Nội',
+      images: ['/images/property2.jpg', '/images/property2-2.jpg'],
+      pricePerMonth: '11 triệu',
+      isFavorite: true,
+    },
+    {
+      id: '3',
+      title: 'Bán nhà 4 tầng phân lô vip trạch, ngõ thông kinh doanh phố',
+      price: '39 tỷ',
+      area: '115 m²',
+      location: 'Đống Đa, Hà Nội',
+      images: ['/images/property3.jpg', '/images/property3-2.jpg', '/images/property3-3.jpg'],
+      isFavorite: false,
+    },
+    {
+      id: '4',
+      title: 'Nhà 7 tỷ có nhà đẹp TDL ĐT45m2 57 ngõ thông rộng',
+      price: 'Giá thỏa thuận',
+      area: '45 m²',
+      location: 'Đống Đa, Hà Nội',
+      images: ['/images/property4.jpg'],
+      isFavorite: false,
+    },
+  ];
 
   const propertyTypes = propertyTypesByTab[activeTab as keyof typeof propertyTypesByTab];
 
   const priceOptions = [
-    { value: "all", label: "Tất cả mức giá" },
-    { value: "0-500", label: "Dưới 500 triệu" },
-    { value: "500-800", label: "500 - 800 triệu" },
-    { value: "800-1000", label: "800 triệu - 1 tỷ" },
-    { value: "1000-2000", label: "1 - 2 tỷ" },
+    { value: 'all', label: 'Tất cả mức giá' },
+    { value: '0-500', label: 'Dưới 500 triệu' },
+    { value: '500-800', label: '500 - 800 triệu' },
+    { value: '800-1000', label: '800 triệu - 1 tỷ' },
+    { value: '1000-2000', label: '1 - 2 tỷ' },
   ];
 
   const areaOptions = [
-    { value: "all", label: "Tất cả diện tích" },
-    { value: "0-30", label: "Dưới 30 m²" },
-    { value: "30-50", label: "30 - 50 m²" },
-    { value: "50-80", label: "50 - 80 m²" },
-    { value: "80-100", label: "80 - 100 m²" },
+    { value: 'all', label: 'Tất cả diện tích' },
+    { value: '0-30', label: 'Dưới 30 m²' },
+    { value: '30-50', label: '30 - 50 m²' },
+    { value: '50-80', label: '50 - 80 m²' },
+    { value: '80-100', label: '80 - 100 m²' },
   ];
 
   const handleSearch = () => {
@@ -308,9 +365,9 @@ function Home() {
   };
 
   const handlePropertyTypeChange = (propertyId: string) => {
-    setSelectedPropertyTypes(prev => {
+    setSelectedPropertyTypes((prev) => {
       if (prev.includes(propertyId)) {
-        return prev.filter(id => id !== propertyId);
+        return prev.filter((id) => id !== propertyId);
       } else {
         return [...prev, propertyId];
       }
@@ -319,104 +376,104 @@ function Home() {
 
   const handlePriceOptionChange = (value: string) => {
     setSelectedPriceOption(value);
-    switch(value) {
-      case "0-500":
-        setMinPrice("");
-        setMaxPrice("500");
+    switch (value) {
+      case '0-500':
+        setMinPrice('');
+        setMaxPrice('500');
         break;
-      case "500-800":
-        setMinPrice("500");
-        setMaxPrice("800");
+      case '500-800':
+        setMinPrice('500');
+        setMaxPrice('800');
         break;
-      case "800-1000":
-        setMinPrice("800");
-        setMaxPrice("1000");
+      case '800-1000':
+        setMinPrice('800');
+        setMaxPrice('1000');
         break;
-      case "1000-2000":
-        setMinPrice("1000");
-        setMaxPrice("2000");
+      case '1000-2000':
+        setMinPrice('1000');
+        setMaxPrice('2000');
         break;
       default:
-        setMinPrice("");
-        setMaxPrice("");
+        setMinPrice('');
+        setMaxPrice('');
     }
   };
 
   const handleAreaOptionChange = (value: string) => {
     setSelectedAreaOption(value);
-    switch(value) {
-      case "0-30":
-        setMinArea("");
-        setMaxArea("30");
+    switch (value) {
+      case '0-30':
+        setMinArea('');
+        setMaxArea('30');
         break;
-      case "30-50":
-        setMinArea("30");
-        setMaxArea("50");
+      case '30-50':
+        setMinArea('30');
+        setMaxArea('50');
         break;
-      case "50-80":
-        setMinArea("50");
-        setMaxArea("80");
+      case '50-80':
+        setMinArea('50');
+        setMaxArea('80');
         break;
-      case "80-100":
-        setMinArea("80");
-        setMaxArea("100");
+      case '80-100':
+        setMinArea('80');
+        setMaxArea('100');
         break;
       default:
-        setMinArea("");
-        setMaxArea("");
+        setMinArea('');
+        setMaxArea('');
     }
   };
 
   const newsByTab: NewsData = {
-    'highlight': [
+    highlight: [
       {
         title: 'Đất Dịch Vụ Hà Nội Tăng Giá Đầu Năm Nhưng Giao Dịch Chậm',
         time: '6 giờ trước',
         img: '/images/news1.jpg',
-        description: 'Thị trường bất động sản đầu năm ghi nhận nhiều biến động...'
+        description: 'Thị trường bất động sản đầu năm ghi nhận nhiều biến động...',
       },
       {
         title: "Đừng Để 'Sụt Bẫy' Tại Điểm Nóng Đất Nền Đông Anh",
         time: '8 giờ trước',
-        img: '/images/news2.jpg'
+        img: '/images/news2.jpg',
       },
       {
         title: '6 Chỉ Báo Của Chuyên Gia Về Tỷ Suất Cho Thuê Khi Đầu Tư Căn Hộ',
         time: '1 ngày trước',
-        img: '/images/news3.jpg'
+        img: '/images/news3.jpg',
       },
       {
         title: 'Đất Nền Đan Phượng Nổi Sóng Đầu Năm 2025',
         time: '2 ngày trước',
-        img: '/images/news4.jpg'
+        img: '/images/news4.jpg',
       },
       {
         title: 'Những Loại Đất Nền Cần Tránh Xa Khi Đầu Tư',
         time: '2 ngày trước',
-        img: '/images/news5.jpg'
+        img: '/images/news5.jpg',
       },
     ],
-    'news': [
+    news: [
       {
         title: 'Thị Trường BĐS 2024: Dự Báo và Triển Vọng',
         time: '1 giờ trước',
         img: '/images/news6.jpg',
-        description: 'Các chuyên gia nhận định về triển vọng thị trường BĐS năm 2024...'
+        description: 'Các chuyên gia nhận định về triển vọng thị trường BĐS năm 2024...',
       },
       {
         title: 'Chính Sách Mới Về Vay Mua Nhà Năm 2024',
         time: '3 giờ trước',
-        img: '/images/news7.jpg'
+        img: '/images/news7.jpg',
       },
       {
         title: 'Top 5 Dự Án Căn Hộ Được Quan Tâm Nhất Tháng 2/2024',
         time: '5 giờ trước',
-        img: '/images/news8.jpg'
+        img: '/images/news8.jpg',
       },
       {
         title: 'Xu Hướng Đầu Tư BĐS: Căn Hộ Du Lịch Lên Ngôi',
         time: '1 ngày trước',
-        img: '/images/news9.jpg'
+        img: '/images/news9.jpg',
       },
     ],
     'bds-tphcm': [
@@ -424,22 +481,22 @@ function Home() {
         title: 'Thị Trường Căn Hộ TP.HCM: Nguồn Cung Khan Hiếm',
         time: '2 giờ trước',
         img: '/images/news10.jpg',
-        description: 'Thị trường căn hộ TP.HCM đang đối mặt với tình trạng khan hiếm nguồn cung...'
+        description: 'Thị trường căn hộ TP.HCM đang đối mặt với tình trạng khan hiếm nguồn cung...',
       },
       {
         title: 'Quận 9 Sẽ Là Tâm Điểm BĐS Năm 2024',
         time: '4 giờ trước',
-        img: '/images/news11.jpg'
+        img: '/images/news11.jpg',
       },
       {
         title: 'Giá Nhà Phố Thương Mại Tại TP.HCM Tăng Mạnh',
         time: '1 ngày trước',
-        img: '/images/news12.jpg'
+        img: '/images/news12.jpg',
       },
       {
         title: 'Các Dự Án Metro Tác Động Đến BĐS TP.HCM',
         time: '2 ngày trước',
-        img: '/images/news13.jpg'
+        img: '/images/news13.jpg',
       },
     ],
     'bds-hanoi': [
@@ -447,22 +504,22 @@ function Home() {
         title: 'Thị Trường BĐS Hà Nội Khởi Sắc Đầu Năm',
         time: '1 giờ trước',
         img: '/images/news14.jpg',
-        description: 'Thị trường bất động sản Hà Nội ghi nhận những tín hiệu tích cực...'
+        description: 'Thị trường bất động sản Hà Nội ghi nhận những tín hiệu tích cực...',
       },
       {
         title: 'Giá Đất Nền Khu Vực Hoài Đức Tăng Mạnh',
         time: '5 giờ trước',
-        img: '/images/news15.jpg'
+        img: '/images/news15.jpg',
       },
       {
         title: 'Dự Án Đường Vành Đai 4 Tác Động BĐS Hà Nội',
         time: '1 ngày trước',
-        img: '/images/news16.jpg'
+        img: '/images/news16.jpg',
       },
       {
         title: 'Khu Đô Thị Mới Tây Hồ Tây Thu Hút Nhà Đầu Tư',
         time: '2 ngày trước',
-        img: '/images/news17.jpg'
+        img: '/images/news17.jpg',
       },
     ],
   };
@@ -473,32 +530,32 @@ function Home() {
     <>
       {/* Banner */}
       <div className='banner bg-[url(/banner.jpg)] bg-cover bg-center h-[500px] inset-0 w-auto relative'>
-        <div className='banner__content top-[20px] absolute md:left-[20%] lg:left-[30%] left-[5%] text-center w-[90%] md:w-[70%] lg:w-[55%]'>
+        <div className='banner__content top-[100px] absolute md:left-[20%] lg:left-[30%] left-[5%] text-center w-[90%] md:w-[70%] lg:w-[55%]'>
           <div className='search w-full'>
             <div className='search__tab'>
               <ul className='flex flex-wrap justify-start text-[#fff] text-sm md:text-base'>
-                <li 
+                <li
                   className={cn(
                     'mr-[5px] mb-2 md:mb-0 inset-0 bg-black/60 z-[99] transition-opacity duration-300 px-[10px] py-[5px] rounded-t-[5px] cursor-pointer hover:bg-black/80',
-                    activeTab === 'nha-dat-ban' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]'
+                    activeTab === 'nha-dat-ban' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]',
                   )}
                   onClick={() => setActiveTab('nha-dat-ban')}
                 >
                   Nhà đất bán
                 </li>
-                <li 
+                <li
                   className={cn(
                     'mr-[5px] mb-2 md:mb-0 inset-0 bg-black/60 z-[99] transition-opacity duration-300 px-[10px] py-[5px] rounded-t-[5px] cursor-pointer hover:bg-black/80',
-                    activeTab === 'nha-dat-cho-thue' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]'
+                    activeTab === 'nha-dat-cho-thue' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]',
                   )}
                   onClick={() => setActiveTab('nha-dat-cho-thue')}
                 >
                   Nhà đất cho thuê
                 </li>
-                <li 
+                <li
                   className={cn(
                     'mb-2 md:mb-0 inset-0 bg-black/60 z-[99] transition-opacity duration-300 px-[10px] py-[5px] rounded-t-[5px] cursor-pointer hover:bg-black/80',
-                    activeTab === 'du-an' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]'
+                    activeTab === 'du-an' && 'bg-[#EF4444]/80 hover:bg-[#EF4444]',
                   )}
                   onClick={() => setActiveTab('du-an')}
                 >
@@ -517,7 +574,7 @@ function Home() {
                       >
                         <div className='flex items-center gap-2'>
                           <IoLocationOutline className='w-4 h-4' />
-                          <span className="truncate">{selectedCity || 'Hồ Chí Minh'}</span>
+                          <span className='truncate'>{selectedCity || 'Hồ Chí Minh'}</span>
                         </div>
                         <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
                       </Button>
@@ -538,7 +595,9 @@ function Home() {
                               >
                                 <img src={city.image} alt={city.name} className='w-full h-full object-cover' />
                                 <div className='absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all'>
-                                  <span className='absolute bottom-2 left-2 text-white font-medium text-sm'>{city.name}</span>
+                                  <span className='absolute bottom-2 left-2 text-white font-medium text-sm'>
+                                    {city.name}
+                                  </span>
                                 </div>
                               </div>
                             ))}
@@ -578,8 +637,8 @@ function Home() {
                     className='absolute right-[10px] top-[8px] bg-[#EF4444] hover:bg-[#FF837A]'
                     onClick={handleSearch}
                   >
-                    <span className="hidden md:inline">Tìm kiếm</span>
-                    <IoIosSearch className="w-4 h-4 md:hidden" />
+                    <span className='hidden md:inline'>Tìm kiếm</span>
+                    <IoIosSearch className='w-4 h-4 md:hidden' />
                   </Button>
                 </div>
               </div>
@@ -591,7 +650,7 @@ function Home() {
                       variant='outline'
                       className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
                     >
-                      <span className="text-sm truncate">Loại hình dự án</span>
+                      <span className='text-sm truncate'>Loại hình dự án</span>
                       <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
                     </Button>
                   </PopoverTrigger>
@@ -599,9 +658,9 @@ function Home() {
                     <div className='p-4'>
                       <div className='flex items-center justify-between mb-4'>
                         <h4 className='font-medium text-base'>Loại nhà đất</h4>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
+                        <Button
+                          variant='ghost'
+                          size='icon'
                           className='h-6 w-6'
                           onClick={() => setShowPropertyTypes(false)}
                         >
@@ -620,15 +679,15 @@ function Home() {
                               htmlFor={type.id}
                               className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
                             >
-                              {type.icon && <span className="mr-2">{type.icon}</span>}
+                              {type.icon && <span className='mr-2'>{type.icon}</span>}
                               {type.label}
                             </label>
                           </div>
                         ))}
                       </div>
                       <div className='flex gap-2 mt-4 border-t pt-4'>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant='outline'
                           className='flex-1'
                           onClick={() => {
                             setSelectedPropertyTypes([]);
@@ -637,7 +696,7 @@ function Home() {
                         >
                           Đặt lại
                         </Button>
-                        <Button 
+                        <Button
                           className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
                           onClick={() => setShowPropertyTypes(false)}
                         >
@@ -654,7 +713,7 @@ function Home() {
                       variant='outline'
                       className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
                     >
-                      <span className="text-sm truncate">Mức giá</span>
+                      <span className='text-sm truncate'>Mức giá</span>
                       <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
                     </Button>
                   </PopoverTrigger>
@@ -662,9 +721,9 @@ function Home() {
                     <div className='p-4'>
                       <div className='flex items-center justify-between mb-4'>
                         <h4 className='font-medium text-base'>Mức giá</h4>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
+                        <Button
+                          variant='ghost'
+                          size='icon'
                           className='h-6 w-6'
                           onClick={() => setShowPriceFilter(false)}
                         >
@@ -672,53 +731,57 @@ function Home() {
                         </Button>
                       </div>
 
-                      <div className="mb-6">
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm font-medium">Giá thấp nhất</span>
-                          <span className="text-sm font-medium">Giá cao nhất</span>
+                      <div className='mb-6'>
+                        <div className='flex justify-between mb-2'>
+                          <span className='text-sm font-medium'>Giá thấp nhất</span>
+                          <span className='text-sm font-medium'>Giá cao nhất</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className='flex items-center gap-2'>
                           <Input
-                            type="text"
-                            placeholder="Từ"
+                            type='text'
+                            placeholder='Từ'
                             value={minPrice}
                             onChange={(e) => setMinPrice(e.target.value)}
-                            className="flex-1"
+                            className='flex-1'
                           />
                           <span>→</span>
                           <Input
-                            type="text"
-                            placeholder="Đến"
+                            type='text'
+                            placeholder='Đến'
                             value={maxPrice}
                             onChange={(e) => setMaxPrice(e.target.value)}
-                            className="flex-1"
+                            className='flex-1'
                           />
                         </div>
-                        <div className="mt-4">
+                        <div className='mt-4'>
                           <Slider
                             defaultValue={[0, 2000]}
                             max={2000}
                             step={100}
-                            value={[parseInt(minPrice || "0"), parseInt(maxPrice || "2000")]}
+                            value={[parseInt(minPrice || '0'), parseInt(maxPrice || '2000')]}
                             onValueChange={(value) => {
                               setMinPrice(value[0].toString());
                               setMaxPrice(value[1].toString());
-                              setSelectedPriceOption("");
+                              setSelectedPriceOption('');
                             }}
-                            className="[&_.bg-\[\#EF4444\]]:bg-[#00B4D8]"
+                            className='[&_.bg-\[\#EF4444\]]:bg-[#00B4D8]'
                           />
                         </div>
                       </div>
 
-                      <RadioGroup 
-                        value={selectedPriceOption} 
+                      <RadioGroup
+                        value={selectedPriceOption}
                         onValueChange={handlePriceOptionChange}
-                        className="space-y-2"
+                        className='space-y-2'
                       >
                         {priceOptions.map((option) => (
-                          <div key={option.value} className="flex items-center space-x-2">
-                            <RadioGroupItem value={option.value} id={option.value} className="text-[#00B4D8] border-[#00B4D8]" />
-                            <label htmlFor={option.value} className="text-sm">
+                          <div key={option.value} className='flex items-center space-x-2'>
+                            <RadioGroupItem
+                              value={option.value}
+                              id={option.value}
+                              className='text-[#00B4D8] border-[#00B4D8]'
+                            />
+                            <label htmlFor={option.value} className='text-sm'>
                               {option.label}
                             </label>
                           </div>
@@ -726,18 +789,18 @@ function Home() {
                       </RadioGroup>
 
                       <div className='flex gap-2 mt-4 border-t pt-4'>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant='outline'
                           className='flex-1'
                           onClick={() => {
-                            setMinPrice("");
-                            setMaxPrice("");
-                            setSelectedPriceOption("all");
+                            setMinPrice('');
+                            setMaxPrice('');
+                            setSelectedPriceOption('all');
                           }}
                         >
                           Đặt lại
                         </Button>
-                        <Button 
+                        <Button
                           className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
                           onClick={() => setShowPriceFilter(false)}
                         >
@@ -754,7 +817,7 @@ function Home() {
                       variant='outline'
                       className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
                     >
-                      <span className="text-sm truncate">Diện tích</span>
+                      <span className='text-sm truncate'>Diện tích</span>
                       <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
                     </Button>
                   </PopoverTrigger>
@@ -762,9 +825,9 @@ function Home() {
                     <div className='p-4'>
                       <div className='flex items-center justify-between mb-4'>
                         <h4 className='font-medium text-base'>Diện tích</h4>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
+                        <Button
+                          variant='ghost'
+                          size='icon'
                           className='h-6 w-6'
                           onClick={() => setShowAreaFilter(false)}
                         >
@@ -772,52 +835,56 @@ function Home() {
                         </Button>
                       </div>
 
-                      <div className="mb-6">
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm font-medium">Diện tích nhỏ nhất</span>
-                          <span className="text-sm font-medium">Diện tích lớn nhất</span>
+                      <div className='mb-6'>
+                        <div className='flex justify-between mb-2'>
+                          <span className='text-sm font-medium'>Diện tích nhỏ nhất</span>
+                          <span className='text-sm font-medium'>Diện tích lớn nhất</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className='flex items-center gap-2'>
                           <Input
-                            type="text"
-                            placeholder="Từ"
+                            type='text'
+                            placeholder='Từ'
                             value={minArea}
                             onChange={(e) => setMinArea(e.target.value)}
-                            className="flex-1"
+                            className='flex-1'
                           />
                           <span>→</span>
                           <Input
-                            type="text"
-                            placeholder="Đến"
+                            type='text'
+                            placeholder='Đến'
                             value={maxArea}
                             onChange={(e) => setMaxArea(e.target.value)}
-                            className="flex-1"
+                            className='flex-1'
                           />
                         </div>
-                        <div className="mt-4">
+                        <div className='mt-4'>
                           <Slider
                             defaultValue={[0, 100]}
                             max={100}
                             step={5}
-                            value={[parseInt(minArea || "0"), parseInt(maxArea || "100")]}
+                            value={[parseInt(minArea || '0'), parseInt(maxArea || '100')]}
                             onValueChange={(value) => {
                               setMinArea(value[0].toString());
                               setMaxArea(value[1].toString());
-                              setSelectedAreaOption("");
+                              setSelectedAreaOption('');
                             }}
                           />
                         </div>
                       </div>
 
-                      <RadioGroup 
-                        value={selectedAreaOption} 
+                      <RadioGroup
+                        value={selectedAreaOption}
                         onValueChange={handleAreaOptionChange}
-                        className="space-y-2"
+                        className='space-y-2'
                       >
                         {areaOptions.map((option) => (
-                          <div key={option.value} className="flex items-center space-x-2">
-                            <RadioGroupItem value={option.value} id={option.value} className="text-[#00B4D8] border-[#00B4D8]" />
-                            <label htmlFor={option.value} className="text-sm">
+                          <div key={option.value} className='flex items-center space-x-2'>
+                            <RadioGroupItem
+                              value={option.value}
+                              id={option.value}
+                              className='text-[#00B4D8] border-[#00B4D8]'
+                            />
+                            <label htmlFor={option.value} className='text-sm'>
                               {option.label}
                             </label>
                           </div>
@@ -825,18 +892,18 @@ function Home() {
                       </RadioGroup>
 
                       <div className='flex gap-2 mt-4 border-t pt-4'>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant='outline'
                           className='flex-1'
                           onClick={() => {
-                            setMinArea("");
-                            setMaxArea("");
-                            setSelectedAreaOption("all");
+                            setMinArea('');
+                            setMaxArea('');
+                            setSelectedAreaOption('all');
                           }}
                         >
                           Đặt lại
                         </Button>
-                        <Button 
+                        <Button
                           className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
                           onClick={() => setShowAreaFilter(false)}
                         >
@@ -854,42 +921,42 @@ function Home() {
       {/* Banner */}
 
       {/* News */}
-      <div className='max-w-4xl mx-auto p-4'>
-        <Tabs value={activeNewsTab} onValueChange={(value: keyof NewsData) => setActiveNewsTab(value)}>
-          <div className="flex items-center justify-between">
+      <div className='max-w-5xl mx-auto p-[60px]'>
+        <Tabs value={activeNewsTab ?? 0} onValueChange={(value: string) => setActiveNewsTab(value as keyof NewsData)}>
+          <div className='flex items-center justify-between'>
             <TabsList className='mb-4 border-b flex flex-wrap gap-2 md:gap-4'>
-              <TabsTrigger 
-                value='highlight' 
+              <TabsTrigger
+                value='highlight'
                 className={cn(
                   'font-semibold border-b-2 transition-colors',
-                  activeNewsTab === 'highlight' ? 'border-red-500 text-red-500' : 'border-transparent'
+                  activeNewsTab === 'highlight' ? 'border-red-500 text-red-500' : 'border-transparent',
                 )}
               >
                 Tin nổi bật
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value='news'
                 className={cn(
                   'font-semibold border-b-2 transition-colors',
-                  activeNewsTab === 'news' ? 'border-red-500 text-red-500' : 'border-transparent'
+                  activeNewsTab === 'news' ? 'border-red-500 text-red-500' : 'border-transparent',
                 )}
               >
                 Tin tức
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value='bds-tphcm'
                 className={cn(
                   'font-semibold border-b-2 transition-colors',
-                  activeNewsTab === 'bds-tphcm' ? 'border-red-500 text-red-500' : 'border-transparent'
+                  activeNewsTab === 'bds-tphcm' ? 'border-red-500 text-red-500' : 'border-transparent',
                 )}
               >
                 BĐS TPHCM
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value='bds-hanoi'
                 className={cn(
                   'font-semibold border-b-2 transition-colors',
-                  activeNewsTab === 'bds-hanoi' ? 'border-red-500 text-red-500' : 'border-transparent'
+                  activeNewsTab === 'bds-hanoi' ? 'border-red-500 text-red-500' : 'border-transparent',
                 )}
               >
                 BĐS Hà Nội
@@ -900,12 +967,12 @@ function Home() {
             </Button>
           </div>
 
-          <TabsContent value={activeNewsTab} className="mt-4">
+          <TabsContent value={activeNewsTab ?? 0} className='mt-4'>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <Card className='col-span-1 md:col-span-2 border-none shadow-none'>
                 <div className='relative h-48 rounded-lg overflow-hidden'>
-                  <img 
-                    src={newsByTab[activeNewsTab][0].img} 
+                  <img
+                    src={newsByTab[activeNewsTab][0].img}
                     alt={newsByTab[activeNewsTab][0].title}
                     className='w-full h-full object-cover transition-transform hover:scale-105'
                   />
@@ -914,29 +981,21 @@ function Home() {
                   <h3 className='text-lg font-semibold hover:text-red-500 cursor-pointer transition-colors'>
                     {newsByTab[activeNewsTab][0].title}
                   </h3>
-                  <p className='text-gray-500 text-sm flex items-center mt-1'>
-                    ⏳ {newsByTab[activeNewsTab][0].time}
-                  </p>
+                  <p className='text-gray-500 text-sm flex items-center mt-1'>⏳ {newsByTab[activeNewsTab][0].time}</p>
                   {newsByTab[activeNewsTab][0].description && (
-                    <p className='text-gray-600 mt-2 text-sm line-clamp-2'>
-                      {newsByTab[activeNewsTab][0].description}
-                    </p>
+                    <p className='text-gray-600 mt-2 text-sm line-clamp-2'>{newsByTab[activeNewsTab][0].description}</p>
                   )}
                 </CardContent>
               </Card>
 
               <div className='space-y-3'>
                 {newsByTab[activeNewsTab].slice(1).map((item: NewsItem, index: number) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className='border-b pb-2 last:border-none hover:bg-gray-50 transition-colors rounded p-2 cursor-pointer'
                   >
-                    <h4 className='text-sm font-semibold hover:text-red-500 transition-colors'>
-                      {item.title}
-                    </h4>
-                    <p className='text-gray-500 text-xs flex items-center mt-1'>
-                      ⏳ {item.time}
-                    </p>
+                    <h4 className='text-sm font-semibold hover:text-red-500 transition-colors'>{item.title}</h4>
+                    <p className='text-gray-500 text-xs flex items-center mt-1'>⏳ {item.time}</p>
                   </div>
                 ))}
               </div>
@@ -949,6 +1008,153 @@ function Home() {
         </Button>
       </div>
       {/* News */}
+
+      {/* bđs for you */}
+      <div className='bg-gray-100 w-full px-[60px] pt-[30px] pb-[60px] '>
+        <div className='content  mx-auto max-w-6xl px-[60px]'>
+          <div className=' title flex justify-between items-center pb-[20px]'>
+            <h2 className='text-[22px] font-bold'>Bất động sản dành cho bạn</h2>
+            <div className='flex'>
+              <div className='block pr-[10px] border border-r-[1px border-r-gray-500 text-[12px]'>
+                <span>
+                  <a href='#'>Tin nhà đất mới</a>
+                </span>
+              </div>
+              <div className='block border border-r-[1px] text-[12px] ml-[10px]'>
+                <span>
+                  <a href='#'>Tin nhà đất cho thuê mới</a>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className='grid grid-cols-4 gap-[16px]'>
+            {recommendedProperties.map((property) => (
+              <Card key={property.id}>
+                <CardContent className='p-0 pb-[20px]'>
+                  <div className=' overflow-hidden w-full '>
+                    <CustomImage
+                      src={property.images[0]}
+                      alt='Placeholder Image'
+                      width='full'
+                      height='full'
+                      className=''
+                    />
+                  </div>
+                  <div className='px-[15px]'>
+                    <div className=' '>
+                      <span className='font-normal text-[2C2C2C] text-sm mt-[10px]'>{property.title}</span>
+                    </div>
+                    <div className='text-red flex'>
+                      <div>
+                        <span>{property.price}</span>
+                      </div>
+                      <div>
+                        <span>{property.area}</span>
+                      </div>
+                    </div>
+                    <div className='flex'>
+                      <IoLocationOutline />
+                      <span>{property.location}</span>
+                    </div>
+                    <div>
+                      <span>Đăng hôm nay</span>
+                    </div>
+                    <div>
+                      <Button className='bg-[#fff] flex justify-end border shadow-none text-[18px] hover:none'>
+                        <div>
+                          <CiHeart className='text-black' />
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {/* <Card>
+              <CardContent className='p-0'>
+                <div className=' overflow-hidden w-full '>
+                  <CustomImage
+                    src='https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'
+                    alt='Placeholder Image'
+                    width='full'
+                    height='full'
+                    className=''
+                  />
+                </div>
+                <div>
+                  <strong>Bán lô đất mặt đường</strong>
+                </div>
+                <div className='text-red flex'>
+                  <div>
+                    <span>55 tỷ</span>
+                  </div>
+                  <div>
+                    <span>434 m</span>
+                  </div>
+                </div>
+                <div className='flex'>
+                  <IoLocationOutline />
+                  <span>Thủ đức</span>
+                </div>
+                <div>
+                  <span>Đăng hôm nay</span>
+                </div>
+                <div>
+                  <Button className='bg-[#fff]'>
+                    <CiHeart className='text-black' />
+                  </Button>
+                </div>
+                
+
+              </CardContent>
+            </Card> */}
+            {/* <Card>
+              <CardContent>
+                <div className=' overflow-hidden rounded-lg'>
+                  <CustomImage
+                    src='https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'
+                    alt='Placeholder Image'
+                    width={30}
+                    height={30}
+                    className=''
+                  />
+                </div>
+                <div></div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <div className=' overflow-hidden rounded-lg'>
+                  <CustomImage
+                    src='https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'
+                    alt='Placeholder Image'
+                    width={30}
+                    height={30}
+                    className=''
+                  />
+                </div>
+                <div></div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <div className=' overflow-hidden rounded-lg'>
+                  <CustomImage
+                    src='https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'
+                    alt='Placeholder Image'
+                    width={30}
+                    height={30}
+                    className=''
+                  />
+                </div>
+                <div></div>
+              </CardContent>
+            </Card> */}
+          </div>
+        </div>
+      </div>
+
+      {/* bđs for you */}
     </>
   );
 }
