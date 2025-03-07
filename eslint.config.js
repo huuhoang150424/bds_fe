@@ -1,12 +1,11 @@
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import ts from '@typescript-eslint/parser'; 
-import tsConfig from '@typescript-eslint/eslint-plugin'; 
+import ts from '@typescript-eslint/parser';
+import tsConfig from '@typescript-eslint/eslint-plugin';
 
 export default [
   { ignores: ['dist'] },
-  // Cấu hình chính
   {
     languageOptions: {
       ecmaVersion: 2020,
@@ -19,11 +18,8 @@ export default [
       '@typescript-eslint': tsConfig,
     },
     rules: {
-      'no-unused-vars': 'off', // Tắt quy tắc no-unused-vars của ESLint
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { 'vars': 'all', 'varsIgnorePattern': '^_', 'argsIgnorePattern': '^_' },
-      ], // Tắt cảnh báo cho import không sử dụng bắt đầu với dấu _
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
@@ -36,19 +32,17 @@ export default [
       },
     },
   },
-
-  // Các cấu hình bổ sung cho React
   {
     files: ['**/*.tsx', '**/*.ts'],
     languageOptions: {
       parser: ts,
       globals: {
         ...globals.browser,
-        React: true, // Biến React có sẵn
+        React: true,
       },
     },
     rules: {
-      'react/react-in-jsx-scope': 'off', // Không cần thiết trong React 17+
+      'react/react-in-jsx-scope': 'off',
       'react-refresh/only-export-components': 'off',
     },
   },

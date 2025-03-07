@@ -11,9 +11,9 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuthModal } from '@/context/auth-modal';
 
 
 const menuItemsSell = [
@@ -59,6 +59,8 @@ const menuItemsProject = [
 const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
 
 function Header() {
+  const { openModal } = useAuthModal();
+
   const [isShow, setIsShow] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -95,47 +97,18 @@ function Header() {
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
                 Nhà bán đất
               </a>
-
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                <li className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán căn hộ chung cư</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán chung cư mini, căn hộ dịch vụ</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán nhà riêng</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán nhà biệt thự, liền kề</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán nhà mặt phố</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán shophouse, nhà phố thương mại</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán đất nền dự án</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán đất</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán trang trại, khu nghỉ dưỡng</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán condotel</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán kho, nhà xưởng</a>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Bán loại bất động sản khác</a>
-                </li>
+                {
+                  menuItemsSell.map((item)=>{
+                    return (
+                      <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
+                      <a href='#'>{item}</a>
+                    </li>
+                    )
+                  })
+                }
               </ul>
             </li>
-
             <li className='relative mr-[30px] group text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
                 Nhà đất cho thuê
@@ -194,17 +167,16 @@ function Header() {
           </ul>
         </div>
       </div>
-
       <div className=' flex items-center hidden lg:flex'>
         <div className='header__save mr-[15px] '>
           <CiHeart className='text-[24px]' />
         </div>
-        <div className='  hover:bg-[#FAFAFA] p-[5px] rounded-[5px] mr-[10px]  text-[17px]'>
-          <a href='#'>Đăng nhập</a>
-        </div>
-        <div className='  text-[17px] hover:bg-[#FAFAFA] p-[5px] rounded-[5px] mr-[10px]'>
-          <a href='#'>Đăng kí</a>
-        </div>
+        <Button onClick={() => openModal('login')} variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+          Đăng nhập
+        </Button>
+        <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+          Đăng ký
+        </Button>
         <Button variant={'outline'} className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '>
           <a href='#' className='py-[30px]'>
             Đăng tin
