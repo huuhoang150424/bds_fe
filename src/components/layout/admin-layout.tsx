@@ -25,7 +25,7 @@ const LayoutContent: React.FC = () => {
           <Outlet />
         </div>
       </div>
-    </div>
+      </div>
   );
 };
 
