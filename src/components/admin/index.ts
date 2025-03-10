@@ -1,14 +1,12 @@
-import  Header  from '@/components/admin/Header';
-import  Body  from '@/components/admin/NoResult';
-import  SideBar  from '@/components/admin/SideBar';
-import Tables  from '@/components/admin/Tables';
-import Paginator  from '@/components/admin/Paginator';
-import Ckeditor  from '@/components/admin/Ckeditor';
+import Header from '@/components/admin/header';
+import  NoResult  from '@/components/admin/no-result';
+import Ckeditor  from '@/components/admin/ckeditor';
+import Sidebar  from '@/components/admin/sidebar';
+
+
 export {
+  NoResult,
+  Ckeditor,
   Header,
-  Body,
-  SideBar,
-  Tables,
-  Paginator,
-  Ckeditor
+  Sidebar
 }
