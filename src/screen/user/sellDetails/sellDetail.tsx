@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
 import { PiBellRingingLight } from 'react-icons/pi';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Car } from 'lucide-react';
@@ -11,10 +12,179 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TbPhoneRinging } from 'react-icons/tb';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@radix-ui/react-hover-card';
 import { CiHeart } from 'react-icons/ci';
+import { CiSearch } from 'react-icons/ci';
+import { FaAngleRight, FaChevronDown } from 'react-icons/fa';
+import { CiFilter } from 'react-icons/ci';
+import { X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { MdKeyboardArrowDown } from 'react-icons/md';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { MultiSelect } from '@/components/user/multi-selector';
+import { Cat, Dog, Fish, Rabbit, Turtle } from 'lucide-react';
+import Map from '@/screen/user/sellDetails/components/Map';
+
+const allCities = [
+  'An Giang',
+  'Bà Rịa Vũng Tàu',
+  'Bắc Giang',
+  'Bắc Kạn',
+  'Bạc Liêu',
+  'Bắc Ninh',
+  'Bến Tre',
+  'Bình Định',
+  'Bình Dương',
+  'Bình Phước',
+  'Bình Thuận',
+  'Cà Mau',
+  'Cần Thơ',
+  'Cao Bằng',
+  'Đà Nẵng',
+  'Đắk Lắk',
+  'Đắk Nông',
+  'Điện Biên',
+  'Đồng Nai',
+  'Đồng Tháp',
+  'Gia Lai',
+  'Hà Giang',
+  'Hà Nam',
+  'Hà Nội',
+  'Hà Tĩnh',
+  'Hải Dương',
+  'Hải Phòng',
+  'Hậu Giang',
+  'Hòa Bình',
+  'Hưng Yên',
+  'Khánh Hòa',
+  'Kiên Giang',
+  'Kon Tum',
+  'Lai Châu',
+  'Lâm Đồng',
+  'Lạng Sơn',
+  'Lào Cai',
+  'Long An',
+  'Nam Định',
+  'Nghệ An',
+  'Ninh Bình',
+  'Ninh Thuận',
+  'Phú Thọ',
+  'Phú Yên',
+  'Quảng Bình',
+  'Quảng Nam',
+  'Quảng Ngãi',
+  'Quảng Ninh',
+  'Quảng Trị',
+  'Sóc Trăng',
+  'Sơn La',
+  'Tây Ninh',
+  'Thái Bình',
+  'Thái Nguyên',
+  'Thanh Hóa',
+  'Thừa Thiên Huế',
+  'Tiền Giang',
+  'TP Hồ Chí Minh',
+  'Trà Vinh',
+  'Tuyên Quang',
+  'Vĩnh Long',
+  'Vĩnh Phúc',
+  'Yên Bái',
+];
+const featuredCities = [
+  {
+    name: 'Hà Nội',
+    image: '/images/hanoi.jpg',
+  },
+  {
+    name: 'Hồ Chí Minh',
+    image: '/images/hochiminh.jpg',
+  },
+  {
+    name: 'Đà Nẵng',
+    image: '/images/danang.jpg',
+  },
+  {
+    name: 'Bình Dương',
+    image: '/images/binhduong.jpg',
+  },
+  {
+    name: 'Đồng Nai',
+    image: '/images/dongnai.jpg',
+  },
+  {
+    name: 'Khánh Hòa',
+    image: '/images/khanhhoa.jpg',
+  },
+];
 function SellDetail() {
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(['nextjs', 'svelte']);
+  const [selectedCity, setSelectedCity] = useState('');
+  const [show, setShow] = useState(false);
   const [showAllCities, setShowAllCities] = useState(false);
   const [searchCity, setSearchCity] = useState('');
+  const [activeButton, setActiveButton] = useState<number | null>(null);
+  const [minArea, setMinArea] = useState('');
+  const [maxArea, setMaxArea] = useState('');
+  const [showAreaFilter, setShowAreaFilter] = useState(false);
+  const [selectedAreaOption, setSelectedAreaOption] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
+  const [showPriceFilter, setShowPriceFilter] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const handlePriceOptionChange = (value: string) => {
+    setSelectedPriceOption(value);
+    switch (value) {
+      case '0-500':
+        setMinPrice('');
+        setMaxPrice('500');
+        break;
+      case '500-800':
+        setMinPrice('500');
+        setMaxPrice('800');
+        break;
+      case '800-1000':
+        setMinPrice('800');
+        setMaxPrice('1000');
+        break;
+      case '1000-2000':
+        setMinPrice('1000');
+        setMaxPrice('2000');
+        break;
+      default:
+        setMinPrice('');
+        setMaxPrice('');
+    }
+  };
 
   const realEstateListings = [
     {
@@ -338,378 +508,767 @@ function SellDetail() {
   ];
 
   const filteredCities = allCities.filter((city) => city.toLowerCase().includes(searchCity.toLowerCase()));
+  const areaOptions = [
+    { value: 'all', label: 'Tất cả diện tích' },
+    { value: '0-30', label: 'Dưới 30 m²' },
+    { value: '30-50', label: '30 - 50 m²' },
+    { value: '50-80', label: '50 - 80 m²' },
+    { value: '80-100', label: '80 - 100 m²' },
+  ];
+
+  const priceOptions = [
+    { value: 'all', label: 'Tất cả mức giá' },
+    { value: '0-500', label: 'Dưới 500 triệu' },
+    { value: '500-800', label: '500 - 800 triệu' },
+    { value: '800-1000', label: '800 triệu - 1 tỷ' },
+    { value: '1000-2000', label: '1 - 2 tỷ' },
+  ];
+  const handleAreaOptionChange = (value: string) => {
+    setSelectedAreaOption(value);
+    switch (value) {
+      case '0-30':
+        setMinArea('');
+        setMaxArea('30');
+        break;
+      case '30-50':
+        setMinArea('30');
+        setMaxArea('50');
+        break;
+      case '50-80':
+        setMinArea('50');
+        setMaxArea('80');
+        break;
+      case '80-100':
+        setMinArea('80');
+        setMaxArea('100');
+        break;
+      default:
+        setMinArea('');
+        setMaxArea('');
+    }
+  };
 
   return (
-    <>
-      <div className='bg-blue-500 max-w-5xl mx-auto contain-content h-full'>
-        {/* Search */}
-        <div className='search bg-red-500 mb-[60px] h-[200px]'>
-          <p>Search</p>
-        </div>
-        {/* Search */}
-        {/* bài đăng */}
-        <div className='flex  '>
-          <div className='post w-[75%] p-[15px]'>
-            <div className='post__title '>
-              <h2 className='text-[22px] font-bold'>Mua bán bất động sản trên toàn quốc</h2>
-              <p className='font-[400]'>Hiện có {getSumByCity()} bất động sản trên toàn quốc</p>
-            </div>
-            <div className='fillter'></div>
-            <div className='post__detail flex flex-col gap-6 relative'>
-              {realEstateListings.map((realEstateListing) => (
-                <Card key={realEstateListing.id} className='overflow-hidden hover:shadow-lg transition-shadow'>
-                  <CardContent className='p-6'>
-                    {/* Grid ảnh */}
-                    <div className='grid grid-cols-5 grid-rows-2 gap-2 h-[250px]'>
-                      {/* Ảnh lớn bên trái */}
-                      <div className='col-span-3 row-span-2  relative rounded-l-lg overflow-hidden'>
-                        <img
-                          src={realEstateListing.images[0]}
-                          alt={realEstateListing.title}
-                          className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                        />
-                      </div>
+    <div className='pt-[80px]'>
+      <div className={cn('flex w-full', showMap ? 'h-[calc(100vh-80px)]' : '')}>
+        <div className={cn('flex flex-col transition-all duration-300', showMap ? 'w-1/2' : 'w-full')}>
+          <div className={cn('', showMap ? 'w-full' : 'max-w-7xl mx-auto w-full')}>
+            <div className='search bg-white rounded-lg w-full'>
+              <div className='px-4 py-6'>
+                <div className='flex flex-col md:flex-row md:items-center mb-[20px] gap-4'>
+                  <div className='flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-[#F2F2F2] p-[10px] rounded-[5px]'>
+                    <div className='relative flex-1'>
+                      <input
+                        type='text'
+                        placeholder='Đường Nguyễn Thị Minh Khai'
+                        className='w-full h-[52px] px-4 pl-10 border-none bg-[#F2F2F2] focus:outline-none focus:border-[#E03C31] text-gray-700'
+                      />
+                      <CiSearch className='h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
+                    </div>
 
-                      {/* Ảnh lớn bên phải trên */}
-                      <div className='col-span-2 col-start-4 relative overflow-hidden'>
-                        <img
-                          src={realEstateListing.images[1]}
-                          alt={realEstateListing.title}
-                          className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                        />
-                      </div>
-
-                      {/* Hai ảnh nhỏ bên phải dưới */}
-                      <div className='col-start-4 row-start-2 relative overflow-hidden'>
-                        <img
-                          src={realEstateListing.images[2]}
-                          alt={realEstateListing.title}
-                          className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                        />
-                      </div>
-
-                      <div className='col-start-5 row-start-2 relative overflow-hidden rounded-br-lg'>
-                        <img
-                          src={realEstateListing.images[3]}
-                          alt={realEstateListing.title}
-                          className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                        />
-                        {realEstateListing.images.length > 4 && (
-                          <div className='absolute inset-0 bg-black/50 flex items-center justify-center'>
-                            <span className='text-white text-lg font-medium'>
-                              +{realEstateListing.images.length - 4}
-                            </span>
+                    <div className='relative min-w-[200px] flex items-center bg-[#F2F2F2]'>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant='outline'
+                            className='w-full h-[52px] justify-between bg-[#F2F2F2] text-gray-600 border-none'
+                          >
+                            <div className='flex items-center gap-2'>
+                              <IoLocationOutline className='w-4 h-4' />
+                              <span className='truncate'>{selectedCity || 'Hồ Chí Minh'}</span>
+                            </div>
+                            <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-[90vw] md:w-[746px] p-0' align='start'>
+                          <div className='grid'>
+                            <div className='p-4'>
+                              <h4 className='font-medium mb-2 text-sm text-gray-500'>Top tỉnh thành nổi bật</h4>
+                              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2'>
+                                {featuredCities.map((city) => (
+                                  <div
+                                    key={city.name}
+                                    className='relative h-[70px] rounded-lg overflow-hidden cursor-pointer group'
+                                    onClick={() => {
+                                      setSelectedCity(city.name);
+                                      setShow(false);
+                                    }}
+                                  >
+                                    <img src={city.image} alt={city.name} className='w-full h-full object-cover' />
+                                    <div className='absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all'>
+                                      <span className='absolute bottom-2 left-2 text-white font-medium text-sm'>
+                                        {city.name}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className='border-t'>
+                              <div className='p-4'>
+                                <h4 className='font-medium mb-1 text-sm text-gray-500'>Tất cả tỉnh thành</h4>
+                                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6'>
+                                  {allCities.map((city) => (
+                                    <div
+                                      key={city}
+                                      className='py-[3px] px-3 hover:bg-gray-100 cursor-pointer rounded text-[13px] text-black'
+                                      onClick={() => {
+                                        setSelectedCity(city);
+                                        setShow(false);
+                                      }}
+                                    >
+                                      {city}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                      </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
 
-                    {/* Thông tin bất động sản */}
-                    <div className='mt-4 space-y-2'>
-                      <h3 className='text-xl font-semibold hover:text-[#E03C31] cursor-pointer transition-colors'>
-                        {realEstateListing.title}
-                      </h3>
-                      <div className='flex items-center gap-2 text-gray-600'>
-                        <IoLocationOutline className='h-5 w-5' />
-                        <span>{realEstateListing.location}</span>
-                      </div>
-                      <div className='flex items-center justify-start gap-4'>
-                        <div className='flex items-center gap-4'>
-                          <span className='text-[#E03C31] font-semibold text-lg'>
-                            {realEstateListing.details.price}
-                          </span>
-                          <span className='flex items-center gap-1 text-gray-600'>
-                            <LuExpand />
-                            {realEstateListing.area}
-                          </span>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <span className='flex items-center gap-1 text-gray-600'>
-                            <IoBedOutline className='h-5 w-5' />
-                            {realEstateListing.details.bedrooms}
-                          </span>
-                          <span className='flex items-center gap-1 text-gray-600'>
-                            <PiBathtubLight className='h-5 w-5' />
-                            {realEstateListing.details.bathrooms}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <button className='w-full sm:w-auto h-[52px] bg-[#E03C31] px-[8px] text-white rounded-lg hover:bg-[#d02e23] transition-colors font-medium text-[14px]'>
+                      Tìm kiếm
+                    </button>
+                  </div>
 
-                    {/* infor poster */}
-                    <div className='infor mt-[15px] flex items-center gap-2 justify-between'>
-                      <div className='flex items-center gap-2'>
-                        <div className='image__poster '>
-                          <Avatar>
-                            <AvatarImage
-                              src='https://th.bing.com/th?id=OIP.5z3tSnN6TDMrwyp7C_55_QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2'
-                              alt='@shadcn'
+                  <div className='w-full md:w-[15%] h-[52px]'>
+                    <Button 
+                      className={cn(
+                        'w-full h-full flex items-center justify-center gap-2 rounded-lg font-medium transition-all',
+                        showMap 
+                          ? 'bg-gray-200 hover:bg-gray-300 text-gray-700' 
+                          : 'bg-[#009BA1] hover:bg-[#1DBABF] text-white'
+                      )}
+                      onClick={() => setShowMap(!showMap)}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="20" 
+                        height="20" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                        <line x1="8" y1="2" x2="8" y2="18" />
+                        <line x1="16" y1="6" x2="16" y2="22" />
+                      </svg>
+                      <span className='hidden sm:inline'>{showMap ? 'Ẩn bản đồ' : 'Xem bản đồ'}</span>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 w-full sm:w-[80%]'>
+                  <div className='filter__area flex-1 sm:flex-initial'>
+                    <Select>
+                      <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Toàn quốc' />
+                      </SelectTrigger>
+                      <SelectContent className='flex-col gap-1 p-[15px]'>
+                        <Select>
+                          <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Chọn theo thành phố/tỉnh thành' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Fruits</SelectLabel>
+                              <SelectItem value='apple'>Apple</SelectItem>
+                              <SelectItem value='banana'>Banana</SelectItem>
+                              <SelectItem value='blueberry'>Blueberry</SelectItem>
+                              <SelectItem value='grapes'>Grapes</SelectItem>
+                              <SelectItem value='pineapple'>Pineapple</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <div className='py-[5px]'></div>
+                        <Select>
+                          <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Chọn theo thành phố/tỉnh thành' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Fruits</SelectLabel>
+                              <SelectItem value='apple'>Apple</SelectItem>
+                              <SelectItem value='banana'>Banana</SelectItem>
+                              <SelectItem value='blueberry'>Blueberry</SelectItem>
+                              <SelectItem value='grapes'>Grapes</SelectItem>
+                              <SelectItem value='pineapple'>Pineapple</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <div className='py-[5px]'></div>
+                        <Select>
+                          <SelectTrigger className='w-[180px] '>
+                            <SelectValue placeholder='Chọn theo thành phố/tỉnh thành' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Fruits</SelectLabel>
+                              <SelectItem value='apple'>Apple</SelectItem>
+                              <SelectItem value='banana'>Banana</SelectItem>
+                              <SelectItem value='blueberry'>Blueberry</SelectItem>
+                              <SelectItem value='grapes'>Grapes</SelectItem>
+                              <SelectItem value='pineapple'>Pineapple</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <div className='py-[5px]'></div>
+                        <Select>
+                          <SelectTrigger className='w-[180px]'>
+                            <SelectValue placeholder='Chọn theo thành phố/tỉnh thành' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Fruits</SelectLabel>
+                              <SelectItem value='apple'>Apple</SelectItem>
+                              <SelectItem value='banana'>Banana</SelectItem>
+                              <SelectItem value='blueberry'>Blueberry</SelectItem>
+                              <SelectItem value='grapes'>Grapes</SelectItem>
+                              <SelectItem value='pineapple'>Pineapple</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <div className='flex items-center gap-1 mt-4'>
+                          <Button className='w-[30%] bg-[#fff] text-black hover:bg-[#fff]'>Đặt lại</Button>
+                          <Button className='w-[70%] bg-[#E03C31]'>Áp dụng</Button>
+                        </div>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Popover open={showAreaFilter} onOpenChange={setShowAreaFilter}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border'
+                      >
+                        <span className='text-sm truncate'>Diện tích</span>
+                        <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
+                      <div className='p-4'>
+                        <div className='flex items-center justify-between mb-4'>
+                          <h4 className='font-medium text-base'>Diện tích</h4>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-6 w-6'
+                            onClick={() => setShowAreaFilter(false)}
+                          >
+                            <X className='h-4 w-4' />
+                          </Button>
+                        </div>
+
+                        <div className='mb-6'>
+                          <div className='flex justify-between mb-2'>
+                            <span className='text-sm font-medium'>Diện tích nhỏ nhất</span>
+                            <span className='text-sm font-medium'>Diện tích lớn nhất</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <Input
+                              type='text'
+                              placeholder='Từ'
+                              value={minArea}
+                              onChange={(e) => setMinArea(e.target.value)}
+                              className='flex-1'
                             />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
+                            <span>→</span>
+                            <Input
+                              type='text'
+                              placeholder='Đến'
+                              value={maxArea}
+                              onChange={(e) => setMaxArea(e.target.value)}
+                              className='flex-1'
+                            />
+                          </div>
+                          <div className='mt-4'>
+                            <Slider
+                              defaultValue={[0, 100]}
+                              max={100}
+                              step={5}
+                              value={[parseInt(minArea || '0'), parseInt(maxArea || '100')]}
+                              onValueChange={(value) => {
+                                setMinArea(value[0].toString());
+                                setMaxArea(value[1].toString());
+                                setSelectedAreaOption('');
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className='poster__detail'>
-                          <p className='text-[10px] font-[600]'>{realEstateListing.poster.name}</p>
+
+                        <RadioGroup
+                          value={selectedAreaOption}
+                          onValueChange={handleAreaOptionChange}
+                          className='space-y-2'
+                        >
+                          {areaOptions.map((option) => (
+                            <div key={option.value} className='flex items-center space-x-2'>
+                              <RadioGroupItem
+                                value={option.value}
+                                id={option.value}
+                                className='text-[#00B4D8] border-[#00B4D8]'
+                              />
+                              <label htmlFor={option.value} className='text-sm'>
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+
+                        <div className='flex gap-2 mt-4 border-t pt-4'>
+                          <Button
+                            variant='outline'
+                            className='flex-1'
+                            onClick={() => {
+                              setMinArea('');
+                              setMaxArea('');
+                              setSelectedAreaOption('all');
+                            }}
+                          >
+                            Đặt lại
+                          </Button>
+                          <Button
+                            className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
+                            onClick={() => setShowAreaFilter(false)}
+                          >
+                            Áp dụng
+                          </Button>
                         </div>
                       </div>
-                      <div className='flex items-center gap-4'>
-                        {/* Nút gọi điện */}
-                        <button className='flex items-center gap-2 bg-[#E03C31] text-white px-4 py-2 rounded-lg hover:bg-[#d02e23] transition-colors'>
-                          <TbPhoneRinging className='text-xl' />
-                          <span>{realEstateListing.poster.phone}</span>
-                        </button>
+                    </PopoverContent>
+                  </Popover>
+                  <Popover open={showPriceFilter} onOpenChange={setShowPriceFilter}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border'
+                      >
+                        <span className='text-sm truncate'>Mức giá</span>
+                        <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
+                      <div className='p-4'>
+                        <div className='flex items-center justify-between mb-4'>
+                          <h4 className='font-medium text-base'>Mức giá</h4>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-6 w-6'
+                            onClick={() => setShowPriceFilter(false)}
+                          >
+                            <X className='h-4 w-4' />
+                          </Button>
+                        </div>
 
-                        {/* Nút lưu tin với HoverCard */}
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <button className='p-2 border border-gray-200 rounded-lg hover:border-[#E03C31] hover:text-[#E03C31] transition-colors'>
-                              <CiHeart className='text-xl' />
-                            </button>
-                          </HoverCardTrigger>
-                          <HoverCardContent className='w-fit p-3 bg-white rounded-lg shadow-lg border border-gray-200'>
-                            <div className='text-sm text-gray-600'>Bấm để lưu tin</div>
-                          </HoverCardContent>
-                        </HoverCard>
+                        <div className='mb-6'>
+                          <div className='flex justify-between mb-2'>
+                            <span className='text-sm font-medium'>Giá thấp nhất</span>
+                            <span className='text-sm font-medium'>Giá cao nhất</span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <Input
+                              type='text'
+                              placeholder='Từ'
+                              value={minPrice}
+                              onChange={(e) => setMinPrice(e.target.value)}
+                              className='flex-1'
+                            />
+                            <span>→</span>
+                            <Input
+                              type='text'
+                              placeholder='Đến'
+                              value={maxPrice}
+                              onChange={(e) => setMaxPrice(e.target.value)}
+                              className='flex-1'
+                            />
+                          </div>
+                          <div className='mt-4'>
+                            <Slider
+                              defaultValue={[0, 2000]}
+                              max={2000}
+                              step={100}
+                              value={[parseInt(minPrice || '0'), parseInt(maxPrice || '2000')]}
+                              onValueChange={(value) => {
+                                setMinPrice(value[0].toString());
+                                setMaxPrice(value[1].toString());
+                                setSelectedPriceOption('');
+                              }}
+                              className='[&_.bg-\[\#EF4444\]]:bg-[#00B4D8]'
+                            />
+                          </div>
+                        </div>
+
+                        <RadioGroup
+                          value={selectedPriceOption}
+                          onValueChange={handlePriceOptionChange}
+                          className='space-y-2'
+                        >
+                          {priceOptions.map((option) => (
+                            <div key={option.value} className='flex items-center space-x-2'>
+                              <RadioGroupItem
+                                value={option.value}
+                                id={option.value}
+                                className='text-[#00B4D8] border-[#00B4D8]'
+                              />
+                              <label htmlFor={option.value} className='text-sm'>
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+
+                        <div className='flex gap-2 mt-4 border-t pt-4'>
+                          <Button
+                            variant='outline'
+                            className='flex-1'
+                            onClick={() => {
+                              setMinPrice('');
+                              setMaxPrice('');
+                              setSelectedPriceOption('all');
+                            }}
+                          >
+                            Đặt lại
+                          </Button>
+                          <Button
+                            className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
+                            onClick={() => setShowPriceFilter(false)}
+                          >
+                            Áp dụng
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* infor poster */}
-                  </CardContent>
-                </Card>
-              ))}
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </div>
           </div>
-          <div className='fill w-[25%] p-[15px] bg-gray-500'>
-            {/* Phần lọc diện tích */}
-            <div className='bg-white rounded-lg shadow-sm p-4'>
-              <h3 className='text-lg font-semibold mb-[10px]'>Lọc theo diện tích</h3>
+          <div className={cn(
+            'flex flex-col lg:flex-row flex-1 overflow-hidden',
+            showMap ? 'w-full' : 'max-w-7xl mx-auto w-full'
+          )}>
+            <div className='post w-full lg:w-[75%] p-[15px] overflow-y-auto'>
+              <div className='post__title mb-[30px]'>
+                <h2 className='text-[22px] font-[650] mb-[10px]'>Mua bán bất động sản trên toàn quốc</h2>
+                <p className='font-[400] text-[14px] text-sm'>Hiện có {getSumByCity()} bất động sản trên toàn quốc</p>
+              </div>
+              <div className='post__detail flex flex-col gap-6'>
+                {realEstateListings.map((realEstateListing) => (
+                  <Card
+                    key={realEstateListing.id}
+                    className='overflow-hidden hover:shadow-lg transition-shadow border rounded-[5px] shadow-sm'
+                  >
+                    <CardContent className='p-6'>
+                      <div className='grid grid-cols-5 grid-rows-2 gap-2 h-[250px]'>
+                        <div className='col-span-3 row-span-2  relative rounded-l-lg overflow-hidden'>
+                          <img
+                            src={realEstateListing.images[0]}
+                            alt={realEstateListing.title}
+                            className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                          />
+                        </div>
 
-              <div className='space-y-2'>
-                {[
-                  { label: 'Dưới 30 m²', value: '0-30' },
-                  { label: '30 - 50 m²', value: '30-50' },
-                  { label: '50 - 80 m²', value: '50-80' },
-                  { label: '80 - 100 m²', value: '80-100' },
-                  { label: '100 - 150 m²', value: '100-150' },
-                  { label: '150 - 200 m²', value: '150-200' },
-                  { label: '200 - 250 m²', value: '200-250' },
-                  { label: '250 - 300 m²', value: '250-300' },
-                  { label: '300 - 500 m²', value: '300-500' },
-                  { label: 'Trên 500 m²', value: '500-999999' },
-                ].map((item) => (
-                  <div className='flex flex-col group cursor-pointer' key={item.value}>
-                    <span className='text-gray-700 group-hover:text-[#E03C31] transition-colors'>{item.label}</span>
-                  </div>
+                        <div className='col-span-2 col-start-4 relative overflow-hidden'>
+                          <img
+                            src={realEstateListing.images[1]}
+                            alt={realEstateListing.title}
+                            className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                          />
+                        </div>
+
+                        <div className='col-start-4 row-start-2 relative overflow-hidden'>
+                          <img
+                            src={realEstateListing.images[2]}
+                            alt={realEstateListing.title}
+                            className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                          />
+                        </div>
+
+                        <div className='col-start-5 row-start-2 relative overflow-hidden rounded-br-lg'>
+                          <img
+                            src={realEstateListing.images[3]}
+                            alt={realEstateListing.title}
+                            className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                          />
+                          {realEstateListing.images.length > 4 && (
+                            <div className='absolute inset-0 bg-black/50 flex items-center justify-center'>
+                              <span className='text-white text-lg font-medium'>
+                                +{realEstateListing.images.length - 4}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className='mt-4 space-y-2'>
+                        <h3 className='text-xl font-semibold hover:text-[#E03C31] cursor-pointer transition-colors'>
+                          {realEstateListing.title}
+                        </h3>
+                        <div className='flex items-center gap-2 text-gray-600'>
+                          <IoLocationOutline className='h-5 w-5' />
+                          <span>{realEstateListing.location}</span>
+                        </div>
+                        <div className='flex items-center justify-start gap-4'>
+                          <div className='flex items-center gap-4'>
+                            <span className='text-[#E03C31] font-semibold text-lg'>
+                              {realEstateListing.details.price}
+                            </span>
+                            <span className='flex items-center gap-1 text-gray-600'>
+                              <LuExpand />
+                              {realEstateListing.area}
+                            </span>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <span className='flex items-center gap-1 text-gray-600'>
+                              <IoBedOutline className='h-5 w-5' />
+                              {realEstateListing.details.bedrooms}
+                            </span>
+                            <span className='flex items-center gap-1 text-gray-600'>
+                              <PiBathtubLight className='h-5 w-5' />
+                              {realEstateListing.details.bathrooms}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='infor mt-[15px] flex items-center gap-2 justify-between'>
+                        <div className='flex items-center gap-2'>
+                          <div className='image__poster '>
+                            <Avatar>
+                              <AvatarImage
+                                src='https://th.bing.com/th?id=OIP.5z3tSnN6TDMrwyp7C_55_QHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2'
+                                alt='@shadcn'
+                              />
+                              <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                          </div>
+                          <div className='poster__detail'>
+                            <p className='text-[10px] font-[600]'>{realEstateListing.poster.name}</p>
+                          </div>
+                        </div>
+                        <div className='flex items-center gap-4'>
+                          <button className='flex items-center gap-2 bg-[#E03C31] text-white px-4 py-2 rounded-lg hover:bg-[#d02e23] transition-colors'>
+                            <TbPhoneRinging className='text-xl' />
+                            <span>{realEstateListing.poster.phone}</span>
+                          </button>
+
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <button className='p-2 border border-gray-200 rounded-lg hover:border-[#E03C31] hover:text-[#E03C31] transition-colors'>
+                                <CiHeart className='text-xl' />
+                              </button>
+                            </HoverCardTrigger>
+                            <HoverCardContent className='w-fit p-3 bg-white rounded-lg shadow-lg border border-gray-200'>
+                              <div className='text-sm text-gray-600'>Bấm để lưu tin</div>
+                            </HoverCardContent>
+                          </HoverCard>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </div>
+            <div className='fill w-full lg:w-[25%] p-[15px] overflow-y-auto'>
+              <div className='bg-white rounded-lg shadow-sm p-4 border border-gray-200'>
+                <h3 className='text-lg font-semibold mb-[10px]'>Lọc theo diện tích</h3>
 
-            {/* Phần lọc khoảng giá */}
-            <div className='bg-white rounded-lg shadow-sm p-4 mt-4'>
-              <h3 className='text-lg font-semibold mb-[10px]'>Lọc theo khoảng giá</h3>
-
-              <div className='space-y-2'>
-                {[
-                  { label: 'Thỏa thuận', value: 'negotiable' },
-                  { label: 'Dưới 500 triệu', value: '0-500000000' },
-                  { label: '500 - 800 triệu', value: '500000000-800000000' },
-                  { label: '800 triệu - 1 tỷ', value: '800000000-1000000000' },
-                  { label: '1 - 2 tỷ', value: '1000000000-2000000000' },
-                  { label: '2 - 3 tỷ', value: '2000000000-3000000000' },
-                  { label: '3 - 5 tỷ', value: '3000000000-5000000000' },
-                  { label: '5 - 7 tỷ', value: '5000000000-7000000000' },
-                  { label: '7 - 10 tỷ', value: '7000000000-10000000000' },
-                  { label: '10 - 20 tỷ', value: '10000000000-20000000000' },
-                  { label: '20 - 30 tỷ', value: '20000000000-30000000000' },
-                  { label: '30 - 40 tỷ', value: '30000000000-40000000000' },
-                  { label: '40 - 60 tỷ', value: '40000000000-60000000000' },
-                  { label: 'Trên 60 tỷ', value: '60000000000-999999999999' },
-                ].map((item) => (
-                  <div
-                    key={item.value}
-                    className='flex items-center justify-between  hover:bg-gray-50 rounded-md cursor-pointer group'
-                  >
-                    <span className='text-gray-700 text-sm group-hover:text-[#E03C31] transition-colors'>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Phần lọc theo thành phố */}
-            <div className='bg-white rounded-lg shadow-sm p-4 mt-4'>
-              <h3 className='text-lg font-semibold mb-[10px]'>Mua bán nhà đất</h3>
-
-              {/* Tìm kiếm thành phố */}
-              <div className='mb-4'>
-                <div className='relative'>
-                  <input
-                    type='text'
-                    placeholder='Tìm kiếm tỉnh thành...'
-                    className='w-full px-3 py-2 pl-9 border border-gray-300 rounded-md focus:outline-none focus:border-[#E03C31] text-sm'
-                    value={searchCity}
-                    onChange={(e) => setSearchCity(e.target.value)}
-                  />
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    className='h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-                    />
-                  </svg>
+                <div className='space-y-2'>
+                  {[
+                    { label: 'Dưới 30 m²', value: '0-30' },
+                    { label: '30 - 50 m²', value: '30-50' },
+                    { label: '50 - 80 m²', value: '50-80' },
+                    { label: '80 - 100 m²', value: '80-100' },
+                    { label: '100 - 150 m²', value: '100-150' },
+                    { label: '150 - 200 m²', value: '150-200' },
+                    { label: '200 - 250 m²', value: '200-250' },
+                    { label: '250 - 300 m²', value: '250-300' },
+                    { label: '300 - 500 m²', value: '300-500' },
+                    { label: 'Trên 500 m²', value: '500-999999' },
+                  ].map((item) => (
+                    <div className='flex flex-col group cursor-pointer' key={item.value}>
+                      <span className='text-gray-700 group-hover:text-[#E03C31] transition-colors'>{item.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className='space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar'>
-                {/* Danh sách các thành phố */}
-                {(searchCity ? filteredCities : showAllCities ? allCities : allCities.slice(0, 10)).map((city) => (
-                  <div
-                    key={city}
-                    className='flex items-center justify-between py-1.5  hover:bg-gray-50 rounded-md cursor-pointer group'
-                  >
-                    <span className='text-gray-700 text-sm group-hover:text-[#E03C31] transition-colors'>{city}</span>
-                    <span className='text-xs text-gray-500'>
-                      {/* Giả lập số lượng BĐS cho mỗi thành phố */}({Math.floor(Math.random() * 1000 + 100)})
-                    </span>
-                  </div>
-                ))}
+              <div className='bg-white rounded-lg shadow-sm p-4 mt-4 border border-gray-200'>
+                <h3 className='text-lg font-semibold mb-[10px]'>Lọc theo khoảng giá</h3>
 
-                {/* Nút xem thêm - chỉ hiển thị khi không có tìm kiếm */}
-                {!searchCity && !showAllCities && (
-                  <div className='pt-2'>
-                    <button
-                      className='text-[#E03C31] text-sm hover:underline flex items-center gap-1'
-                      onClick={() => setShowAllCities(true)}
+                <div className='space-y-2 '>
+                  {[
+                    { label: 'Thỏa thuận', value: 'negotiable' },
+                    { label: 'Dưới 500 triệu', value: '0-500000000' },
+                    { label: '500 - 800 triệu', value: '500000000-800000000' },
+                    { label: '800 triệu - 1 tỷ', value: '800000000-1000000000' },
+                    { label: '1 - 2 tỷ', value: '1000000000-2000000000' },
+                    { label: '2 - 3 tỷ', value: '2000000000-3000000000' },
+                    { label: '3 - 5 tỷ', value: '3000000000-5000000000' },
+                    { label: '5 - 7 tỷ', value: '5000000000-7000000000' },
+                    { label: '7 - 10 tỷ', value: '7000000000-10000000000' },
+                    { label: '10 - 20 tỷ', value: '10000000000-20000000000' },
+                    { label: '20 - 30 tỷ', value: '20000000000-30000000000' },
+                    { label: '30 - 40 tỷ', value: '30000000000-40000000000' },
+                    { label: '40 - 60 tỷ', value: '40000000000-60000000000' },
+                    { label: 'Trên 60 tỷ', value: '60000000000-999999999999' },
+                  ].map((item) => (
+                    <div
+                      key={item.value}
+                      className='flex items-center justify-between  hover:bg-gray-50 rounded-md cursor-pointer group'
                     >
-                      Xem thêm
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='h-4 w-4'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        stroke='currentColor'
-                      >
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-
-                {/* Nút thu gọn - chỉ hiển thị khi đang xem tất cả và không có tìm kiếm */}
-                {!searchCity && showAllCities && (
-                  <div className='pt-2'>
-                    <button
-                      className='text-[#E03C31] text-sm hover:underline flex items-center gap-1'
-                      onClick={() => setShowAllCities(false)}
-                    >
-                      Thu gọn
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='h-4 w-4 transform rotate-180'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        stroke='currentColor'
-                      >
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Bài viết được quan tâm */}
-            <div className='bg-white rounded-lg shadow-sm p-4 mt-4'>
-              <h3 className='text-lg font-semibold mb-[10px]'>Bài viết được quan tâm</h3>
-
-              <div className='space-y-3'>
-                {[
-                  {
-                    id: 1,
-                    title: 'Trọn Bộ Lãi Suất Vay Mua Nhà Mới Nhất Tháng 2/2025',
-                  },
-                  {
-                    id: 2,
-                    title: 'Toàn Cảnh Thị Trường Bất Động Sản Tháng 12/2024',
-                  },
-                  {
-                    id: 3,
-                    title: 'Bình Chánh Tỏa Sáng Trên Bản Đồ Phát Triển Đô Thị',
-                  },
-                  {
-                    id: 4,
-                    title: 'Thị Trường Chung Cư Hà Nội Vắng Bóng Nhà Đầu Tư',
-                  },
-                  {
-                    id: 5,
-                    title: 'Bình Dương Đối Đầu Nguồn Cung Dự Án Mới Trong Quý 1/2025',
-                  },
-                ].map((article, index) => (
-                  <div key={article.id} className='flex items-center group cursor-pointer'>
-                    <h4 className='text-sm text-gray-700 group-hover:text-[#E03C31] transition-colors line-clamp-2'>
-                      {article.title}
-                    </h4>
-                  </div>
-                ))}
+                      <span className='text-gray-700 text-sm group-hover:text-[#E03C31] transition-colors'>
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Nút xem thêm */}
-              <div className='mt-4 text-center'>
-                <button
-                  className='text-[#E03C31] text-sm hover:underline inline-flex items-center gap-1'
-                  onClick={() => {
-                    // Xử lý logic chuyển đến trang tin tức
-                    console.log('Chuyển đến trang tin tức');
-                  }}
-                >
-                  Xem tất cả tin tức
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    className='h-4 w-4'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
+              <div className='bg-white rounded-lg shadow-sm p-4 mt-4 border border-gray-200'>
+                <h3 className='text-lg font-semibold mb-[10px]'>Mua bán nhà đất</h3>
+
+                <div className='mb-4'>
+                  <div className='relative'>
+                    <input
+                      type='text'
+                      placeholder='Tìm kiếm tỉnh thành...'
+                      className='w-full px-3 py-2 pl-9 border border-gray-300 rounded-md focus:outline-none focus:border-[#E03C31] text-sm'
+                      value={searchCity}
+                      onChange={(e) => setSearchCity(e.target.value)}
+                    />
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <div className='space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar '>
+                  {(searchCity ? filteredCities : showAllCities ? allCities : allCities.slice(0, 10)).map((city) => (
+                    <div
+                      key={city}
+                      className='flex items-center justify-between py-1.5  hover:bg-gray-50 rounded-md cursor-pointer group'
+                    >
+                      <span className='text-gray-700 text-sm group-hover:text-[#E03C31] transition-colors'>{city}</span>
+                    </div>
+                  ))}
+
+                  {!searchCity && !showAllCities && (
+                    <div className='pt-2'>
+                      <button
+                        className='text-[#E03C31] text-sm hover:underline flex items-center gap-1'
+                        onClick={() => setShowAllCities(true)}
+                      >
+                        Xem thêm
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-4 w-4'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                        >
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {!searchCity && showAllCities && (
+                    <div className='pt-2'>
+                      <button
+                        className='text-[#E03C31] text-sm hover:underline flex items-center gap-1'
+                        onClick={() => setShowAllCities(false)}
+                      >
+                        Thu gọn
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-4 w-4 transform rotate-180'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                        >
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className='bg-white rounded-lg shadow-sm p-4 mt-4 border border-gray-200'>
+                <h3 className='text-lg font-semibold mb-[10px]'>Bài viết được quan tâm</h3>
+
+                <div className='space-y-3'>
+                  {[
+                    {
+                      id: 1,
+                      title: 'Trọn Bộ Lãi Suất Vay Mua Nhà Mới Nhất Tháng 2/2025',
+                    },
+                    {
+                      id: 2,
+                      title: 'Toàn Cảnh Thị Trường Bất Động Sản Tháng 12/2024',
+                    },
+                    {
+                      id: 3,
+                      title: 'Bình Chánh Tỏa Sáng Trên Bản Đồ Phát Triển Đô Thị',
+                    },
+                    {
+                      id: 4,
+                      title: 'Thị Trường Chung Cư Hà Nội Vắng Bóng Nhà Đầu Tư',
+                    },
+                    {
+                      id: 5,
+                      title: 'Bình Dương Đối Đầu Nguồn Cung Dự Án Mới Trong Quý 1/2025',
+                    },
+                  ].map((article, index) => (
+                    <div key={article.id} className='flex items-center group cursor-pointer border-b pb-2'>
+                      <h4 className='text-sm text-gray-700 group-hover:text-[#E03C31] transition-colors line-clamp-2'>
+                        {article.title}
+                      </h4>
+                    </div>
+                  ))}
+                </div>
+
+                <div className='mt-4 text-center'>
+                  <button
+                    className='text-[#E03C31] text-sm hover:underline inline-flex items-center gap-1'
+                    onClick={() => {
+                      console.log('Chuyển đến trang tin tức');
+                    }}
                   >
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-                  </svg>
-                </button>
+                    Xem tất cả tin tức
+                    <FaAngleRight />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* bài đăng */}
+        {showMap && (
+          <div className='w-full md:w-1/2 bg-white h-[calc(100vh-80px)]'>
+            <Map />
+          </div>
+        )}
       </div>
-
-      {/* Thêm style cho custom scrollbar */}
-      {/* <style jsx global="true">{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 2px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 2px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-      `}</style> */}
-    </>
+    </div>
   );
 }
 
