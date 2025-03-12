@@ -1,4 +1,4 @@
-import  { useEffect } from 'react';
+import { useEffect } from 'react';
 import CustomImage from '../common/images';
 import { CiHeart } from 'react-icons/ci';
 import { Button } from '@/components/ui/button';
@@ -6,16 +6,34 @@ import { FaBarsStaggered } from 'react-icons/fa6';
 import { useState } from 'react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import { MdKeyboardArrowUp } from 'react-icons/md';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthModal } from '@/context/auth-modal';
+import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess, selectUser } from '@/redux/authReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { cn } from '@/lib/utils';
+import { PiBellRinging } from 'react-icons/pi';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { IoChevronDownOutline } from 'react-icons/io5';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { BsCheckAll } from 'react-icons/bs';
 
-
+import {
+  FaUser,
+  FaLock,
+  FaSignOutAlt,
+  FaClipboardList,
+  FaUsers,
+  FaWallet,
+  FaGift,
+  FaMoneyBillWave,
+} from 'react-icons/fa';
+import { MdDashboard, MdManageAccounts } from 'react-icons/md';
+import { IoMailOutline, IoNotificationsOutline } from 'react-icons/io5';
+import { MdOutlineSettings } from 'react-icons/md';
+import { Label } from 'recharts';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -60,10 +78,14 @@ const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
 
 function Header() {
   const { openModal } = useAuthModal();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+  console.log(user?.fullname);
 
   const [isShow, setIsShow] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+  const [read, setRead] = useState(false);
 
   const toggleMenu = (menu: string) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
@@ -75,21 +97,27 @@ function Header() {
     } else {
       setHeightHeader(false);
     }
-  }
+  };
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
-
-
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
-    <header className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md fixed z-[100] transition-all duration-300 ease-in-out `}>
+    <header
+      className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md fixed z-[100] transition-all duration-300 ease-in-out `}
+    >
       <div className='flex items-center '>
         <div className=''>
-          <CustomImage src='../../../public/logo.svg' alt='Placeholder Image' width={40} height={40} className='rounded-lg mr-[30px] ' />
+          <CustomImage
+            src='../../../public/logo.svg'
+            alt='Placeholder Image'
+            width={40}
+            height={40}
+            className='rounded-lg mr-[30px] '
+          />
         </div>
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
@@ -98,15 +126,13 @@ function Header() {
                 Nhà bán đất
               </a>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                {
-                  menuItemsSell.map((item)=>{
-                    return (
-                      <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
+                {menuItemsSell.map((item) => {
+                  return (
+                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
                       <a href='#'>{item}</a>
                     </li>
-                    )
-                  })
-                }
+                  );
+                })}
               </ul>
             </li>
             <li className='relative mr-[30px] group text-[16px]'>
@@ -114,15 +140,13 @@ function Header() {
                 Nhà đất cho thuê
               </a>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                {
-                  menuItemsSell.map((item)=>{
-                    return (
-                      <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
+                {menuItemsSell.map((item) => {
+                  return (
+                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
                       <a href='#'>{item}</a>
                     </li>
-                    )
-                  })
-                }
+                  );
+                })}
               </ul>
             </li>
             <li className='relative mr-[30px] group text-[16px]'>
@@ -130,15 +154,13 @@ function Header() {
                 Dự án
               </a>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                {
-                  menuItemsRent.map((item) => {
-                    return (
-                      <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
-                        <a href='#'>{item}</a>
-                      </li>
-                    )
-                  })
-                }
+                {menuItemsRent.map((item) => {
+                  return (
+                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
+                      <a href='#'>{item}</a>
+                    </li>
+                  );
+                })}
               </ul>
             </li>
             <li className='mr-[30px] text-[16px]'>
@@ -168,16 +190,163 @@ function Header() {
         </div>
       </div>
       <div className=' flex items-center hidden lg:flex'>
-        <div className='header__save mr-[15px] '>
-          <CiHeart className='text-[24px]' />
+        <div className='header__save mr-[30px] '>
+          <Popover>
+            <PopoverTrigger className='p-0 m-0'>
+              <CiHeart className='text-[24px]' />
+            </PopoverTrigger>
+            <PopoverContent className='z-[100] mt-[10px] w-[350px]'>
+              <div className=''>
+                <span className='flex justify-center text-[16px] font-bold'>Tin đăng đã lưu</span>
+                <div className='w-full border border-gray-100 my-[15px]'></div>
+                <div className='flex justify-center'>
+                  <img
+                    className='h-[100px] flex justify-center'
+                    src='https://th.bing.com/th/id/OIP.ANM1SjqLEqA6dNmd5lzuNwHaHa?rs=1&pid=ImgDetMain'
+                    alt='save'
+                  />
+                </div>
+                <div className='flex items-center gap-1 justify-center'>
+                  bấm <CiHeart /> để lưu tin
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
-        <Button onClick={() => openModal('login')} variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-          Đăng nhập
-        </Button>
-        <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-          Đăng ký
-        </Button>
-        <Button variant={'outline'} className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '>
+        <div className={cn(isAuthenticated === true ? 'hidden' : 'display')}>
+          <Button
+            onClick={() => openModal('login')}
+            variant={'outline'}
+            className='px-[12px] border-none shadow-none text-[16px] font-[400]  '
+          >
+            Đăng nhập
+          </Button>
+          <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+            Đăng ký
+          </Button>
+        </div>
+        {isAuthenticated && (
+          <div className='flex items-center gap-[30px] mr-[30px]'>
+            <Popover>
+              <PopoverTrigger>
+                <PiBellRinging className='text-[22px]' />
+              </PopoverTrigger>
+              <PopoverContent className='z-[100] w-[500px] mt-[10px]'>
+                <div className='flex items-center justify-between mb-[10px]'>
+                  <span>Thông báo</span>
+                  <div className='flex items-center space-x-2'>
+                    <Switch id='airplane-mode' />
+                    <label htmlFor='airplane-mode'>Chưa đọc</label>
+                    <HoverCard>
+                      <HoverCardTrigger>
+                        <div className='text-[24px]'>
+                          <BsCheckAll
+                            className={cn(read === true ? 'opacity-20' : 'font-bold')}
+                            onClick={() => setRead(!read)}
+                          />
+                        </div>
+                      </HoverCardTrigger>
+                      <HoverCardContent>Đánh dấu tất cả đã đọc thông báo</HoverCardContent>
+                    </HoverCard>
+                  </div>
+                </div>
+                <div className='border border-gray-100 w-full flex justify-center'></div>
+                <div>
+                  <Tabs defaultValue='account' className='w-[500px] '>
+                    <TabsList className='bg-[#fff]'>
+                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='account'>
+                        Tất cả
+                      </TabsTrigger>
+                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
+                        Tin đăng
+                      </TabsTrigger>
+                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
+                        Tài chính
+                      </TabsTrigger>
+                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
+                        Khuyến mãi
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value='account'>Make changes to your account here.</TabsContent>
+                    <TabsContent value='password'>Change your password here.</TabsContent>
+                  </Tabs>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <HoverCard>
+              <HoverCardTrigger>
+                <div className='avt flex items-center gap-[10px] relative'>
+                  <div>
+                    <Avatar>
+                      <AvatarImage src={user?.avatar} alt='@shadcn' />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <span>{user?.fullname}</span>
+                  <IoChevronDownOutline />
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className='p-0  rounded-[10px]'>
+                <div className='w-[300px]  h-[500px]'>
+                  <div className='image relative w-full '>
+                    <img
+                      className='rounded-t-[10px] h-[150px] w-full'
+                      src='https://th.bing.com/th/id/OIP.BzaY5GKh3hFvshHMlpabxAHaEj?rs=1&pid=ImgDetMain'
+                      alt=' nền '
+                    />
+                    <div className='title absolute top-[30px] left-[45px] text-[#fff]'>
+                      <h3 className='text-[24px] font-bold '>Gói hội viên</h3>
+                      <span className='text-[16px] font-[500]'>Tiết kiệm đến 39%</span>
+                      <Button className='bg-[#E03C31] hover:bg-[#FF837A] mt-[5px]'>Tìm hiểu thêm</Button>
+                    </div>
+                    <div className='h-full w-full  text-white h-screen py-2 text-black'>
+                      {/* Menu Items */}
+                      <ul className='sidebar-menu text-black'>
+                        <div className='hover:bg-[#F2F2F2]'>
+                          <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                            <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
+                          </li>
+                        </div>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaClipboardList /> <span>Quản lý tin đăng</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaGift /> <span>Gói hội viên</span>{' '}
+                          <span className='badge text-[12px] text-[#E03C31]'>-39%</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaUsers /> <span>Quản lý khách hàng</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaWallet /> <span>Quản lý tin tài trợ</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <MdManageAccounts /> <span>Thay đổi thông tin cá nhân</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaLock /> <span>Thay đổi mật khẩu</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaUsers /> <span>Môi giới chuyên nghiệp</span>
+                        </li>
+                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaMoneyBillWave /> <span>Nạp tiền</span>
+                        </li>
+                        <li className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
+                          <FaSignOutAlt /> <span>Đăng xuất</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+        )}
+        <Button
+          variant={'outline'}
+          className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '
+        >
           <a href='#' className='py-[30px]'>
             Đăng tin
           </a>
@@ -186,14 +355,13 @@ function Header() {
       <div className='lg:hidden lg:ml-[15px] flex justify-end absolute right-[50px]'>
         <Sheet>
           <SheetTrigger asChild>
-            <Button className='bg-[#fff] text-black hover:bg-[#fff] border-none' >
+            <Button className='bg-[#fff] text-black hover:bg-[#fff] border-none'>
               <FaBarsStaggered />
             </Button>
           </SheetTrigger>
           <SheetContent className='z-[99999] w-[50%] '>
             <SheetHeader>
-              <SheetDescription>
-              </SheetDescription>
+              <SheetDescription></SheetDescription>
             </SheetHeader>
             <div className='flex flex-col items-start p-5 space-y-4 mt-10'>
               <div className='flex justify-start  w-full'>

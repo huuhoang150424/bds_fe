@@ -16,8 +16,8 @@ export default function MainRouter() {
         
 
         <Route element={<MainLayout />}>
-          <Route path='/sd' element={<Home />} />
-          <Route path='/' element={<SellDetail/>} />
+          <Route path='/' element={<Home />} />
+          <Route path='/sd' element={<SellDetail/>} />
         </Route>
 
       </Routes>
