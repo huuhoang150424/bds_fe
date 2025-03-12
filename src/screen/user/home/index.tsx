@@ -762,7 +762,7 @@ function Home() {
             <div className='search__content bg-black/60 z-[99] transition-opacity duration-30 py-[30px] px-[15px]'>
               <div className='flex flex-col md:flex-row gap-2'>
                 <div className='relative w-full md:w-auto'>
-                  <Popover>
+              <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant='outline'
@@ -771,7 +771,7 @@ function Home() {
                         <div className='flex items-center gap-2'>
                           <IoLocationOutline className='w-4 h-4' />
                           <span className='truncate'>{selectedCity || 'Hồ Chí Minh'}</span>
-                        </div>
+                  </div>
                         <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
                       </Button>
                     </PopoverTrigger>
@@ -823,7 +823,7 @@ function Home() {
                   </Popover>
                 </div>
                 <div className='flex relative w-full bg-white rounded-[5px]'>
-                  <Input
+                    <Input
                     className='block w-full p-[15px] border-none'
                     placeholder='Nhập tối đa 5 địa điểm, dự án.'
                     value={searchQuery}
@@ -862,7 +862,7 @@ function Home() {
                         >
                           <X className='h-4 w-4' />
                         </Button>
-                      </div>
+                    </div>
                       <div className='space-y-3'>
                         {propertyTypes.map((type) => (
                           <div key={type.id} className='flex items-center space-x-2'>
@@ -878,9 +878,9 @@ function Home() {
                               {type.icon && <span className='mr-2'>{type.icon}</span>}
                               {type.label}
                             </label>
-                          </div>
+                  </div>
                         ))}
-                      </div>
+                </div>
                       <div className='flex gap-2 mt-4 border-t pt-4'>
                         <Button
                           variant='outline'
@@ -901,7 +901,7 @@ function Home() {
                       </div>
                     </div>
                   </PopoverContent>
-                </Popover>
+              </Popover>
 
                 <Popover open={showPriceFilter} onOpenChange={setShowPriceFilter}>
                   <PopoverTrigger asChild>
@@ -925,13 +925,13 @@ function Home() {
                         >
                           <X className='h-4 w-4' />
                         </Button>
-                      </div>
+            </div>
 
                       <div className='mb-6'>
                         <div className='flex justify-between mb-2'>
                           <span className='text-sm font-medium'>Giá thấp nhất</span>
                           <span className='text-sm font-medium'>Giá cao nhất</span>
-                        </div>
+          </div>
                         <div className='flex items-center gap-2'>
                           <Input
                             type='text'
@@ -1128,8 +1128,8 @@ function Home() {
                   activeNewsTab === 'highlight' ? 'border-red-500 text-red-500' : 'border-transparent',
                 )}
               >
-                Tin nổi bật
-              </TabsTrigger>
+              Tin nổi bật
+            </TabsTrigger>
               <TabsTrigger
                 value='news'
                 className={cn(
@@ -1181,10 +1181,10 @@ function Home() {
                   {newsByTab[activeNewsTab][0].description && (
                     <p className='text-gray-600 mt-2 text-sm line-clamp-2'>{newsByTab[activeNewsTab][0].description}</p>
                   )}
-                </CardContent>
-              </Card>
+            </CardContent>
+          </Card>
 
-              <div className='space-y-3'>
+          <div className='space-y-3'>
                 {newsByTab[activeNewsTab].slice(1).map((item: NewsItem, index: number) => (
                   <div
                     key={index}
@@ -1192,10 +1192,10 @@ function Home() {
                   >
                     <h4 className='text-sm font-semibold hover:text-red-500 transition-colors'>{item.title}</h4>
                     <p className='text-gray-500 text-xs flex items-center mt-1'>⏳ {item.time}</p>
-                  </div>
-                ))}
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
           </TabsContent>
         </Tabs>
 
