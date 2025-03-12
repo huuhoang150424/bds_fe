@@ -5,7 +5,12 @@ interface User {
   id: number;
   fullname: string;
   email: string;
-  avatar: string
+  avatar: string;
+  roles: string;
+  phone: string;
+  balance:number;
+  score:number;
+
 }
 
 interface AuthState {

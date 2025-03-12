@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { BsCheckAll } from 'react-icons/bs';
+import { AiFillDashboard } from "react-icons/ai";
 import {
   FaLock,
   FaSignOutAlt,
@@ -31,7 +32,8 @@ import { MdDashboard, MdManageAccounts } from 'react-icons/md';
 import { AppDispatch } from '@/redux/store';
 import { handleApi } from '@/service';
 import { toast } from '@/hooks/use-toast';
-import { Loading, LoadingSpinner } from '../common';
+import { Loading } from '../common';
+import { Link } from 'react-router-dom';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -129,9 +131,8 @@ function Header() {
           className='absolute w-full mt-[400px] '
         /> ) : ( null )
       }
-
       <div className='flex items-center '>
-        <div className=''>
+        <Link to={'/'}>
           <CustomImage
             src='../../../public/logo.svg'
             alt='Placeholder Image'
@@ -139,7 +140,7 @@ function Header() {
             height={40}
             className='rounded-lg mr-[30px] '
           />
-        </div>
+        </Link>
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
             <li className='relative group mr-[30px] text-[16px]'>
@@ -296,7 +297,7 @@ function Header() {
                 </div>
               </HoverCardTrigger>
               <HoverCardContent className='p-0  rounded-[10px]'>
-                <div className='w-[300px]  h-[500px]'>
+                <div className='w-[300px]  h-[540px]'>
                   <div className='image relative w-full '>
                     <img
                       className='rounded-t-[10px] h-[150px] w-full'
@@ -308,9 +309,9 @@ function Header() {
                       <span className='text-[16px] font-[500]'>Tiết kiệm đến 39%</span>
                       <Button className='bg-[#E03C31] hover:bg-[#FF837A] mt-[5px]'>Tìm hiểu thêm</Button>
                     </div>
-                    <div className='h-full w-full  text-white h-screen py-2 text-black'>
+                    <div className='h-full w-full  py-2 '>
                       {/* Menu Items */ }
-                      <ul className='sidebar-menu text-black cursor-pointer '>
+                      <ul className=' text-black cursor-pointer '>
                         <div className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                             <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
@@ -341,7 +342,14 @@ function Header() {
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaMoneyBillWave /> <span>Nạp tiền</span>
                         </li>
-                        <li onClick={handleLogout}  className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
+                        {
+                          user?.roles === 'Admin' ? ( <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                            <Link to={'/admin/dashboard'} className='flex gap-[10px] items-center '>
+                              <AiFillDashboard /> <span>Quản trị</span>
+                            </Link>
+                          </li> ) : ( null )
+                        }
+                        <li onClick={ handleLogout } className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaSignOutAlt /> <span>Đăng xuất</span>
                         </li>
                       </ul>
