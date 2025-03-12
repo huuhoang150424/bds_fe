@@ -8,20 +8,17 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthModal } from '@/context/auth-modal';
-import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess, selectUser } from '@/redux/authReducer';
+import {  logout, selectIsAuthenticated, selectUser } from '@/redux/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '@/lib/utils';
 import { PiBellRinging } from 'react-icons/pi';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { IoChevronDownOutline } from 'react-icons/io5';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { BsCheckAll } from 'react-icons/bs';
-
 import {
-  FaUser,
   FaLock,
   FaSignOutAlt,
   FaClipboardList,
@@ -31,9 +28,10 @@ import {
   FaMoneyBillWave,
 } from 'react-icons/fa';
 import { MdDashboard, MdManageAccounts } from 'react-icons/md';
-import { IoMailOutline, IoNotificationsOutline } from 'react-icons/io5';
-import { MdOutlineSettings } from 'react-icons/md';
-import { Label } from 'recharts';
+import { AppDispatch } from '@/redux/store';
+import { handleApi } from '@/service';
+import { toast } from '@/hooks/use-toast';
+import { Loading, LoadingSpinner } from '../common';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -78,13 +76,11 @@ const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
 
 function Header() {
   const { openModal } = useAuthModal();
-
+  const dispatch=useDispatch<AppDispatch>();
   const user=useSelector(selectUser);
   const isAuthenticated=useSelector(selectIsAuthenticated);
-
-  console.log(user?.fullname);
-
   const [isShow, setIsShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const [read, setRead] = useState(false);
@@ -107,11 +103,33 @@ function Header() {
     }
   }, [])
 
-
+  const handleLogout=async()=>{
+    setLoading(true);
+    try {
+      console.log("check")
+      const res = await handleApi('/auth/logout', null, 'POST');
+      console.log(res)
+      toast({
+        variant: 'success',
+        title: res.data.message
+      })
+      dispatch(logout());
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <header
       className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md fixed z-[100] transition-all duration-300 ease-in-out `}
     >
+      {
+        loading ? ( <Loading
+          className='absolute w-full mt-[400px] '
+        /> ) : ( null )
+      }
+
       <div className='flex items-center '>
         <div className=''>
           <CustomImage
@@ -292,7 +310,7 @@ function Header() {
                     </div>
                     <div className='h-full w-full  text-white h-screen py-2 text-black'>
                       {/* Menu Items */ }
-                      <ul className='sidebar-menu text-black'>
+                      <ul className='sidebar-menu text-black cursor-pointer '>
                         <div className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                             <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
@@ -323,7 +341,7 @@ function Header() {
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaMoneyBillWave /> <span>Nạp tiền</span>
                         </li>
-                        <li onClick={()=>{}} className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
+                        <li onClick={handleLogout}  className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaSignOutAlt /> <span>Đăng xuất</span>
                         </li>
                       </ul>
