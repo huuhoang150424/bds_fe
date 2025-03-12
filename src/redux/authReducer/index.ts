@@ -3,8 +3,14 @@ import { loginAuth } from '../action/auth'
 
 interface User {
   id: number;
-  name: string;
+  fullname: string;
   email: string;
+  avatar: string;
+  roles: string;
+  phone: string;
+  balance:number;
+  score:number;
+
 }
 
 interface AuthState {
@@ -53,7 +59,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loginAuth.pending, (state) => {
-        console.log('Login pending'); 
         state.loading = true;
       })
       .addCase(loginAuth.fulfilled, (state, action: PayloadAction<{  message: string; data: any }>) => {

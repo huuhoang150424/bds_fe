@@ -8,20 +8,18 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthModal } from '@/context/auth-modal';
-import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess, selectUser } from '@/redux/authReducer';
+import {  logout, selectIsAuthenticated, selectUser } from '@/redux/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '@/lib/utils';
 import { PiBellRinging } from 'react-icons/pi';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { IoChevronDownOutline } from 'react-icons/io5';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { BsCheckAll } from 'react-icons/bs';
-
+import { AiFillDashboard } from "react-icons/ai";
 import {
-  FaUser,
   FaLock,
   FaSignOutAlt,
   FaClipboardList,
@@ -31,9 +29,11 @@ import {
   FaMoneyBillWave,
 } from 'react-icons/fa';
 import { MdDashboard, MdManageAccounts } from 'react-icons/md';
-import { IoMailOutline, IoNotificationsOutline } from 'react-icons/io5';
-import { MdOutlineSettings } from 'react-icons/md';
-import { Label } from 'recharts';
+import { AppDispatch } from '@/redux/store';
+import { handleApi } from '@/service';
+import { toast } from '@/hooks/use-toast';
+import { Loading } from '../common';
+import { Link } from 'react-router-dom';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -78,11 +78,11 @@ const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
 
 function Header() {
   const { openModal } = useAuthModal();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const user = useSelector(selectUser);
-  console.log(user?.fullname);
-
+  const dispatch=useDispatch<AppDispatch>();
+  const user=useSelector(selectUser);
+  const isAuthenticated=useSelector(selectIsAuthenticated);
   const [isShow, setIsShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const [read, setRead] = useState(false);
@@ -101,16 +101,38 @@ function Header() {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
+  const handleLogout=async()=>{
+    setLoading(true);
+    try {
+      console.log("check")
+      const res = await handleApi('/auth/logout', null, 'POST');
+      console.log(res)
+      toast({
+        variant: 'success',
+        title: res.data.message
+      })
+      dispatch(logout());
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <header
       className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md fixed z-[100] transition-all duration-300 ease-in-out `}
     >
+      {
+        loading ? ( <Loading
+          className='absolute w-full mt-[400px] '
+        /> ) : ( null )
+      }
       <div className='flex items-center '>
-        <div className=''>
+        <Link to={'/'}>
           <CustomImage
             src='../../../public/logo.svg'
             alt='Placeholder Image'
@@ -118,7 +140,7 @@ function Header() {
             height={40}
             className='rounded-lg mr-[30px] '
           />
-        </div>
+        </Link>
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
             <li className='relative group mr-[30px] text-[16px]'>
@@ -189,47 +211,34 @@ function Header() {
           </ul>
         </div>
       </div>
-      <div className=' flex items-center hidden lg:flex'>
-        <div className='header__save mr-[30px] '>
-          <Popover>
-            <PopoverTrigger className='p-0 m-0'>
-              <CiHeart className='text-[24px]' />
-            </PopoverTrigger>
-            <PopoverContent className='z-[100] mt-[10px] w-[350px]'>
-              <div className=''>
-                <span className='flex justify-center text-[16px] font-bold'>Tin đăng đã lưu</span>
-                <div className='w-full border border-gray-100 my-[15px]'></div>
-                <div className='flex justify-center'>
-                  <img
-                    className='h-[100px] flex justify-center'
-                    src='https://th.bing.com/th/id/OIP.ANM1SjqLEqA6dNmd5lzuNwHaHa?rs=1&pid=ImgDetMain'
-                    alt='save'
-                  />
-                </div>
-                <div className='flex items-center gap-1 justify-center'>
-                  bấm <CiHeart /> để lưu tin
-                </div>
+      <div className=' flex items-center lg:flex'>
+        <Popover >
+          <PopoverTrigger >
+            <CiHeart size={ 22 } className='mr-[20px] ' />
+          </PopoverTrigger>
+          <PopoverContent className='z-[100] mt-[10px] w-[350px]'>
+            <div className=''>
+              <span className='flex justify-center text-[16px] font-bold'>Tin đăng đã lưu</span>
+              <div className='w-full border border-gray-100 my-[15px]'></div>
+              <div className='flex justify-center'>
+                <img
+                  className='h-[100px] flex justify-center'
+                  src='https://th.bing.com/th/id/OIP.ANM1SjqLEqA6dNmd5lzuNwHaHa?rs=1&pid=ImgDetMain'
+                  alt='save'
+                />
               </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className={cn(isAuthenticated === true ? 'hidden' : 'display')}>
-          <Button
-            onClick={() => openModal('login')}
-            variant={'outline'}
-            className='px-[12px] border-none shadow-none text-[16px] font-[400]  '
-          >
-            Đăng nhập
-          </Button>
-          <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-            Đăng ký
-          </Button>
-        </div>
-        {isAuthenticated && (
-          <div className='flex items-center gap-[30px] mr-[30px]'>
+              <div className='flex items-center gap-1 justify-center'>
+                bấm <CiHeart /> để lưu tin
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        { isAuthenticated ? (
+          <div className='flex items-center gap-[20px] mr-[15px]'>
             <Popover>
               <PopoverTrigger>
-                <PiBellRinging className='text-[22px]' />
+                <PiBellRinging size={ 22 } />
               </PopoverTrigger>
               <PopoverContent className='z-[100] w-[500px] mt-[10px]'>
                 <div className='flex items-center justify-between mb-[10px]'>
@@ -241,8 +250,8 @@ function Header() {
                       <HoverCardTrigger>
                         <div className='text-[24px]'>
                           <BsCheckAll
-                            className={cn(read === true ? 'opacity-20' : 'font-bold')}
-                            onClick={() => setRead(!read)}
+                            className={ cn( read === true ? 'opacity-20' : 'font-bold' ) }
+                            onClick={ () => setRead( !read ) }
                           />
                         </div>
                       </HoverCardTrigger>
@@ -277,17 +286,18 @@ function Header() {
               <HoverCardTrigger>
                 <div className='avt flex items-center gap-[10px] relative'>
                   <div>
-                    <Avatar>
-                      <AvatarImage src={user?.avatar} alt='@shadcn' />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
+                    <CustomImage
+                      src={ user?.avatar }
+                      alt='user'
+                      className='w-[30px] h-[30px] rounded-[50%] border border-gray-200 '
+                    />
                   </div>
-                  <span>{user?.fullname}</span>
-                  <IoChevronDownOutline />
+                  <span className='text-gray-800 text-[15px] '>{ user?.fullname }</span>
+                  <IoChevronDownOutline size={ 18 } className='text-gray-500 ' />
                 </div>
               </HoverCardTrigger>
               <HoverCardContent className='p-0  rounded-[10px]'>
-                <div className='w-[300px]  h-[500px]'>
+                <div className='w-[300px]  h-[540px]'>
                   <div className='image relative w-full '>
                     <img
                       className='rounded-t-[10px] h-[150px] w-full'
@@ -299,9 +309,9 @@ function Header() {
                       <span className='text-[16px] font-[500]'>Tiết kiệm đến 39%</span>
                       <Button className='bg-[#E03C31] hover:bg-[#FF837A] mt-[5px]'>Tìm hiểu thêm</Button>
                     </div>
-                    <div className='h-full w-full  text-white h-screen py-2 text-black'>
-                      {/* Menu Items */}
-                      <ul className='sidebar-menu text-black'>
+                    <div className='h-full w-full  py-2 '>
+                      {/* Menu Items */ }
+                      <ul className=' text-black cursor-pointer '>
                         <div className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                             <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
@@ -311,7 +321,7 @@ function Header() {
                           <FaClipboardList /> <span>Quản lý tin đăng</span>
                         </li>
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaGift /> <span>Gói hội viên</span>{' '}
+                          <FaGift /> <span>Gói hội viên</span>{ ' ' }
                           <span className='badge text-[12px] text-[#E03C31]'>-39%</span>
                         </li>
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
@@ -332,7 +342,14 @@ function Header() {
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaMoneyBillWave /> <span>Nạp tiền</span>
                         </li>
-                        <li className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
+                        {
+                          user?.roles === 'Admin' ? ( <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
+                            <Link to={'/admin/dashboard'} className='flex gap-[10px] items-center '>
+                              <AiFillDashboard /> <span>Quản trị</span>
+                            </Link>
+                          </li> ) : ( null )
+                        }
+                        <li onClick={ handleLogout } className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaSignOutAlt /> <span>Đăng xuất</span>
                         </li>
                       </ul>
@@ -342,9 +359,22 @@ function Header() {
               </HoverCardContent>
             </HoverCard>
           </div>
-        )}
+        ) : ( <div >
+          <Button
+            onClick={ () => openModal( 'login' ) }
+            variant={ 'outline' }
+            className='px-[12px] border-none shadow-none text-[16px] font-[400]  '
+          >
+            Đăng nhập
+          </Button>
+          <Button variant={ 'outline' } className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+            Đăng ký
+          </Button>
+        </div>
+        )
+        }
         <Button
-          variant={'outline'}
+          variant={ 'outline' }
           className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '
         >
           <a href='#' className='py-[30px]'>

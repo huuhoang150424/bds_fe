@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 interface CustomImageProps {
-  src: string;
-  alt: string;
+  src?: string;
+  alt?: string;
   width?: number | string;
   height?: number | string;
   className?: string;

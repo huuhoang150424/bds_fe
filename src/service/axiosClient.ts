@@ -13,7 +13,7 @@ export const axiosClient = axios.create({
 // config interceptors
 const updateAccessToken = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/auth/refresh-token', {
+    const res = await axios.get('http://localhost:3000/auth/refreshToken', {
       withCredentials: true,
     });
     return res.data;
@@ -37,7 +37,7 @@ axiosClient.interceptors.request.use(
           store.dispatch(updateToken({ token: accessToken }));
         }
       }
-      config.headers.token = `Bearer ${accessToken}`;
+      config.headers.authorization = `Bearer ${accessToken}`;
     }
     config.headers.Accept = `application/json`;
     return config;
