@@ -192,67 +192,34 @@ function Header() {
           </ul>
         </div>
       </div>
-      <div className=' flex items-center hidden lg:flex'>
-
-        <div className=' mr-[15px] '>
-          <CiHeart className='text-[24px]' />
-        </div>
-        {
-          isAuthenticated ? (
-          <div className=''>
-            <span className="">{user?.fullname}</span>
-          </div>) : (<div className="">
-            <Button onClick={() => openModal('login')} variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-              Đăng nhập
-            </Button>
-            <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-              Đăng ký
-            </Button>
-          </div>)
-        }
-
-        <Button variant={'outline'} className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '></Button>
-
-        <div className=' mr-[30px] '>
-          <Popover>
-            <PopoverTrigger className='p-0 m-0'>
-              <CiHeart className='text-[24px]' />
-            </PopoverTrigger>
-            <PopoverContent className='z-[100] mt-[10px] w-[350px]'>
-              <div className=''>
-                <span className='flex justify-center text-[16px] font-bold'>Tin đăng đã lưu</span>
-                <div className='w-full border border-gray-100 my-[15px]'></div>
-                <div className='flex justify-center'>
-                  <img
-                    className='h-[100px] flex justify-center'
-                    src='https://th.bing.com/th/id/OIP.ANM1SjqLEqA6dNmd5lzuNwHaHa?rs=1&pid=ImgDetMain'
-                    alt='save'
-                  />
-                </div>
-                <div className='flex items-center gap-1 justify-center'>
-                  bấm <CiHeart /> để lưu tin
-                </div>
+      <div className=' flex items-center lg:flex'>
+        <Popover >
+          <PopoverTrigger >
+            <CiHeart size={ 22 } className='mr-[20px] ' />
+          </PopoverTrigger>
+          <PopoverContent className='z-[100] mt-[10px] w-[350px]'>
+            <div className=''>
+              <span className='flex justify-center text-[16px] font-bold'>Tin đăng đã lưu</span>
+              <div className='w-full border border-gray-100 my-[15px]'></div>
+              <div className='flex justify-center'>
+                <img
+                  className='h-[100px] flex justify-center'
+                  src='https://th.bing.com/th/id/OIP.ANM1SjqLEqA6dNmd5lzuNwHaHa?rs=1&pid=ImgDetMain'
+                  alt='save'
+                />
               </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className={cn(isAuthenticated === true ? 'hidden' : 'display')}>
-          <Button
-            onClick={() => openModal('login')}
-            variant={'outline'}
-            className='px-[12px] border-none shadow-none text-[16px] font-[400]  '
-          >
-            Đăng nhập
-          </Button>
-          <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-            Đăng ký
-          </Button>
-        </div>
-        {isAuthenticated && (
-          <div className='flex items-center gap-[30px] mr-[30px]'>
+              <div className='flex items-center gap-1 justify-center'>
+                bấm <CiHeart /> để lưu tin
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        { isAuthenticated ? (
+          <div className='flex items-center gap-[20px] mr-[15px]'>
             <Popover>
               <PopoverTrigger>
-                <PiBellRinging className='text-[22px]' />
+                <PiBellRinging size={ 22 } />
               </PopoverTrigger>
               <PopoverContent className='z-[100] w-[500px] mt-[10px]'>
                 <div className='flex items-center justify-between mb-[10px]'>
@@ -264,8 +231,8 @@ function Header() {
                       <HoverCardTrigger>
                         <div className='text-[24px]'>
                           <BsCheckAll
-                            className={cn(read === true ? 'opacity-20' : 'font-bold')}
-                            onClick={() => setRead(!read)}
+                            className={ cn( read === true ? 'opacity-20' : 'font-bold' ) }
+                            onClick={ () => setRead( !read ) }
                           />
                         </div>
                       </HoverCardTrigger>
@@ -300,13 +267,14 @@ function Header() {
               <HoverCardTrigger>
                 <div className='avt flex items-center gap-[10px] relative'>
                   <div>
-                    <Avatar>
-                      <AvatarImage src={user?.avatar} alt='@shadcn' />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
+                    <CustomImage
+                      src={ user?.avatar }
+                      alt='user'
+                      className='w-[30px] h-[30px] rounded-[50%] border border-gray-200 '
+                    />
                   </div>
-                  <span>{user?.fullname}</span>
-                  <IoChevronDownOutline />
+                  <span className='text-gray-800 text-[15px] '>{ user?.fullname }</span>
+                  <IoChevronDownOutline size={ 18 } className='text-gray-500 ' />
                 </div>
               </HoverCardTrigger>
               <HoverCardContent className='p-0  rounded-[10px]'>
@@ -323,7 +291,7 @@ function Header() {
                       <Button className='bg-[#E03C31] hover:bg-[#FF837A] mt-[5px]'>Tìm hiểu thêm</Button>
                     </div>
                     <div className='h-full w-full  text-white h-screen py-2 text-black'>
-                      {/* Menu Items */}
+                      {/* Menu Items */ }
                       <ul className='sidebar-menu text-black'>
                         <div className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
@@ -334,7 +302,7 @@ function Header() {
                           <FaClipboardList /> <span>Quản lý tin đăng</span>
                         </li>
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaGift /> <span>Gói hội viên</span>{' '}
+                          <FaGift /> <span>Gói hội viên</span>{ ' ' }
                           <span className='badge text-[12px] text-[#E03C31]'>-39%</span>
                         </li>
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
@@ -355,7 +323,7 @@ function Header() {
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaMoneyBillWave /> <span>Nạp tiền</span>
                         </li>
-                        <li className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
+                        <li onClick={()=>{}} className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaSignOutAlt /> <span>Đăng xuất</span>
                         </li>
                       </ul>
@@ -365,9 +333,22 @@ function Header() {
               </HoverCardContent>
             </HoverCard>
           </div>
-        )}
+        ) : ( <div >
+          <Button
+            onClick={ () => openModal( 'login' ) }
+            variant={ 'outline' }
+            className='px-[12px] border-none shadow-none text-[16px] font-[400]  '
+          >
+            Đăng nhập
+          </Button>
+          <Button variant={ 'outline' } className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+            Đăng ký
+          </Button>
+        </div>
+        )
+        }
         <Button
-          variant={'outline'}
+          variant={ 'outline' }
           className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '
         >
           <a href='#' className='py-[30px]'>
