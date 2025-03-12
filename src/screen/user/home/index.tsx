@@ -20,7 +20,7 @@ import { AiOutlinePicture } from 'react-icons/ai';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess } from '@/redux/authReducer';
+import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess, selectUser } from '@/redux/authReducer';
 import { AppDispatch } from '@/redux/store';
 import { toast } from '@/hooks/use-toast';
 interface NewsItem {
@@ -579,7 +579,7 @@ function Home() {
   const message=useSelector(selectMessage);
   const success=useSelector(selectSuccess);
   const dispatch=useDispatch<AppDispatch>();
-
+  const user=useSelector(selectUser)
   const [show, setShow] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -596,7 +596,7 @@ function Home() {
   const [maxArea, setMaxArea] = useState('');
   const [activeTab, setActiveTab] = useState('nha-dat-ban');
   const [visibleProperties, setVisibleProperties] = useState<number>(8);
-
+  console.log("home",user)
   //show message and delete
   useEffect(()=>{
     if (success) {

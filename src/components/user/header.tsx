@@ -14,6 +14,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useAuthModal } from '@/context/auth-modal';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated, selectUser } from '@/redux/authReducer';
 
 
 const menuItemsSell = [
@@ -60,7 +62,8 @@ const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
 
 function Header() {
   const { openModal } = useAuthModal();
-
+  const user=useSelector(selectUser);
+  const isAuthenticated=useSelector(selectIsAuthenticated);
   const [isShow, setIsShow] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -83,7 +86,7 @@ function Header() {
     }
   }, [])
 
-
+  console.log(user)
 
   return (
     <header className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md fixed z-[100] transition-all duration-300 ease-in-out `}>
@@ -168,15 +171,23 @@ function Header() {
         </div>
       </div>
       <div className=' flex items-center hidden lg:flex'>
-        <div className='header__save mr-[15px] '>
+        <div className=' mr-[15px] '>
           <CiHeart className='text-[24px]' />
         </div>
-        <Button onClick={() => openModal('login')} variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-          Đăng nhập
-        </Button>
-        <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
-          Đăng ký
-        </Button>
+        {
+          isAuthenticated ? (
+          <div className=''>
+            <span className="">{user?.fullname}</span>
+          </div>) : (<div className="">
+            <Button onClick={() => openModal('login')} variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+              Đăng nhập
+            </Button>
+            <Button variant={'outline'} className='px-[12px] border-none shadow-none text-[16px] font-[400]  '>
+              Đăng ký
+            </Button>
+          </div>)
+        }
+
         <Button variant={'outline'} className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '>
           <a href='#' className='py-[30px]'>
             Đăng tin

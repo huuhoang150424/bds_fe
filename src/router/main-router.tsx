@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import {MainLayout } from '@/components/layout';
-import Home from "@/screen/user/home/Home";
+import Home from "@/screen/user/home";
 import { AuthModalProvider } from "@/context/auth-modal";
 
 export default function MainRouter() {
