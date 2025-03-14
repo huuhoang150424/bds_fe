@@ -211,7 +211,7 @@ function Header() {
           </ul>
         </div>
       </div>
-      <div className=' flex items-center lg:flex'>
+      <div className='hidden lg:block flex items-center lg:flex'>
         <Popover >
           <PopoverTrigger >
             <CiHeart size={ 22 } className='mr-[20px] ' />
