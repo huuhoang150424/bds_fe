@@ -164,13 +164,11 @@ const orderNewsByTime = (newsArray: any[]) => {
       new Date(a.date.split(' ')[0].split('/').reverse().join('-') + 'T' + a.date.split(' ')[1]).getTime(),
   );
 };
-console.log(orderNewsByTime(newss));
 
 const orderNewsByView = (newsArray: any[]) => {
   return newsArray.sort((a, b) => b.view - a.view);
 };
 
-console.log(orderNewsByView(newss)[0]);
 const latestNews = orderNewsByTime(newss)[0];
 
 function News() {

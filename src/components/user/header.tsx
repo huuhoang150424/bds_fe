@@ -186,9 +186,9 @@ function Header() {
               </ul>
             </li>
             <li className='mr-[30px] text-[16px]'>
-              <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
+              <Link to={'/new'} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Tin tức
-              </a>
+              </Link>
             </li>
             <li className='mr-[30px] text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
