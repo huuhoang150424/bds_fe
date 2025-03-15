@@ -21,7 +21,7 @@ const LayoutContent: React.FC = () =>
           } ${ isMobileOpen ? "ml-0" : "" }` }
       >
         <Header />
-        <div className="p-4 mx-auto max-w-screen-2xl md:p-6  dark:bg-gray-900">
+        <div className="p-4 mx-auto md:p-6  dark:bg-gray-900 max-w-[1240px] ">
           <Outlet />
         </div>
       </div>
