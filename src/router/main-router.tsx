@@ -17,10 +17,10 @@ export default function MainRouter() {
     <AuthModalProvider>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path='/x' element={<Home />} />
-          <Route path='/x' element={<SellDetail/>} />
+          <Route path='/d' element={<Home />} />
+          <Route path='/d' element={<SellDetail/>} />
 
-          <Route path='/s' element={<News/>} />
+          <Route path='/d' element={<News/>} />
           <Route path='/' element={<PostDetail/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />

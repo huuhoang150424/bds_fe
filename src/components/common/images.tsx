@@ -8,6 +8,7 @@ interface CustomImageProps {
   className?: string;
   loading?: "lazy" | "eager";
   placeholder?: string; 
+  onClick?: () => void; // Thêm sự kiện onClick
 }
 
 const CustomImage: React.FC<CustomImageProps> = ({
@@ -18,6 +19,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
   className = "",
   loading = "lazy",
   placeholder = "",
+  onClick, // Nhận sự kiện onClick từ props
 }) => {
   const [loaded, setLoaded] = useState(false);
 
@@ -29,6 +31,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
         height: typeof height === "number" ? `${height}px` : height,
         overflow: "hidden",
       }}
+      onClick={onClick} // Gán sự kiện onClick vào div chứa ảnh
     >
       {!loaded && placeholder && (
         <div

@@ -8,6 +8,10 @@ function App() {
   const lastMousePosition = useRef({ x: 0, y: 0 });
   //update Color
 
+  if (typeof global === "undefined") {
+    window.global = window;
+  }
+
   const updateCursorPosition = () => {
     const { x, y } = mousePosition.current;
     if (x !== lastMousePosition.current.x || y !== lastMousePosition.current.y) {
