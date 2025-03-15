@@ -21,7 +21,7 @@ const LayoutContent: React.FC = () =>
           } ${ isMobileOpen ? "ml-0" : "" }` }
       >
         <Header />
-        <div className="p-4 mx-auto md:p-6  dark:bg-gray-900 max-w-[1240px] ">
+        <div className={`p-4 mx-auto md:p-6  dark:bg-gray-900 ${isExpanded ? "max-w-[1240px]":"max-w-[1440px]"}  `}>
           <Outlet />
         </div>
       </div>
