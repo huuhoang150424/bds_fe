@@ -1,3 +1,4 @@
+
 import React, { ReactNode, useState } from 'react';
 import { EmblaOptionsType } from 'embla-carousel';
 import Carousel, {
@@ -40,7 +41,7 @@ import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AiFillLike } from 'react-icons/ai';
-import CommentItem from './components/CommentItem';
+import CommentItem from './components/commentItem';
 
 function PostDetail() {
   const user = useSelector(selectUser);
@@ -499,3 +500,4 @@ function PostDetail() {
 }
 
 export default PostDetail;
+

@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetAuthState, selectIsAuthenticated, selectMessage, selectSuccess, selectUser } from '@/redux/authReducer';
 import { AppDispatch } from '@/redux/store';
 import { toast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 interface NewsItem {
   title: string;
   time: string;
@@ -586,7 +587,6 @@ function Home() {
   const [showPropertyTypes, setShowPropertyTypes] = useState(false);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20]);
   const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
@@ -596,7 +596,6 @@ function Home() {
   const [maxArea, setMaxArea] = useState('');
   const [activeTab, setActiveTab] = useState('nha-dat-ban');
   const [visibleProperties, setVisibleProperties] = useState<number>(8);
-  console.log("home",user)
   //show message and delete
   useEffect(()=>{
     if (success) {
@@ -725,10 +724,10 @@ function Home() {
   return (
     <>
       {/* Banner */}
-      <div className='banner bg-[url(/banner.jpg)] bg-cover bg-center h-[500px] inset-0 w-auto relative'>
-        <div className='banner__content top-[100px] absolute md:left-[20%] lg:left-[20%] left-[5%] text-center w-[90%] md:w-[70%] lg:w-[55%]'>
-          <div className='search w-full'>
-            <div className='search__tab'>
+      <div className=' bg-[url(/banner.jpg)] bg-cover bg-center h-[500px] inset-0 w-auto relative'>
+        <div className=' top-[100px] absolute md:left-[20%] lg:left-[20%] left-[5%] text-center w-[90%] md:w-[70%] lg:w-[55%]'>
+          <div className=' w-full'>
+            <div className=''>
               <ul className='flex flex-wrap justify-start text-[#fff] text-sm md:text-base'>
                 <li
                   className={cn(
@@ -833,7 +832,7 @@ function Home() {
                     className='absolute right-[10px] top-[8px] bg-[#EF4444] hover:bg-[#FF837A]'
                     onClick={handleSearch}
                   >
-                    <span className='hidden md:inline'>Tìm kiếm</span>
+                    <Link to={'/search'} className='hidden md:inline'>Tìm kiếm</Link>
                     <IoIosSearch className='w-4 h-4 md:hidden' />
                   </Button>
                 </div>
