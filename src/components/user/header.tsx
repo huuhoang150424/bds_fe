@@ -312,11 +312,11 @@ function Header() {
                     <div className='h-full w-full  py-2 '>
                       {/* Menu Items */ }
                       <ul className=' text-black cursor-pointer '>
-                        <div className='hover:bg-[#F2F2F2]'>
+                        <Link to={'/agent/dashboard'} className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                             <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
                           </li>
-                        </div>
+                        </Link>
                         <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                           <FaClipboardList /> <span>Quản lý tin đăng</span>
                         </li>
