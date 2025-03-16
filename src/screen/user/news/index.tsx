@@ -164,11 +164,13 @@ const orderNewsByTime = (newsArray: any[]) => {
       new Date(a.date.split(' ')[0].split('/').reverse().join('-') + 'T' + a.date.split(' ')[1]).getTime(),
   );
 };
+console.log(orderNewsByTime(newss));
 
 const orderNewsByView = (newsArray: any[]) => {
   return newsArray.sort((a, b) => b.view - a.view);
 };
 
+console.log(orderNewsByView(newss)[0]);
 const latestNews = orderNewsByTime(newss)[0];
 
 function News() {
@@ -177,153 +179,135 @@ function News() {
     setVisibleProperties((prev) => prev + 3);
   };
   return (
-    <div className='max-w-6xl h-full mx-auto pt-[80px] px-4 md:px-6 lg:px-8'>
+    <div className='max-w-6xl h-full mx-auto pt-[80px]  '>
       {/* Search */}
       <div className='search bg-yellow-500'></div>
-
-      {/* Title Section */}
-      <div className='flex flex-col items-center px-4 md:px-8 lg:px-[210px] py-8 md:py-12 lg:py-[60px]'>
-        <div className='title mb-4 md:mb-[20px] text-center'>
-          <h1 className='font-[500] text-2xl md:text-3xl lg:text-[40px] leading-tight md:leading-[64px]'>
-            Tin tức bất động sản mới nhất
-          </h1>
+      {/* Search */}
+      {/* title */}
+      <div className=' flex flex-col items-center px-[210px] py-[60px]'>
+        <div className='title mb-[20px] '>
+          <h1 className='font-[500] leading-[64px] text-[40px]'>Tin tức bất động sản mới nhất</h1>
         </div>
-        <div className='descrip font-[400] text-sm md:text-base lg:text-[16px] leading-relaxed md:leading-[26px] text-center max-w-3xl'>
+        <div className='descrip font-[400] text-[16px] leading-[26px] center'>
           <p>
             Thông tin mới, đầy đủ, hấp dẫn về thị trường bất động sản Việt Nam thông qua dữ liệu lớn về giá, giao dịch,
             nguồn cung - cầu và khảo sát thực tế của đội ngũ phóng viên, biên tập của Batdongsan.com.vn
           </p>
         </div>
       </div>
+      {/* title */}
 
-      {/* Main News Grid */}
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-4'>
-        <div className='col-span-1 lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-7'>
-          {/* Latest News */}
-          <div className='firstNew relative col-span-1 lg:col-span-8'>
-            <img 
-              src={latestNews.image} 
-              alt='ảnh nền' 
-              className='w-full h-[240px] md:h-[300px] lg:h-[360px] object-cover rounded-lg'
-            />
-            <div className='absolute inset-0 bg-black/30 rounded-lg'></div>
-            <div className='absolute w-full top-[45%] p-4 md:p-6 lg:p-[30px] flex flex-col items-start gap-2'>
-              <div className='flex text-gray-100 text-xs md:text-sm lg:text-[14px] gap-2 font-[400] leading-relaxed'>
+      {/* news */}
+      <div className='grid grid-cols-12 gap-4 '>
+        <div className='col-span-12 grid grid-cols-12 gap-7'>
+          {/* tin mới nhất */}
+          <div className='firstNew relative col-span-8'>
+            <img src={latestNews.image} alt='ảnh nền' className='w-full h-[360px] object-cover' />
+            <div className='absolute inset-0 bg-black/30'></div>
+            <div className='absolute w-full top-[45%] p-[30px] flex flex-col items-start gap-2'>
+              <div className='flex text-gray-100 text-[14px] gap-2 font-[400] leading-[22px]'>
                 <span>{latestNews.date}</span>
                 <span>{latestNews.category}</span>
               </div>
               <div>
-                <span className='font-[500] text-lg md:text-xl lg:text-[24px] leading-tight md:leading-[32px] text-[#fff]'>
-                  {latestNews.title}
-                </span>
+                <span className='font-[500] text-[24px] leading-[32px] text-[#fff]'>{latestNews.title}</span>
               </div>
               <div>
-                <span className='text-sm md:text-base lg:text-[16px] font-[400] leading-relaxed md:leading-[26px] w-full text-[#fff] line-clamp-2 md:line-clamp-3'>
+                <span className='text-[16px] font-[400] leading-[26px] w-full text-[#fff]'>
                   {latestNews.description}
                 </span>
               </div>
             </div>
           </div>
-
-          {/* Side News */}
-          <div className='col-span-1 lg:col-span-4'>
+          <div className='col-span-4 '>
             {orderNewsByTime(newss)
               .slice(2, 5)
               .map((news, index) => (
-                <div key={index} className='w-full'>
-                  <div className='pr-4 md:pr-[15px] py-4 md:py-[15px] space-y-1'>
-                    <div className='flex text-gray-400 text-xs md:text-sm gap-2 font-[400]'>
+                <div key={index} className=' w-full '>
+                  <div className=' pr-[15px] py-[15px] space-y-1 '>
+                    <div className='flex text-gray-400 text-sm gap-2 font-[400]'>
                       <span>{news.date}</span>
                       <span>{news.author}</span>
                     </div>
                     <div>
-                      <span className='font-[400] text-base md:text-lg lg:text-xl line-clamp-2'>
-                        {news.title}
-                      </span>
+                      <span className='font-[400] text-xl line-clamp-2 '>{news.title}</span>
                     </div>
                   </div>
-                  <div className='border border-gray-100'></div>
+                  <div className='border border-gray-100 flex justify-center'></div>
                 </div>
               ))}
           </div>
+          {/* tin đầu tiên */}
         </div>
       </div>
-
-      {/* News List and Sidebar */}
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-4 mt-8'>
-        {/* News List */}
-        <div className='col-span-1 lg:col-span-8'>
-          <div className='mt-4 md:mt-[30px]'>
+      <div className='grid grid-cols-12 gap-4'>
+        <div className='col-span-8  h-full '>
+          {/* list new */}
+          <div className='mt-[30px] '>
             {newss.slice(5, visibleProperties).map((news, index) => (
-              <div key={index} className='grid grid-cols-1 md:grid-cols-12 mb-4 md:mb-[20px] w-full gap-4 md:gap-5'>
-                <div className='col-span-1 md:col-span-4 relative'>
-                  <img 
-                    src={news.image} 
-                    alt='ảnh new' 
-                    className='rounded-[8px] w-full h-[200px] md:h-[150px] object-cover'
-                  />
-                  <div className='absolute top-2 md:top-[10px] bg-[#505050] rounded-br-[5px] rounded-tr-[5px] px-2 md:px-[10px] py-1 md:py-[2px] text-[#fff] text-xs md:text-sm'>
+              <div key={index} className=' grid grid-cols-12 mb-[20px] w-full space-x-5 '>
+                <div className='  col-span-4 relative'>
+                  <img src={news.image} alt='ảnh new' className='rounded-[8px] w-[260px] h-[150px] object-cover' />
+                  <div className='absolute top-[10px] bg-[#505050] rounded-br-[5px] rounded-tr-[5px] px-[10px] py-[2px] text-[#fff] text-sm'>
                     Tin tức
                   </div>
                 </div>
-                <div className='col-span-1 md:col-span-8 pr-4 md:pr-[15px] py-4 md:py-[15px] space-y-1'>
-                  <div className='flex text-gray-400 text-xs md:text-sm gap-2 font-[400]'>
+                <div className='col-span-8 pr-[15px] py-[15px] space-y-1 '>
+                  <div className='flex text-gray-400 text-sm gap-2 font-[400]'>
                     <span>{news.date}</span>
                     <span>{news.author}</span>
                   </div>
                   <div>
-                    <span className='font-[400] text-base md:text-lg lg:text-xl line-clamp-2'>
-                      {news.title}
-                    </span>
+                    <span className='font-[400] text-xl line-clamp-2 '>{news.title}</span>
                   </div>
                   <div>
-                    <span className='text-xs md:text-sm font-[400] w-full line-clamp-2 md:line-clamp-3'>
-                      {news.description}
-                    </span>
+                    <span className='text-sm font-[400]  w-full line-clamp-3 '>{news.description}</span>
                   </div>
                 </div>
-                <div className='border border-gray-100 col-span-1 md:col-span-12 mt-4 md:mt-[20px]'></div>
+
+                <div className='border border-gray-100 col-span-12 mt-[20px] '></div>
               </div>
             ))}
 
             {visibleProperties < newss.length && (
-              <div className='flex justify-center my-8'>
+              <div className='flex justify-center mt-8'>
                 <Button
                   onClick={handleLoadMore}
-                  className='bg-white text-[#E03C31] hover:bg-[#E03C31] hover:text-white border border-[#E03C31] px-6 md:px-8 py-2 rounded-full transition-colors duration-300 text-sm md:text-base'
+                  className='bg-white text-[#E03C31] hover:bg-[#E03C31] hover:text-white border border-[#E03C31] px-8 py-2 rounded-full transition-colors duration-300'
                 >
                   Xem thêm
                 </Button>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Sidebar */}
-        <div className='col-span-1 lg:col-span-4 lg:col-start-9'>
-          <div className='border rounded-[8px] sticky top-24'>
-            <div className='font-[500] text-base md:text-lg text-center p-4 md:p-[15px]'>
+          {/* list new */}
+        </div>
+        <div className='col-span-4 col-start-9  h-[500px]'>
+          <div className='border rounded-[8px]'>
+            <div className='font-[500] text-lg text-center p-[15px]'>
               <span>Bài viết được xem nhiều nhất</span>
             </div>
-            <div className='border border-gray-100'></div>
+            <div className='border border-gray-100 col-span-12 mb-[20px] '></div>
             <div>
               {orderNewsByView(newss)
                 .slice(0, 5)
                 .map((news, index) => (
-                  <div key={index} className='px-4 md:px-[20px]'>
-                    <div className='flex items-center justify-start gap-4 py-4'>
-                      <div className='rounded-[50%] w-8 h-8 md:w-[32px] md:h-[32px] text-[#E03C31] bg-[#FFECEB] p-2 md:p-[8px] flex items-center justify-center text-sm md:text-base'>
+                  <div className='px-[20px] '>
+                    <div className='flex items-center justify-start gap-4'>
+                      <div className='rounded-[50%] w-[32px] h-[32px] text-[#E03C31] bg-[#FFECEB] p-[8px] flex items-center justify-center'>
                         <span>{index + 1}</span>
                       </div>
-                      <div className='text-sm md:text-base line-clamp-2'>{news.title}</div>
+                      <div>{news.title}</div>
                     </div>
-                    <div className='border border-gray-100'></div>
+                    <div className='border border-gray-100 my-[20px] '></div>
                   </div>
                 ))}
             </div>
           </div>
         </div>
       </div>
+      {/* news */}
     </div>
   );
 }

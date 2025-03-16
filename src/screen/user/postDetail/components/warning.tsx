@@ -1,15 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@radix-ui/react-hover-card';
 import React from 'react';
 import { IoWarningOutline } from 'react-icons/io5';
 
-function Warning() {
+function warning() {
   return (
     <div className='warning'>
       <HoverCard>
-        <HoverCardTrigger >
+        <HoverCardTrigger asChild>
           <Dialog>
             <DialogTrigger>
               <div className='text-[24px]'>
@@ -24,69 +24,69 @@ function Warning() {
                 <div className='border border-gray-100 my-[10px]'></div>
                 <div className='space-y-4'>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='address' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='address'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
-                      Địa chỉ bất động sản
+                      Dịa chỉ baasrt động sản
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='info' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='info'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Các thông tin về giá, diện tích, mô tả,..
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='image' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='image'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Ảnh
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='duplicate' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='duplicate'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Trùng với tin giao khác
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='contact' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='contact'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Không liên lạc được
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='fake' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='fake'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Tin không có thật
                     </label>
                   </div>
                   <div className='flex items-center space-x-2'>
-                    <Checkbox id='sold' />
+                    <Checkbox id='terms' />
                     <label
-                      htmlFor='sold'
-                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed'
+                      htmlFor='terms'
+                      className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed text '
                     >
                       Bất động sản đã bán
                     </label>
                   </div>
-                  <Button className='w-full bg-[#E03C31] hover:bg-[#FF837A]'>
+                  <Button className='w-full bg-[#E03C31] hover:bg-[#FF837A] '>
                     <span>Gửi</span>
                   </Button>
                 </div>
@@ -94,12 +94,10 @@ function Warning() {
             </DialogContent>
           </Dialog>
         </HoverCardTrigger>
-        <HoverCardContent side="top" className='mb-[10px]'>
-          <p>Báo cáo tin đăng vi phạm</p>
-        </HoverCardContent>
+        <HoverCardContent side='top'><p>Cảnh báo</p></HoverCardContent>
       </HoverCard>
     </div>
   );
 }
 
-export default Warning;
+export default warning;

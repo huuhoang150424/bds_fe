@@ -48,28 +48,28 @@ function BdsForU() {
             <CarouselContent className="-ml-4">
               {recommendedProperties.map((property, index) => (
                 <CarouselItem key={index} className="pl-4 basis-1/4">
-                  <Card className='rounded-[5px] h-[350px]'>
-                    <CardContent className='p-0 relative h-full'>
-                      <div className='overflow-hidden w-full h-[200px]'>
+                  <Card className='rounded-[5px]'>
+                    <CardContent className='p-0 pb-[10px] relative'>
+                      <div className='overflow-hidden w-full'>
                         <CustomImage
                           src={property.images[0]}
                           alt='Placeholder Image'
                           width='full'
                           height='full'
-                          className='rounded-t-[5px] w-full h-full object-cover'
+                          className='rounded-[5px]'
                         />
                       </div>
                       <div className='flex'>
-                        <AiOutlinePicture className='text-[#fff] absolute top-[160px] right-[30px] text-[24px]' />
-                        <p className='text-[#fff] absolute top-[160px] right-[15px] text-[16px]'>
+                        <AiOutlinePicture className='text-[#fff] absolute top-[100px] right-[30px] text-[24px]' />
+                        <p className='text-[#fff] absolute top-[100px] right-[15px] text-[16px]'>
                           {property.images.length}
                         </p>
                       </div>
-                      <div className='px-[15px] pt-[15px]'>
-                        <div className='h-[45px] overflow-hidden'>
-                          <span className='font-[700] text-[#2C2C2C] text-sm line-clamp-2'>{property.title}</span>
+                      <div className='px-[15px]'>
+                        <div>
+                          <span className='font-[700] text-[#2C2C2C] text-sm mt-[10px]'>{property.title}</span>
                         </div>
-                        <div className='text-red flex mt-[10px]'>
+                        <div className='text-red flex'>
                           <div className='text-[#E03C31] mr-[30px] font-[500]'>
                             <span>{property.price}</span>
                           </div>
@@ -79,7 +79,7 @@ function BdsForU() {
                         </div>
                         <div className='flex justify-start items-center mt-[5px]'>
                           <IoLocationOutline />
-                          <span className='text-sm ml-[5px] truncate'>{property.location}</span>
+                          <span className='text-sm ml-[5px] font-[0]'>{property.location}</span>
                         </div>
                         <div className='flex justify-between items-center mt-[10px]'>
                           <span className='text-[14px] text-gray-400'>Đăng hôm nay</span>
