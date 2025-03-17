@@ -10,7 +10,7 @@ import Carousel, {
 } from '@/components/core/carousel';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
-import SliderItem from './components/slideItem';
+import SliderItem from './components/slide-item';
 import { ChevronLeft, ChevronRight, GitGraph } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,7 +27,7 @@ import { GrDirections } from 'react-icons/gr';
 import { AiOutlineHome } from 'react-icons/ai';
 import { GoLaw } from 'react-icons/go';
 import { RiArmchairLine } from 'react-icons/ri';
-import Chart from './components/lineChart';
+import Chart from './components/line-chart';
 import BdsForU from './components/bdsForU';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,7 @@ import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AiFillLike } from 'react-icons/ai';
-import CommentItem from './components/commentItem';
+import CommentItem from './components/comment-item';
 
 function PostDetail() {
   const user = useSelector(selectUser);

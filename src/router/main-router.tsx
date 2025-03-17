@@ -7,6 +7,9 @@ import News from "@/screen/user/news/index";
 import NotFoundScreen from "@/screen/user/NotFoundScreen";
 import PostDetail from "@/screen/user/postDetail";
 import Profile from "@/screen/user/profile";
+import NewsDetail from "@/screen/user/newsDetail";
+import Business from "@/screen/user/Business";
+import BusinessDetail from "@/screen/user/BusinessDetail";
 
 
 
@@ -17,11 +20,14 @@ export default function MainRouter() {
         <Route element={<MainLayout />}>
 
 
-          <Route path='/' element={<Home />} />
+          <Route path='/d' element={<Home />} />
           <Route path='/search' element={<SellDetail/>} />
           <Route path='/new' element={<News/>} />
           <Route path='/productDetail/:id' element={<PostDetail/>} />
           <Route path='/profile/:id' element={<Profile/>} />
+          <Route path='/new/:id' element={<NewsDetail/>} />
+          <Route path='/business' element={<Business/>} />
+          <Route path='/' element={<BusinessDetail/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>

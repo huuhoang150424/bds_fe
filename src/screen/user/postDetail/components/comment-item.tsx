@@ -2,7 +2,7 @@
 import { cn } from '@/lib/utils';
 import { AiFillLike } from 'react-icons/ai';
 import { Textarea } from '@/components/ui/textarea';
-import ReplyInput from './replyInput';
+import ReplyInput from './reply-input';
 
 interface CommentItemProps {
   comment: {
