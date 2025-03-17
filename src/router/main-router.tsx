@@ -10,6 +10,7 @@ import Profile from "@/screen/user/profile";
 import NewsDetail from "@/screen/user/newsDetail";
 import Business from "@/screen/user/Business";
 import BusinessDetail from "@/screen/user/BusinessDetail";
+import RealEstateAgentDirectory from "@/screen/user/Brokers";
 
 
 
@@ -24,10 +25,11 @@ export default function MainRouter() {
           <Route path='/search' element={<SellDetail/>} />
           <Route path='/new' element={<News/>} />
           <Route path='/productDetail/:id' element={<PostDetail/>} />
+          <Route path='/' element={<RealEstateAgentDirectory/>} />
           <Route path='/profile/:id' element={<Profile/>} />
           <Route path='/new/:id' element={<NewsDetail/>} />
           <Route path='/business' element={<Business/>} />
-          <Route path='/' element={<BusinessDetail/>} />
+          <Route path='/business/:id' element={<BusinessDetail/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>

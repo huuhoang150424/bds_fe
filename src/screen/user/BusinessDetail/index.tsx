@@ -6,23 +6,34 @@ import Relate from './components/relate';
 
 function BusinessDetail() {
   return (
-    <div className='min-h-screen bg-gray-50 pt-[80px]'>
-      <Banner />
+    <div className='min-h-screen bg-gradient-to-b from-gray-50 to-white'>
+      <div className='pt-[80px]'>
+        <Banner />
+      </div>
 
-      <main className='max-w-6xl mx-auto py-12'>
+      <main className='max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
           <div className='lg:col-span-2 space-y-8'>
-            <CompanyInfo />
-            <ProjectList />
+            <div className='bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300'>
+              <CompanyInfo />
+            </div>
+            
+            <div className='bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300'>
+              <ProjectList />
+            </div>
           </div>
 
           <div className='lg:col-span-1'>
-            <ContactInfo />
+            <div className='bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 sticky top-24'>
+              <ContactInfo />
+            </div>
           </div>
         </div>
 
-        <div className='bg-white rounded-xl shadow-sm p-8 mt-8 hover:shadow-md transition-shadow'>
-          <h2 className='text-2xl font-bold mb-6 text-gray-800'>Các doanh nghiệp tương tự</h2>
+        <div className='bg-white rounded-xl shadow-sm p-8 mt-12 hover:shadow-lg transition-all duration-300'>
+          <h2 className='text-2xl font-bold mb-8 text-gray-800 border-b pb-4'>
+            Các doanh nghiệp tương tự
+          </h2>
           <Relate />
         </div>
       </main>
