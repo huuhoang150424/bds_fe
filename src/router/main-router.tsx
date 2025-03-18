@@ -12,6 +12,7 @@ import Business from "@/screen/user/Business";
 import BusinessDetail from "@/screen/user/BusinessDetail";
 import RealEstateAgentDirectory from "@/screen/user/Brokers";
 import UltilitySuport from "@/screen/user/ultility-suport";
+import MessengerClone from "@/components/user/chat-box";
 
 
 
@@ -26,12 +27,13 @@ export default function MainRouter() {
           <Route path='/search' element={<SellDetail/>} />
           <Route path='/new' element={<News/>} />
           <Route path='/productDetail/:id' element={<PostDetail/>} />
-          <Route path='/' element={<RealEstateAgentDirectory/>} />
+          <Route path='/brokers' element={<RealEstateAgentDirectory/>} />
           <Route path='/profile/:id' element={<Profile/>} />
           <Route path='/new/:id' element={<NewsDetail/>} />
           <Route path='/business' element={<Business/>} />
           <Route path='/business/:id' element={<BusinessDetail/>} />
-          <Route path='/f' element={<UltilitySuport/>} />
+          <Route path='/support' element={<UltilitySuport/>} />
+          <Route path='/' element={<MessengerClone/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>
