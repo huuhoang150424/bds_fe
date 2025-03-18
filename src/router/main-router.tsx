@@ -11,6 +11,7 @@ import NewsDetail from "@/screen/user/newsDetail";
 import Business from "@/screen/user/Business";
 import BusinessDetail from "@/screen/user/BusinessDetail";
 import RealEstateAgentDirectory from "@/screen/user/Brokers";
+import UltilitySuport from "@/screen/user/ultility-suport";
 
 
 
@@ -30,6 +31,7 @@ export default function MainRouter() {
           <Route path='/new/:id' element={<NewsDetail/>} />
           <Route path='/business' element={<Business/>} />
           <Route path='/business/:id' element={<BusinessDetail/>} />
+          <Route path='/f' element={<UltilitySuport/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>
