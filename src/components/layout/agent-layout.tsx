@@ -5,13 +5,10 @@ import
     SidebarProvider,
   } from "@/components/ui/sidebar"
 import Header from "@/components/agent/header";
-interface Props
-{
-  children?: React.ReactNode;
-}
+import { Outlet } from "react-router-dom";
 
 
-const AgentLayout: React.FC<Props> = ( { children } ) =>
+const AgentLayout: React.FC = ( ) =>
 {
   return (
     <SidebarProvider>
@@ -19,7 +16,7 @@ const AgentLayout: React.FC<Props> = ( { children } ) =>
       <SidebarInset>
         <Header/>
         <main >
-          { children }
+          <Outlet/>
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -23,7 +23,7 @@ export default function MainRouter() {
         <Route element={<MainLayout />}>
 
 
-          <Route path='/d' element={<Home />} />
+          <Route path='/' element={<Home />} />
           <Route path='/search' element={<SellDetail/>} />
           <Route path='/new' element={<News/>} />
           <Route path='/productDetail/:id' element={<PostDetail/>} />
@@ -33,7 +33,7 @@ export default function MainRouter() {
           <Route path='/business' element={<Business/>} />
           <Route path='/business/:id' element={<BusinessDetail/>} />
           <Route path='/support' element={<UltilitySuport/>} />
-          <Route path='/' element={<MessengerClone/>} />
+          <Route path='/message' element={<MessengerClone/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>

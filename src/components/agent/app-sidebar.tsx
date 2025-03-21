@@ -6,9 +6,12 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { data } from "@/constant/nav-agent";
+import NavOverview from "./nav-overview";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -18,6 +21,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
+        <NavOverview overview={data.overview} />
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
