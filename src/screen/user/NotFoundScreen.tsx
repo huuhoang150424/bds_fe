@@ -1,16 +1,27 @@
-import { Link } from "react-router-dom";
+'use client';
 
-export default function NotFoundScreen() {
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+
+export default function ErrorPage() {
+  
+
   return (
-    <div className="text-center my-[100px] ">
-      <h1 className="mb-4 text-6xl font-semibold text-primaryColor">404</h1>
-      <p className="mb-4 text-lg text-gray-600">Oops! Looks like you're lost.</p>
-      <div className="animate-bounce">
-        <svg className="mx-auto h-16 w-16 text-primaryColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-        </svg>
-      </div>
-      <p className="mt-4 text-gray-600">Let's get you back <Link to={"/"} className="text-primaryColor font-[500] "  >Quay về trang chủ</Link>.</p>
+    <div className="flex flex-col items-center justify-center h-screen bg-[#fff] text-white text-center px-4">
+      <img
+        src="https://consultation.co.jp/img/404-page-animation-example.gif"
+        alt="404 GIF"
+        className="w-[800px] "
+      />
+      <h1 className="text-3xl font-bold mt-4">Oops! Trang không tồn tại</h1>
+      <p className="text-lg text-gray-400 mt-2">
+        Trang bạn đang tìm kiếm không khả dụng hoặc đã bị xóa.
+      </p>
+      <Button  className="mt-8 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2">
+        <Link to={'/'} className='flex'><ArrowLeft className="w-4 h-4 mr-2" />
+        Quay lại</Link>
+      </Button>
     </div>
-  )
+  );
 }

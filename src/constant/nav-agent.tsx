@@ -79,7 +79,10 @@ export const data = {
       icon: SquareTerminal,
       isActive: true,
       items: [
-        
+        {
+          title: "Đăng ký mua",
+          url: "vip",
+        },
       ],
     },
 
