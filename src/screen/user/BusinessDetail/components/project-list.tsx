@@ -4,11 +4,11 @@ import { realEstateCompanies } from '@/constant/constBusinessDetail';
 
 const ProjectList = () => {
   return (
-    <div className='bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-shadow'>
+    <div className='bg-white rounded-xl  p-8  transition-shadow'>
       <h2 className='text-2xl font-bold mb-6 text-gray-800'>Dự án thuộc {realEstateCompanies.name}</h2>
       <div className='space-y-6'>
         {realEstateCompanies.notableProjects.map((project, index) => (
-          <Card key={index} className='overflow-hidden hover:shadow-lg transition-shadow shadow-sm'>
+          <Card key={index} className='overflow-hidden border border-gray-200 rounded-[10px] transition-shadow shadow-sm'>
             <CardContent className='p-0'>
               <div className='flex flex-col md:flex-row'>
                 <div className='relative w-full md:w-[300px]'>

@@ -30,7 +30,7 @@ export const data = {
         },
         {
           title: "Quản lí bài đăng",
-          url: "#",
+          url: "manage-post",
         },
       ],
     },

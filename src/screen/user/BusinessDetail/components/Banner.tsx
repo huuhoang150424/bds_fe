@@ -3,7 +3,7 @@ import { realEstateCompanies } from '@/constant/constBusinessDetail';
 
 const Banner = () => {
   return (
-    <div className="relative h-[350px] bg-gradient-to-r  bg-[url('https://th.bing.com/th/id/R.8ebe95e12c829f4a31c26c6cc587c77d?rik=%2fGT3qHOaunsgAg&pid=ImgRaw&r=0')] bg-cover bg-center bg-blend-overlay">
+    <div className="relative h-[350px] bg-gradient-to-r  bg-[url('https://th.bing.com/th/id/OIP.LZ1iGU9iMuPFsH6xLOJMdAHaEo?rs=1&pid=ImgDetMain')] bg-cover bg-center bg-blend-overlay">
       <div className='absolute bottom-[30px] left-0 w-full'>
         <div className='container max-w-6xl mx-auto flex items-end'>
           <div className='bg-white p-3 rounded-xl shadow-lg mr-6 transform hover:scale-105 transition-transform duration-300'>

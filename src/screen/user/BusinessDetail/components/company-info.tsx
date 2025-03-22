@@ -2,7 +2,7 @@ import { realEstateCompanies } from '@/constant/constBusinessDetail';
 
 const CompanyInfo = () => {
   return (
-    <div className='bg-white rounded-xl shadow-sm p-8 hover:shadow-md transition-shadow'>
+    <div className='bg-white rounded-xl  p-8  transition-shadow'>
       <h2 className='text-2xl font-bold mb-6 text-gray-800'>Giới thiệu</h2>
       <div className='space-y-4'>
         <div className='grid grid-cols-3 gap-4 border-b border-gray-100 pb-4 hover:bg-gray-50 rounded-lg p-2'>

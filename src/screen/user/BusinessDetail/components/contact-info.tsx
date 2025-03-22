@@ -3,7 +3,7 @@ import { Mail, Phone } from 'lucide-react';
 
 const ContactInfo = () => {
   return (
-    <div className='bg-white rounded-xl shadow-sm p-6 sticky top-[80px]'>
+    <div className='bg-white rounded-xl  p-6 sticky top-[80px]'>
       <h2 className='text-xl font-bold mb-4 text-gray-800'>Thông tin về dự án</h2>
       <p className='text-gray-600 mb-6'>
         Liên hệ với chúng tôi để có thêm thông tin chi tiết về dự án thuộc chủ đầu tư này
