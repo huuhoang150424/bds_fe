@@ -1,6 +1,9 @@
 import AgentLayout from "@/components/layout/agent-layout";
 import CreatePostPage from "@/screen/agent/create-new-post.tsx";
 import DashBoard from "@/screen/agent/dasboard";
+import { UserProfile } from "@/screen/agent/manage-account/infor";
+
+import AccountManagement from "@/screen/agent/manage-account/update-infor";
 import Overview from "@/screen/agent/overview";
 import ManagePost from "@/screen/agent/post";
 import Vip from "@/screen/agent/vip";
@@ -21,6 +24,8 @@ export default function AgentRouter ()
         <Route path="/vip" element={<Vip/>}/>
         <Route path="/vip-required" element={<VIPRequired/>}/>
         <Route path="/manage-post" element={<ManagePost/>}/>
+        <Route path="/manage-account" element={<AccountManagement/>}/>
+        <Route path="/profile" element={<UserProfile/>}/>
       </Route>
     </Routes>
   )

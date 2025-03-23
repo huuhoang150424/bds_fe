@@ -45,13 +45,17 @@ export const data = {
     },
     {
       title: "Tài khoản cá nhân",
-      url: "#",
+      url: "profile",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
+          title: "Thông tin cá nhân",
+          url: "profile",
+        },
+        {
           title: "Chỉnh sửa thông tin cá nhân",
-          url: "#",
+          url: "manage-account",
         },
         {
           title: "Tài chính cá nhân",
