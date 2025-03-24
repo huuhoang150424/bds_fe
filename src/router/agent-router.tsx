@@ -1,6 +1,8 @@
 import AgentLayout from "@/components/layout/agent-layout";
 import CreatePostPage from "@/screen/agent/create-new-post.tsx";
+import CustomersPage from "@/screen/agent/customer";
 import DashBoard from "@/screen/agent/dasboard";
+import { Finance } from "@/screen/agent/finance";
 import { UserProfile } from "@/screen/agent/manage-account/infor";
 
 import AccountManagement from "@/screen/agent/manage-account/update-infor";
@@ -26,6 +28,8 @@ export default function AgentRouter ()
         <Route path="/manage-post" element={<ManagePost/>}/>
         <Route path="/manage-account" element={<AccountManagement/>}/>
         <Route path="/profile" element={<UserProfile/>}/>
+        <Route path="/customer-infor" element={<CustomersPage/>}/>
+        <Route path="/finance" element={<Finance/>}/>
       </Route>
     </Routes>
   )

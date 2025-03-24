@@ -36,11 +36,14 @@ export const data = {
     },
     {
       title: "Khách hàng",
-      url: "#",
+      url: "",
       icon: SquareTerminal,
       isActive: true,
       items: [
-        
+        {
+          title: "Quản lí khách hàng",
+          url: "customer-infor",
+        },
       ],
     },
     {
@@ -59,7 +62,7 @@ export const data = {
         },
         {
           title: "Tài chính cá nhân",
-          url: "#",
+          url: "finance",
         },
         
       ],
