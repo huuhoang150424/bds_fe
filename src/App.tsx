@@ -37,6 +37,8 @@ function App() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  
   return (
     <div className=''>
       <Toaster/>

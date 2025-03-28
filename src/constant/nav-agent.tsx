@@ -26,7 +26,7 @@ export const data = {
         },
         {
           title: "Bài đăng nháp",
-          url: "#",
+          url: "draft-post",
         },
         {
           title: "Quản lí bài đăng",
@@ -75,7 +75,7 @@ export const data = {
       items: [
         {
           title: "Thống kê lượng người xem",
-          url: "#",
+          url: "statistical",
         },
         
       ],

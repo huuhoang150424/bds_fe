@@ -144,9 +144,9 @@ function Header() {
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
             <li className='relative group mr-[30px] text-[16px]'>
-              <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
+            <Link to={"/post"} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
                 Nhà bán đất
-              </a>
+              </Link>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsSell.map((item) => {
                   return (
@@ -158,9 +158,9 @@ function Header() {
               </ul>
             </li>
             <li className='relative mr-[30px] group text-[16px]'>
-              <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
+              <Link to={"/post"} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
                 Nhà đất cho thuê
-              </a>
+              </Link>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsSell.map((item) => {
                   return (
@@ -171,10 +171,10 @@ function Header() {
                 })}
               </ul>
             </li>
-            <li className='relative mr-[30px] group text-[16px]'>
-              <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
+            {/* <li className='relative mr-[30px] group text-[16px]'>
+              <Link to={"/"} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
                 Dự án
-              </a>
+              </Link>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsRent.map((item) => {
                   return (
@@ -184,27 +184,27 @@ function Header() {
                   );
                 })}
               </ul>
-            </li>
+            </li> */}
             <li className='mr-[30px] text-[16px]'>
               <Link to={'/new'} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Tin tức
               </Link>
             </li>
-            <li className='mr-[30px] text-[16px]'>
+            {/* <li className='mr-[30px] text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Phân tích đánh giá
               </a>
-            </li>
+            </li> */}
             <li className='relative mr-[30px] group text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Danh bạ
               </a>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 <li className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Nhà môi giới</a>
+                  <Link to={"/brokers"}>Nhà môi giới</Link>
                 </li>
                 <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <a href='#'>Doanh nghiệp</a>
+                  <Link to={"/business"}>Doanh nghiệp</Link>
                 </li>
               </ul>
             </li>

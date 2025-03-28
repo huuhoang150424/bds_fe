@@ -19,7 +19,7 @@ export default function Router ()
           user?.roles === 'Admin' ? ( <Route path="/admin/*" element={ <AdminRouter /> } /> ) : ( null )
         }
         {/* Agent routing */ }
-        <Route path="/agent/*" element={ <AgentRouter /> } />
+        <Route  path="/agent/*" element={ <AgentRouter /> } />
       </Routes>
     </Routers>
   );
