@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { article, anotherArticle } from '@/constant/constNewsDetail';
+import { Link } from 'react-router-dom';
 
 interface ArticleData {
   title: string;
@@ -97,8 +98,8 @@ function NewsArticle() {
             ))}
 
             <div className='my-6 w-full'>
-            <img src={article.secondImage} alt='ảnh nền' className='w-full h-[400px] object-cover' />
-            {/* <CustomImage
+              <img src={article.secondImage} alt='ảnh nền' className='w-full h-[400px] object-cover' />
+              {/* <CustomImage
                 src={article.secondImage || '/placeholder.svg?height=400&width=800'}
                 alt={article.mainImageCaption}
                 width='full'
@@ -139,37 +140,37 @@ function NewsArticle() {
           <div className='max-w-4xl mx-auto mt-12 mb-16'>
             <h2 className='text-xl font-bold mb-6 pb-2 border-b'>Bài viết khác</h2>
             {anotherArticle.slice(0, visible).map((article, index) => (
-              <div className='space-y-8'>
-                {/* Article 1 */}
-                <div className='flex flex-col md:flex-row gap-4 mb-[30px]'>
-                  <div className='relative md:w-1/3 h-48 md:h-auto'>
-                    <div className='absolute top-[10px] left-0 bg-gray-800 text-white text-xs font-medium px-2 py-1 z-10 rounded-l-[10px]'>
-                      TIN TỨC
+              <Link to={'/new/:id'}>
+                <div className='space-y-8'>
+                  {/* Article 1 */}
+                  <div className='flex flex-col md:flex-row gap-4 mb-[30px]'>
+                    <div className='relative md:w-1/3 h-48 md:h-auto'>
+                      <div className='absolute top-[10px] left-0 bg-gray-800 text-white text-xs font-medium px-2 py-1 z-10 rounded-l-[10px]'>
+                        TIN TỨC
+                      </div>
+                      <CustomImage
+                        src={article.image}
+                        alt='Các Kênh Dẫn Vốn'
+                        width='auto'
+                        height={150}
+                        className='w-full h-full object-cover rounded-md'
+                      />
                     </div>
-                    <CustomImage
-                      src={article.image}
-                      alt='Các Kênh Dẫn Vốn'
-                      width='auto'
-                      height={150}
-                      className='w-full h-full object-cover rounded-md'
-                    />
-                  </div>
-                  <div className='md:w-2/3 space-y-2'>
-                    <div className='text-sm text-gray-500 mb-2'>15/03/2025 07:55 • Nguyễn Nam</div>
-                    <h3 className='text-lg font-bold mb-2 hover:text-red-500 transition-colors'>
-                      <a href='#'>Các Kênh Dẫn Vốn Đang Tác Động Như Thế Nào Đến Thị Trường Bất Động Sản Việt Nam?</a>
-                    </h3>
-                    <p className='text-sm text-gray-600 mb-3 line-clamp-3'>
-                      Tín dụng ngân hàng và phát hành trái phiếu là 2 trong số nhiều kênh dẫn vốn của thị trường bất
-                      động sản Việt Nam. Đây cũng là những nguồn vốn đã tác động mạnh đến quá trình lên xuống, sự thăng
-                      trầm của thị trường...
-                    </p>
-                  
+                    <div className='md:w-2/3 space-y-2'>
+                      <div className='text-sm text-gray-500 mb-2'>15/03/2025 07:55 • Nguyễn Nam</div>
+                      <h3 className='text-lg font-bold mb-2 hover:text-red-500 transition-colors'>
+                        <a href='#'>Các Kênh Dẫn Vốn Đang Tác Động Như Thế Nào Đến Thị Trường Bất Động Sản Việt Nam?</a>
+                      </h3>
+                      <p className='text-sm text-gray-600 mb-3 line-clamp-3'>
+                        Tín dụng ngân hàng và phát hành trái phiếu là 2 trong số nhiều kênh dẫn vốn của thị trường bất
+                        động sản Việt Nam. Đây cũng là những nguồn vốn đã tác động mạnh đến quá trình lên xuống, sự
+                        thăng trầm của thị trường...
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
-            
 
             {visible < anotherArticle.length && (
               <div className='flex justify-center mt-8'>
@@ -193,6 +194,7 @@ function NewsArticle() {
             <div className='border border-gray-100 col-span-12 mb-[20px] '></div>
             <div>
               {article.relatedArticles.map((news, index) => (
+                <Link to={'/new/:id'}>
                 <div className='px-[20px] '>
                   <div className='flex items-center justify-start gap-4'>
                     <div className='rounded-[50%] w-[32px] h-[32px] text-[#E03C31] bg-[#FFECEB] p-[8px] flex items-center justify-center'>
@@ -201,7 +203,7 @@ function NewsArticle() {
                     <div>{news}</div>
                   </div>
                   <div className='border border-gray-100 my-[20px] '></div>
-                </div>
+                </div></Link>
               ))}
             </div>
           </div>

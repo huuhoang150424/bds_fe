@@ -53,6 +53,7 @@ import {
 import { MultiSelect } from '@/components/user/multi-selector';
 import { Cat, Dog, Fish, Rabbit, Turtle } from 'lucide-react';
 import Map from '@/screen/user/sellDetails/components/Map';
+import { Link } from 'react-router-dom';
 
 const allCities = [
   'An Giang',
@@ -960,7 +961,8 @@ function SellDetail() {
               </div>
               <div className='post__detail flex flex-col gap-6'>
                 {realEstateListings.map((realEstateListing) => (
-                  <Card
+                  <Link to={"/post/:id"}>
+                    <Card
                     key={realEstateListing.id}
                     className='overflow-hidden hover:shadow-lg transition-shadow border rounded-[5px] shadow-sm'
                   >
@@ -1072,6 +1074,7 @@ function SellDetail() {
                       </div>
                     </CardContent>
                   </Card>
+                  </Link>
                 ))}
               </div>
             </div>

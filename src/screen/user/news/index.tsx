@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const newss = [
   {
@@ -202,27 +203,30 @@ function News() {
         <div className='col-span-12 grid grid-cols-12 gap-7'>
           {/* tin mới nhất */}
           <div className='firstNew relative col-span-8'>
-            <img src={latestNews.image} alt='ảnh nền' className='w-full h-[360px] object-cover' />
-            <div className='absolute inset-0 bg-black/30'></div>
-            <div className='absolute w-full top-[45%] p-[30px] flex flex-col items-start gap-2'>
-              <div className='flex text-gray-100 text-[14px] gap-2 font-[400] leading-[22px]'>
-                <span>{latestNews.date}</span>
-                <span>{latestNews.category}</span>
+            <Link to={"/new/:id"}>
+              <img src={latestNews.image} alt='ảnh nền' className='w-full h-[360px] object-cover' />
+              <div className='absolute inset-0 bg-black/30'></div>
+              <div className='absolute w-full top-[45%] p-[30px] flex flex-col items-start gap-2'>
+                <div className='flex text-gray-100 text-[14px] gap-2 font-[400] leading-[22px]'>
+                  <span>{latestNews.date}</span>
+                  <span>{latestNews.category}</span>
+                </div>
+                <div>
+                  <span className='font-[500] text-[24px] leading-[32px] text-[#fff]'>{latestNews.title}</span>
+                </div>
+                <div>
+                  <span className='text-[16px] font-[400] leading-[26px] w-full text-[#fff]'>
+                    {latestNews.description}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className='font-[500] text-[24px] leading-[32px] text-[#fff]'>{latestNews.title}</span>
-              </div>
-              <div>
-                <span className='text-[16px] font-[400] leading-[26px] w-full text-[#fff]'>
-                  {latestNews.description}
-                </span>
-              </div>
-            </div>
+            </Link>
           </div>
           <div className='col-span-4 '>
             {orderNewsByTime(newss)
               .slice(2, 5)
               .map((news, index) => (
+                <Link to={'/new/:id'}>
                 <div key={index} className=' w-full '>
                   <div className=' pr-[15px] py-[15px] space-y-1 '>
                     <div className='flex text-gray-400 text-sm gap-2 font-[400]'>
@@ -234,7 +238,7 @@ function News() {
                     </div>
                   </div>
                   <div className='border border-gray-100 flex justify-center'></div>
-                </div>
+                </div></Link>
               ))}
           </div>
           {/* tin đầu tiên */}
@@ -245,6 +249,7 @@ function News() {
           {/* list new */}
           <div className='mt-[30px] '>
             {newss.slice(5, visibleProperties).map((news, index) => (
+              <Link to={'/new/:id'}>
               <div key={index} className=' grid grid-cols-12 mb-[20px] w-full space-x-5 '>
                 <div className='  col-span-4 relative'>
                   <img src={news.image} alt='ảnh new' className='rounded-[8px] w-[260px] h-[150px] object-cover' />
@@ -266,11 +271,11 @@ function News() {
                 </div>
 
                 <div className='border border-gray-100 col-span-12 mt-[20px] '></div>
-              </div>
+              </div></Link>
             ))}
 
             {visibleProperties < newss.length && (
-              <div className='flex justify-center mt-8'>
+              <div className='flex justify-center my-8'>
                 <Button
                   onClick={handleLoadMore}
                   className='bg-white text-[#E03C31] hover:bg-[#E03C31] hover:text-white border border-[#E03C31] px-8 py-2 rounded-full transition-colors duration-300'
@@ -293,6 +298,7 @@ function News() {
               {orderNewsByView(newss)
                 .slice(0, 5)
                 .map((news, index) => (
+                  <Link to={'/new/:id'}>
                   <div className='px-[20px] '>
                     <div className='flex items-center justify-start gap-4'>
                       <div className='rounded-[50%] w-[32px] h-[32px] text-[#E03C31] bg-[#FFECEB] p-[8px] flex items-center justify-center'>
@@ -301,7 +307,7 @@ function News() {
                       <div>{news.title}</div>
                     </div>
                     <div className='border border-gray-100 my-[20px] '></div>
-                  </div>
+                  </div></Link>
                 ))}
             </div>
           </div>
