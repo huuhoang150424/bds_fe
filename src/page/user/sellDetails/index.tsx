@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { PiBellRingingLight } from 'react-icons/pi';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Car } from 'lucide-react';
 import { IoBedOutline } from 'react-icons/io5';
 import { PiBathtubLight } from 'react-icons/pi';
 import { IoLocationOutline } from 'react-icons/io5';
@@ -21,15 +20,6 @@ import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '@/components/ui/command';
-import {
   Select,
   SelectContent,
   SelectGroup,
@@ -41,19 +31,9 @@ import {
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { MultiSelect } from '@/components/user/multi-selector';
-import { Cat, Dog, Fish, Rabbit, Turtle } from 'lucide-react';
-import Map from '@/screen/user/sellDetails/components/Map';
+
 import { Link } from 'react-router-dom';
+import Map from '@/page/user/sellDetails/components/Map';
 
 const allCities = [
   'An Giang',

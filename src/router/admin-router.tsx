@@ -1,10 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
 import { AdminLayout } from "@/components/layout";
-import DashBroad from "@/screen/admin/dasbroad";
-import Post from '@/screen/admin/post';
-import UserManagement from '@/screen/admin/user';
-import ReportManagement from '@/screen/admin/reports';
-import NewsManagement from '@/screen/admin/news';
+import DashBroad from "@/page/admin/dasbroad";
+import Post from '@/page/admin/post';
+import UserManagement from '@/page/admin/user';
+import ReportManagement from '@/page/admin/reports';
+import NewsManagement from '@/page/admin/news';
 
 
 

@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/pagination';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Label } from 'recharts';
-import formSendEmail from '@/screen/user/Brokers/schema';
+import formSendEmail from '@/page/user/Brokers/schema';
 import { z } from 'zod';
 import { agents, recommendedProperties } from '@/constant/const-brokers';
 import { Item } from '@radix-ui/react-dropdown-menu';
