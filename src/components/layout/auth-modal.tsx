@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useAuthModal } from '@/context/auth-modal';
-import LoginScreen from '@/screen/auth/login';
+import LoginScreen from '@/page/auth/login';
 import AuthLayout from './auth-layout';
-import RegisterScreen from '@/screen/auth/register';
+import RegisterScreen from '@/page/auth/register';
 
 const AuthModal: React.FC = () => {
   const { isOpen, currentScreen, closeModal } = useAuthModal();

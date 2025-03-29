@@ -14,7 +14,7 @@ import { Loader2 } from 'lucide-react';
 import FileUploadDropzone from './components/upload-image';
 import Ckeditor from './components/CKEditor';
 import Tags from './components/tags';
-import { formSchema } from '@/screen/agent/create-new-post.tsx/schema'
+import { formSchema } from '@/page/agent/create-new-post.tsx/schema'
 
 
 export default function CreatePostPage() {

@@ -1,8 +1,8 @@
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import CompanySection from '@/screen/user/Business/components/company-section';
-import FeaturedListings from '@/screen/user/Business/components/featured-listing';
+import CompanySection from '@/page/user/Business/components/company-section';
+import FeaturedListings from '@/page/user/Business/components/featured-listing';
 import {
   companiesDes,
   companiesConstruct,

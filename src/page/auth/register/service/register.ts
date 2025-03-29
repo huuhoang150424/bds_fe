@@ -1,5 +1,5 @@
 import { handleApi } from '@/service';
-import { FormRegister } from '@/screen/auth/register/schema/schema-register';
+import { FormRegister } from '@/page/auth/register/schema/schema-register';
 
 
 export const register =async (dataS:FormRegister)=>{

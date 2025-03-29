@@ -52,7 +52,7 @@ import {
 } from '@/components/ui/dialog';
 import { MultiSelect } from '@/components/user/multi-selector';
 import { Cat, Dog, Fish, Rabbit, Turtle } from 'lucide-react';
-import Map from '@/screen/user/sellDetails/components/Map';
+import Map from '@/page/user/sellDetails/components/Map';
 
 const allCities = [
   'An Giang',

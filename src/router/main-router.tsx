@@ -1,17 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 import {MainLayout } from '@/components/layout';
-import Home from "@/screen/user/home";
-import SellDetail from "@/screen/user/sellDetails";
+import Home from "@/page/user/home";
+import SellDetail from "@/page/user/sellDetails";
 import { AuthModalProvider } from "@/context/auth-modal";
-import News from "@/screen/user/news/index";
-import NotFoundScreen from "@/screen/user/NotFoundScreen";
-import PostDetail from "@/screen/user/postDetail";
-import Profile from "@/screen/user/profile";
-import NewsDetail from "@/screen/user/newsDetail";
-import Business from "@/screen/user/Business";
-import BusinessDetail from "@/screen/user/BusinessDetail";
-import RealEstateAgentDirectory from "@/screen/user/Brokers";
-import UltilitySuport from "@/screen/user/ultility-suport";
+import News from "@/page/user/news/index";
+import NotFoundScreen from "@/page/user/NotFoundScreen";
+import PostDetail from "@/page/user/postDetail";
+import Profile from "@/page/user/profile";
+import NewsDetail from "@/page/user/newsDetail";
+import Business from "@/page/user/Business";
+import BusinessDetail from "@/page/user/BusinessDetail";
+import RealEstateAgentDirectory from "@/page/user/Brokers";
+import UltilitySuport from "@/page/user/ultility-suport";
 import MessengerClone from "@/components/user/chat-box";
 
 

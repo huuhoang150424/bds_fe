@@ -9,7 +9,7 @@ import formSchema, { FormRegister } from './schema/schema-register';
 import { useAuthModal } from '@/context/auth-modal';
 import Loader from '@/components/common/loading/loader/loading';
 import { useMutation } from '@tanstack/react-query';
-import { register } from '@/screen/auth/register/service/register';
+import { register } from '@/page/auth/register/service/register';
 import { toast } from '@/hooks/use-toast';
 
 
