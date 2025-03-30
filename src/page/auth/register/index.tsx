@@ -139,13 +139,16 @@ function RegisterScreen() {
                     </FormItem>
                   )}
                 />
-                <div className='flex justify-center'>
+                <div className='flex flex-col gap-[20px] justify-center'>
                   <Button
                     type='submit'
                     className='w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md'
                   >
                     Đăng Ký
                   </Button>
+                  <div className="flex items-center mx-auto gap-[5px] ">
+                    <h4 className="text-[15px] ">Bạn đã có tài khoản ?</h4> <span onClick={()=>openModal('login')}  className="text-[16px] font-[500] text-[#E03C31] cursor-pointer">Đăng nhập</span>
+                  </div>
                 </div>
               </form>
             </Form>)

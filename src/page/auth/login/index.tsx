@@ -107,9 +107,9 @@ function LoginScreen() {
                 </label>
               </div>
               <div>
-                <a href='#' className='hover:underline'>
+                <span onClick={()=>openModal('forgotPassword')} className='hover:underline cursor-pointer'>
                   Quên mật khẩu?
-                </a>
+                </span>
               </div>
             </div>
             <div className='flex justify-center'>

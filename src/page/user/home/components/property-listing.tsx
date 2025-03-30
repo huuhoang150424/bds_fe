@@ -7,8 +7,6 @@ import { CiHeart } from "react-icons/ci"
 import { AiOutlinePicture } from "react-icons/ai"
 import CustomImage from "@/components/common/images"
 import { useGetPostsPrioritys } from "@/page/user/home/hook/use-get-post-priority"
-import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
 import { formatRelativeTime } from "@/lib/convert-date"
 import { Link } from "react-router-dom"
 

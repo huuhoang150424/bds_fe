@@ -90,39 +90,8 @@ function Home ()
     dispatch( resetAuthState() );
   }, [ message, success, dispatch ] );
 
-  const getPostCountByCity = () =>
-  {
-    const cityCounts: { [ key: string ]: number } = {};
-    return cityCounts;
-  };
 
-  const cityInfos: CityInfo[] = [
-    {
-      name: "TP. Hồ Chí Minh",
-      count: 63542,
-      image: "https://file4.batdongsan.com.vn/images/newhome/cities/HCM-web-1.jpg",
-    },
-    {
-      name: "Hà Nội",
-      count: getPostCountByCity()[ "Hà Nội" ] || 0,
-      image: "https://file4.batdongsan.com.vn/images/newhome/cities/HN-web-1.jpg",
-    },
-    {
-      name: "Đà Nẵng",
-      count: 9813,
-      image: "https://file4.batdongsan.com.vn/images/newhome/cities/DN-web-1.jpg",
-    },
-    {
-      name: "Bình Dương",
-      count: 8071,
-      image: "https://file4.batdongsan.com.vn/images/newhome/cities/BD-web-1.jpg",
-    },
-    {
-      name: "Đồng Nai",
-      count: 4322,
-      image: "https://file4.batdongsan.com.vn/images/newhome/cities/DN2-web-1.jpg",
-    },
-  ];
+
 
   return (
     <>
@@ -133,7 +102,7 @@ function Home ()
         <MessengerClone />
       </div>
       <LazySection Component={ PropertyListings } />
-      <LazySection Component={ LocationSection } cityInfos={ cityInfos } />
+      <LazySection Component={ LocationSection } />
       <LazySection Component={ NewsCarousel } />
       <LazySection Component={ UtilitySection } />
       <LazySection Component={ BusinessCarousel } />
