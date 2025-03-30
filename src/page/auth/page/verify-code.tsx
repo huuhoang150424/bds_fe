@@ -6,30 +6,34 @@ import { Form } from "@/components/ui/form";
 import { useAuthModal } from "@/context/auth-modal";
 import Loader from "@/components/common/loading/loader/loading";
 import { toast } from "@/hooks/use-toast";
-import { VerificationCodeInput } from "./components/verification-code-input";
-import { formSchemaVerification, type FormVerifyCode } from "./schemas/verify-code";
-import { useVerificationCode } from "./hooks/use-verify-code"; 
+import { VerificationCodeInput } from "./verification-code-input";
+import { formSchemaVerification, type FormVerifyCode } from "../schema/verify-code";
+import { useVerificationCode } from "../hook/use-verify-code";
 
-function VerificationCode() {
+function VerificationCode ()
+{
   const { openModal } = useAuthModal();
-  const verifyMutation = useVerificationCode(openModal);
-  const {isPending}=verifyMutation;
-  const form = useForm<FormVerifyCode>({
-    resolver: zodResolver(formSchemaVerification),
+  const verifyMutation = useVerificationCode( openModal );
+  const { isPending } = verifyMutation;
+  const form = useForm<FormVerifyCode>( {
+    resolver: zodResolver( formSchemaVerification ),
     defaultValues: { code: "" },
-  });
+  } );
 
-  const onSubmit = (values: z.infer<typeof formSchemaVerification>) => {
-    verifyMutation.mutate(values);
+  const onSubmit = ( values: z.infer<typeof formSchemaVerification> ) =>
+  {
+    verifyMutation.mutate( values );
   };
 
-  const resendCode = () => {
-    toast({ title: "Đã gửi lại mã xác thực", description: "Vui lòng kiểm tra email của bạn" });
+  const resendCode = () =>
+  {
+    toast( { title: "Đã gửi lại mã xác thực", description: "Vui lòng kiểm tra email của bạn" } );
   };
 
-  const handleCodeComplete = (code: string) => {
-    form.setValue("code", code);
-    if (code.length === 4) form.handleSubmit(onSubmit)();
+  const handleCodeComplete = ( code: string ) =>
+  {
+    form.setValue( "code", code );
+    if ( code.length === 4 ) form.handleSubmit( onSubmit )();
   };
 
   return (
@@ -38,22 +42,23 @@ function VerificationCode() {
         <p className="text-gray-600 text-[15px]">Xác thực tài khoản</p>
         <span className="block text-xl font-[600]">Nhập mã xác thực</span>
       </div>
-      {isPending || verifyMutation.isPending ? (
+      { isPending || verifyMutation.isPending ? (
         <Loader className="my-[120px]" />
       ) : (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Form { ...form }>
+          <form onSubmit={ form.handleSubmit( onSubmit ) }>
             <div className="text-gray-600 text-[13px] mb-4">
               Vui lòng nhập mã xác thực 4 chữ số đã được gửi đến email của bạn.
             </div>
-            <VerificationCodeInput onComplete={handleCodeComplete} />
-            {form.formState.errors.code && (
-              <p className="text-[#E03C31] text-sm mt-2">{form.formState.errors.code.message}</p>
-            )}
+            <VerificationCodeInput onComplete={ handleCodeComplete } />
+            { form.formState.errors.code && (
+              <p className="text-[#E03C31] text-sm mt-2">{ form.formState.errors.code.message }</p>
+            ) }
             <div className="flex justify-center">
               <Button
-                type="submit"
-                disabled={verifyMutation.isPending}
+                //type="submit"
+                disabled={ isPending }
+                onClick={ () => openModal( "resetPassword" ) }
                 className="w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md mt-[15px]"
               >
                 Xác nhận
@@ -62,7 +67,7 @@ function VerificationCode() {
             <div className="flex justify-center text-[14px] text-gray-600 mt-2">
               <p>Chưa nhận được mã?</p>
               <span
-                onClick={resendCode}
+                onClick={ resendCode }
                 className="text-[#E03C31] px-[6px] font-[500] cursor-pointer"
               >
                 Gửi lại mã
@@ -71,7 +76,7 @@ function VerificationCode() {
             <div className="flex justify-center text-[14px] text-gray-600 mt-[200px]">
               <p>Quay lại</p>
               <span
-                onClick={() => openModal("forgotPassword")}
+                onClick={ () => openModal( "forgotPassword" ) }
                 className="text-[#E03C31] px-[6px] font-[500] cursor-pointer"
               >
                 quên mật khẩu
@@ -79,7 +84,7 @@ function VerificationCode() {
             </div>
           </form>
         </Form>
-      )}
+      ) }
     </div>
   );
 }

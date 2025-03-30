@@ -2,7 +2,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
+import
+{
   Form,
   FormControl,
   FormField,
@@ -13,20 +14,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuthModal } from "@/context/auth-modal";
 import Loader from "@/components/common/loading/loader/loading";
-import { formSchemaForgotPassword, type FormForgotPassword } from "./schema/forgot-password";
-import { useForgotPassword } from "./hook/use-forgot-password"; 
+import { formSchemaForgotPassword, type FormForgotPassword } from "../schema/forgot-password";
+import { useForgotPassword } from "../hook/use-forgot-password";
 
-function ForgotPassword() {
+function ForgotPassword ()
+{
   const { openModal } = useAuthModal();
-  const forgotPasswordMutation = useForgotPassword(openModal);
-  const {isPending}=forgotPasswordMutation;
-  const form = useForm<FormForgotPassword>({
-    resolver: zodResolver(formSchemaForgotPassword),
+  const forgotPasswordMutation = useForgotPassword( openModal );
+  const { isPending } = forgotPasswordMutation;
+  const form = useForm<FormForgotPassword>( {
+    resolver: zodResolver( formSchemaForgotPassword ),
     defaultValues: { email: "" },
-  });
+  } );
 
-  const onSubmit = (values: z.infer<typeof formSchemaForgotPassword>) => {
-    forgotPasswordMutation.mutate(values);
+  const onSubmit = ( values: z.infer<typeof formSchemaForgotPassword> ) =>
+  {
+    forgotPasswordMutation.mutate( values );
   };
 
   return (
@@ -38,33 +41,34 @@ function ForgotPassword() {
           Vui lòng nhập email đã đăng ký. Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu đến email của bạn.
         </div>
       </div>
-      {isPending ? (
+      { isPending ? (
         <Loader className="my-[120px]" />
       ) : (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Form { ...form }>
+          <form onSubmit={ form.handleSubmit( onSubmit ) }>
             <FormField
-              control={form.control}
+              control={ form.control }
               name="email"
-              render={({ field }) => (
+              render={ ( { field } ) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       placeholder="Nhập email"
-                      {...field}
+                      { ...field }
                       className="w-full border p-[10px] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
+              ) }
             />
             <div className="flex justify-center">
               <Button
-                type="submit"
-                disabled={forgotPasswordMutation.isPending}
+                //type="submit"
+                disabled={ isPending }
+                onClick={ () => openModal( "verifyCode" ) }
                 className="w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md mt-[15px]"
               >
                 Gửi yêu cầu
@@ -73,7 +77,7 @@ function ForgotPassword() {
             <div className="flex justify-center text-[14px] text-gray-600 mt-[200px]">
               <p>Đã nhớ mật khẩu?</p>
               <span
-                onClick={() => openModal("login")}
+                onClick={ () => openModal( "login" ) }
                 className="text-[#E03C31] px-[6px] font-[500] cursor-pointer"
               >
                 Đăng nhập
@@ -82,7 +86,7 @@ function ForgotPassword() {
             </div>
           </form>
         </Form>
-      )}
+      ) }
     </div>
   );
 }

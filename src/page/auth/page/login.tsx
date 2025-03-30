@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { FcGoogle } from 'react-icons/fc';
-import formSchemaLogin from './schema/schema-login';
+import formSchemaLogin from '../schema/schema-login';
 import { useAuthModal } from '@/context/auth-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/redux/store';

@@ -1,5 +1,5 @@
 import { handleApi } from '@/service';
-import type { FormVerifyCode } from '../schemas/verify-code';
+import type { FormVerifyCode } from '../schema/verify-code';
 
 export const verifyCode = async (data:FormVerifyCode) => {
   try {
