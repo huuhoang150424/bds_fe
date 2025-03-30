@@ -124,6 +124,7 @@ function ResetPassword ()
               <Button
                 //type="submit"
                 disabled={ isPending }
+                onClick={()=>openModal("verifyEmail")}
                 className="w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md mt-[15px]"
               >
                 Đặt lại mật khẩu
