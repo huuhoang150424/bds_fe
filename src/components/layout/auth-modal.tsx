@@ -5,7 +5,8 @@ import LoginScreen from '@/page/auth/login';
 import AuthLayout from './auth-layout';
 import RegisterScreen from '@/page/auth/register';
 import ForgotPassword from '@/page/auth/forgotPassword';
-
+import VerificationCode from '@/page/auth/verifyCode';
+VerificationCode
 const AuthModal: React.FC = () => {
   const { isOpen, currentScreen, closeModal } = useAuthModal();
 
@@ -19,6 +20,7 @@ const AuthModal: React.FC = () => {
           {currentScreen === 'login' && <LoginScreen />}
           {currentScreen === 'register' && <RegisterScreen />}
           {currentScreen === 'forgotPassword' && <ForgotPassword />}
+          {currentScreen === 'verifyCode' && <VerificationCode />}
         </AuthLayout>
       </DialogContent>
     </Dialog>
