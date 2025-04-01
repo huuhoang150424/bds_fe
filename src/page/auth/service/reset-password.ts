@@ -1,7 +1,6 @@
 import { handleApi } from '@/service';
-import type { FormResetPassword } from '../schema/reset-password';
 
-export const resetPassword = async (data:FormResetPassword) => {
+export const resetPassword = async (data:{newPassword:string,resetToken:string,email:string}) => {
   try {
     const response = await handleApi('/auth/resetPassword', data, 'PATCH');
     return response.data;

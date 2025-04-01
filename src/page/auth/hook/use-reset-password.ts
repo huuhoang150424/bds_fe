@@ -4,7 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { resetPassword } from "../service/reset-password"; 
 export const useResetPassword = (openModal: any) =>
   useMutation({
-    mutationFn: resetPassword,
+    mutationFn:(data: {newPassword:string,resetToken:string,email:string})=> resetPassword(data),
     onSuccess: () => {
       toast({
         title: "Đặt lại mật khẩu thành công",

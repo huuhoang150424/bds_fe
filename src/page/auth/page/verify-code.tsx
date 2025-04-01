@@ -13,9 +13,9 @@ import { useForgotPassword } from "../hook/use-forgot-password";
 import { useEffect, useState } from "react";
 
 function VerificationCode (){
-  const { openModal, otpExpires, email, setOtpExpires } = useAuthModal();
+  const { openModal, otpExpires, email, setOtpExpires,setResetToken } = useAuthModal();
   const [ timeLeft, setTimeLeft ] = useState<string>( '' );
-  const verifyMutation = useVerificationCode( openModal );
+  const verifyMutation = useVerificationCode( openModal,setResetToken );
   const forgotPasswordMutation = useForgotPassword( openModal, setOtpExpires );
   const { isPending } = verifyMutation;
   console.log(otpExpires)

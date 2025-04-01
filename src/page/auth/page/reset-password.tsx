@@ -19,10 +19,12 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { formSchemaResetPassword, type FormResetPassword } from "../schema/reset-password";
 import { useResetPassword } from "../hook/use-reset-password";
+import { toast } from "@/hooks/use-toast";
+
 
 function ResetPassword ()
 {
-  const { openModal } = useAuthModal();
+  const { openModal,resetToken,email } = useAuthModal();
   const resetPasswordMutation = useResetPassword( openModal );
   const [ showPassword, setShowPassword ] = useState( false );
   const [ showConfirmPassword, setShowConfirmPassword ] = useState( false );
@@ -34,9 +36,19 @@ function ResetPassword ()
     defaultValues: { password: "", confirmPassword: "" },
   } );
 
-  const onSubmit = ( values: FormResetPassword ) =>
-  {
-    resetPasswordMutation.mutate( values );
+  const onSubmit = (values: FormResetPassword) => {
+    if (!resetToken) {
+      toast({
+        variant: 'destructive',
+        title: 'Lỗi',
+        description: 'Không tìm thấy token xác thực. Vui lòng xác minh mã OTP trước.',
+      });
+      openModal('verifyCode'); 
+      return;
+    }
+
+    const newValue = { newPassword: values.password };
+    resetPasswordMutation.mutate({ email, resetToken, ...newValue });
   };
 
   return (
@@ -122,9 +134,9 @@ function ResetPassword ()
 
             <div className="flex justify-center mt-[100px]">
               <Button
-                //type="submit"
+                type="submit"
                 disabled={ isPending }
-                onClick={()=>openModal("verifyEmail")}
+                //onClick={()=>openModal("verifyEmail")}
                 className="w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md mt-[15px]"
               >
                 Đặt lại mật khẩu

@@ -7,8 +7,11 @@ interface AuthModalContextType {
   currentScreen: ScreenType;
   email: string;
   otpExpires: string | null; 
+  resetToken: string | null; 
   setEmail: (email: string) => void;
   setOtpExpires: (otpExpires: string | null) => void; 
+
+  setResetToken: (resetToken:string | null) =>void;
   openModal: (screen: ScreenType) => void;
   closeModal: () => void;
 }
@@ -20,7 +23,7 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
   const [email, setEmail] = useState('');
   const [otpExpires, setOtpExpires] = useState<string | null>(null);
-
+  const [resetToken, setResetToken] = useState<string | null>(null);
   const openModal = (screen: ScreenType) => {
     setCurrentScreen(screen);
     setIsOpen(true);
@@ -42,7 +45,7 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthModalContext.Provider value={{ isOpen, currentScreen, email, otpExpires, setEmail, setOtpExpires, openModal, closeModal }}>
+    <AuthModalContext.Provider value={{ isOpen, currentScreen, email, otpExpires,resetToken, setEmail, setOtpExpires, openModal, closeModal,setResetToken }}>
       {children}
     </AuthModalContext.Provider>
   );
