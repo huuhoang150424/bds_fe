@@ -4,7 +4,7 @@ import { verifyCode } from '../service/verify-code';
 
 export const useVerificationCode = (openModal: any) =>
   useMutation({
-    mutationFn: verifyCode,
+    mutationFn: (data: { email: string; otpCode: string }) => verifyCode(data),
     onSuccess: (data) => {
       toast({ title: 'Mã xác thực hợp lệ', description: 'Bạn có thể đặt lại mật khẩu ngay bây giờ' });
       openModal('resetPassword');

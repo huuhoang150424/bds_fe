@@ -19,16 +19,16 @@ import { useForgotPassword } from "../hook/use-forgot-password";
 
 function ForgotPassword ()
 {
-  const { openModal } = useAuthModal();
-  const forgotPasswordMutation = useForgotPassword( openModal );
+  const { openModal,setOtpExpires,setEmail } = useAuthModal();
+  const forgotPasswordMutation = useForgotPassword( openModal,setOtpExpires,"SEND" );
   const { isPending } = forgotPasswordMutation;
   const form = useForm<FormForgotPassword>( {
     resolver: zodResolver( formSchemaForgotPassword ),
     defaultValues: { email: "" },
   } );
 
-  const onSubmit = ( values: z.infer<typeof formSchemaForgotPassword> ) =>
-  {
+  const onSubmit = ( values: z.infer<typeof formSchemaForgotPassword> ) => {
+    setEmail(values.email);
     forgotPasswordMutation.mutate( values );
   };
 
@@ -66,9 +66,9 @@ function ForgotPassword ()
             />
             <div className="flex justify-center">
               <Button
-                //type="submit"
+                type="submit"
                 disabled={ isPending }
-                onClick={ () => openModal( "verifyCode" ) }
+                //onClick={ () => openModal( "verifyCode" ) }
                 className="w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md mt-[15px]"
               >
                 Gửi yêu cầu
