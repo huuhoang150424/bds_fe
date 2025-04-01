@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 
 function RegisterScreen ()
 {
-  const { openModal } = useAuthModal();
+  const { openModal,setEmail } = useAuthModal();
   const form = useForm<FormRegister>( {
     resolver: zodResolver( formSchema ),
     defaultValues: {
@@ -27,13 +27,14 @@ function RegisterScreen ()
   } );
   const mutation = useMutation( {
     mutationFn: register,
-    onSuccess: ( data ) =>
+    onSuccess: ( data,variables ) =>
     {
       toast( {
         variant: 'success',
         title: data.message
       } )
-      openModal( 'login' );
+      setEmail(variables.email);
+      openModal( 'verifyEmail' );
     },
     onError: ( error ) =>
     {
@@ -43,8 +44,8 @@ function RegisterScreen ()
 
   const { isPending } = mutation;
 
-  function onSubmit ( values: FormRegister )
-  {
+  function onSubmit ( values: FormRegister )  {
+    console.log(values)
     mutation.mutate( values );
   }
 
