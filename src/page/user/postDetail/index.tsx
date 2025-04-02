@@ -28,18 +28,14 @@ import { GoLaw } from 'react-icons/go';
 import { RiArmchairLine } from 'react-icons/ri';
 import Chart from './components/line-chart';
 import BdsForU from './components/bdsForU';
-import { FaCircleCheck } from 'react-icons/fa6';
-import { Button } from '@/components/ui/button';
-import { FiPhoneCall } from 'react-icons/fi';
-import { Card, CardContent } from '@/components/ui/card';
-import { CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+
 import { useSelector } from 'react-redux';
 import { selectToken, selectUser } from '@/redux/authReducer';
 import { Textarea } from '@/components/ui/textarea';
 import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { AiFillLike } from 'react-icons/ai';
+
 import CommentItem from './components/comment-item';
 import InforBrokerPpost from './components/infor-broker-post';
 import { useGetPostDetail } from './hooks/use-get-post-detail';

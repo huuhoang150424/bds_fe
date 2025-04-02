@@ -2,7 +2,7 @@ import { handleApi } from '@/service';
 
 export const getListPost = async (page: number, limit: number) => {
   try {
-    const response = await handleApi('/post/getPostClient', undefined, 'GET', {
+    const response = await handleApi('/post/getPostClient', null, 'GET', {
       page,
       limit,
     });

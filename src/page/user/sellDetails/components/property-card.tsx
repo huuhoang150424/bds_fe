@@ -8,6 +8,7 @@ import { LuExpand } from 'react-icons/lu';
 import { TbPhoneRinging } from 'react-icons/tb';
 import { CiHeart } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
+import { CiMoneyCheck1 } from 'react-icons/ci';
 interface Tag {
   tagName: string;
 }
@@ -50,13 +51,14 @@ interface Post {
   status: string;
   slug: string;
   images: Image[];
+  user : User;
 }
-
-export default function PropertyCard( post : Post) {
+export default function PropertyCard(post: Post) {
+  console.log('post', post);
+  console.log('post.user', post.user);
   return (
     <Card className='overflow-hidden hover:shadow-lg transition-shadow border rounded-[5px] shadow-sm'>
       <CardContent className='p-6'>
-        
         <div className='grid grid-cols-5 grid-rows-2 gap-2 h-[250px]'>
           <div className='col-span-3 row-span-2 relative rounded-l-lg overflow-hidden'>
             <img
@@ -95,28 +97,30 @@ export default function PropertyCard( post : Post) {
             )}
           </div>
         </div>
-        
-        
+
         <div className='mt-4 space-y-2'>
-          <h3 className='text-2xl font-semibold hover:text-[#E03C31] cursor-pointer transition-colors'>
-            {post.title}
-          </h3>
+          <h3 className='text-2xl font-semibold hover:text-[#E03C31] cursor-pointer transition-colors'>{post.title}</h3>
           <div className='flex items-center gap-2 text-gray-600'>
             <IoLocationOutline className='h-5 w-5' />
             <span className='text-lg'>{post.address}</span>
           </div>
           <div className='flex items-center justify-start gap-4'>
             <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-4 text-[16px] font-[500]'>
+                <CiMoneyCheck1 className='text-[24px]  font-[500]' />
+                
+              </div>
+              <span className='text-[#E03C31] font-[500] text-lg'>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(post.price)}</span>
               {/* <span className='text-[#E03C31] font-semibold text-lg'>{listing.details.price}</span> */}
               <span className='flex items-center gap-2 text-gray-600'>
                 <LuExpand />
-                <span className='text-[#E03C31]'>{post.squareMeters}  m²</span>
+                <span className='text-[#E03C31] font-[500] text-lg'>{post.squareMeters} m²</span>
               </span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='flex items-center gap-1 text-gray-600'>
                 <IoBedOutline className='h-5 w-5' />
-                <span >{post.bedroom}</span>
+                <span>{post.bedroom}</span>
               </span>
               <span className='flex items-center gap-1 text-gray-600'>
                 <PiBathtubLight className='h-5 w-5' />
@@ -125,13 +129,13 @@ export default function PropertyCard( post : Post) {
             </div>
           </div>
         </div>
-        
+
         {/* <div className='infor mt-[15px] flex items-center gap-2 justify-between'>
           <Link to={''}>
           <div className='flex items-center gap-2'>
             <div className='image__poster'>
               <Avatar>
-                <AvatarImage src={post.user.avatar} alt={post.user.avatar} />
+                <AvatarImage src={post.user.avatar} alt="avt" />
                 <AvatarFallback>{post.user.fullname.charAt(0)}</AvatarFallback>
               </Avatar>
             </div>

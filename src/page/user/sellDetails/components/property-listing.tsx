@@ -51,6 +51,7 @@ interface Post {
   status: string;
   slug: string;
   images: Image[];
+  user : User;
 }
 export default function PropertyListings() {
   const [page, setPage] = useState(1);
