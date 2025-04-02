@@ -1,0 +1,7 @@
+.leaflet-container {
+    z-index: 0 !important;
+  }
+  
+  .leaflet-popup {
+    z-index: 1 !important;
+  }

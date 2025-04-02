@@ -17,7 +17,7 @@ import { Link } from "react-router-dom"
 
 export default function PropertyListings() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isError } = useGetPostsPrioritys(10, page);
+  const { data, isLoading, isError } = useGetPostsPrioritys(8, page);
 
   return (
     <div className="bg-gray-100 w-full px-[60px] pt-[30px] pb-[60px]">
@@ -48,7 +48,7 @@ export default function PropertyListings() {
                       alt="Placeholder Image"
                       width="full"
                       height="full"
-                      className="rounded-[5px]"
+                      className="rounded-t-[5px]"
                     />
                   </div>
                   <div className="flex">
@@ -64,7 +64,8 @@ export default function PropertyListings() {
                         <span>{post?.price?.toLocaleString('vi-VN')}</span>
                       </div>
                       <div className="text-[#E03C31] font-[500] text-[15px] ">
-                        <span>{post?.squareMeters} m^2</span>
+                      <span>{post?.squareMeters} m²</span>
+
                       </div>
                     </div>
                     <div className="flex justify-start items-center mt-[5px]">

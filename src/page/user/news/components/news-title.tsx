@@ -6,7 +6,7 @@ export default function NewsTitle() {
       <img
         src="https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/10/tai-anh-phong-canh-dep-1.jpg"
         alt="ảnh nền"
-        className="w-full object-cover"
+        className="w-full object-cover "
       />
       <div className="absolute inset-0 bg-black/30"></div>
       <div className="absolute inset-0 flex flex-col justify-center p-6 gap-2 top-[50%] ">

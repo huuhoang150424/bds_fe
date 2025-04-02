@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { newsByTab } from "@/constant/const-home"
+import { CustomImage } from "@/components/common"
 
 interface NewsItem {
   title: string
@@ -25,14 +26,14 @@ export default function NewsSection() {
   const [activeNewsTab, setActiveNewsTab] = useState<keyof NewsData>("highlight")
 
   return (
-    <div className="max-w-5xl mx-auto p-[60px]">
+    <div className="max-w-6xl mx-auto p-[60px]">
       <Tabs value={String(activeNewsTab)} onValueChange={(value: string) => setActiveNewsTab(value as keyof NewsData)}>
         <div className="flex items-center justify-between">
           <TabsList className="mb-4 border-b flex flex-wrap gap-2 md:gap-4">
             <TabsTrigger
               value="highlight"
               className={cn(
-                "font-semibold border-b-2 transition-colors",
+                "font-semibold  transition-colors",
                 activeNewsTab === "highlight" ? "border-red-500 text-red-500" : "border-transparent",
               )}
             >
@@ -41,7 +42,7 @@ export default function NewsSection() {
             <TabsTrigger
               value="news"
               className={cn(
-                "font-semibold border-b-2 transition-colors",
+                "font-semibold  transition-colors",
                 activeNewsTab === "news" ? "border-red-500 text-red-500" : "border-transparent",
               )}
             >
@@ -50,7 +51,7 @@ export default function NewsSection() {
             <TabsTrigger
               value="bds-tphcm"
               className={cn(
-                "font-semibold border-b-2 transition-colors",
+                "font-semibold  transition-colors",
                 activeNewsTab === "bds-tphcm" ? "border-red-500 text-red-500" : "border-transparent",
               )}
             >
@@ -59,7 +60,7 @@ export default function NewsSection() {
             <TabsTrigger
               value="bds-hanoi"
               className={cn(
-                "font-semibold border-b-2 transition-colors",
+                "font-semibold  transition-colors",
                 activeNewsTab === "bds-hanoi" ? "border-red-500 text-red-500" : "border-transparent",
               )}
             >
@@ -75,7 +76,7 @@ export default function NewsSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="col-span-1 md:col-span-2 border-none shadow-none">
               <div className="relative h-48 rounded-lg overflow-hidden">
-                <img
+                <CustomImage
                   src={newsByTab[activeNewsTab][0].img || "/placeholder.svg"}
                   alt={newsByTab[activeNewsTab][0].title}
                   className="w-full h-full object-cover transition-transform hover:scale-105"

@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useState } from 'react';
 import { EmblaOptionsType } from 'embla-carousel';
 import Carousel, {
@@ -35,16 +34,25 @@ import { FiPhoneCall } from 'react-icons/fi';
 import { Card, CardContent } from '@/components/ui/card';
 import { CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { useSelector } from 'react-redux';
-import { selectUser } from '@/redux/authReducer';
+import { selectToken, selectUser } from '@/redux/authReducer';
 import { Textarea } from '@/components/ui/textarea';
 import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AiFillLike } from 'react-icons/ai';
 import CommentItem from './components/comment-item';
+import InforBrokerPpost from './components/infor-broker-post';
+import { useGetPostDetail } from './hooks/use-get-post-detail';
+import { useParams } from 'react-router-dom';
+import { Loading } from '@/components/common';
+import MapComponent from './components/Map/map';
+import { selectIsAuthenticated } from '@/redux/authReducer';
+
 
 function PostDetail() {
+  const token = useSelector(selectToken)
   const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const [like, setLike] = useState<Boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -72,11 +80,11 @@ function PostDetail() {
       prevComments.map((comment) =>
         comment.id === id
           ? { ...comment, likes: comment.likes + 1 } // Tăng like
-          : comment
-      )
+          : comment,
+      ),
     );
   };
-  
+
   const OPTIONS: EmblaOptionsType = {
     loop: true,
     align: 'start',
@@ -93,13 +101,29 @@ function PostDetail() {
   const handleSubmitReply = (commentId: number) => {
     if (replyContent.trim()) {
       // Xử lý logic submit reply ở đây
-      
+
       // Reset state
       setReplyingTo(null);
       setReplyContent('');
     }
   };
+  const { slug } = useParams<{ slug: string }>();
+  const { data, isLoading, isError } = useGetPostDetail(slug || '');
+  console.log('data:', data);
 
+  if (isLoading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+    
+
+    const formattedData = data.priceHistory.map((item: { price: number; changed_at: string | number | Date; }) => ({
+      price: item.price,
+      changed_at: new Date(item.changed_at).toLocaleDateString('vi-VN'),
+    }));
+  
   return (
     <div className='max-w-6xl h-full mx-auto pt-[80px] px-4 md:px-6 lg:px-8'>
       <div className='grid grid-cols-12 gap-6'>
@@ -108,11 +132,11 @@ function PostDetail() {
             <div className='w-full'>
               <Carousel options={OPTIONS} className='relative' isAutoPlay={false}>
                 <SliderContainer className='gap-2'>
-                  {Object.values(imgPreview).map((src, index) => (
+                  {data.images.map((src: { image_url: string }, index: number) => (
                     <SliderItem
                       key={index}
-                      src={src}
-                        alt={`Hình ảnh ${index + 1}`}
+                      src={src.image_url}
+                      alt={`Hình ảnh ${index + 1}`}
                       onClick={() => {
                         setCurrentIndex(index);
                         setIsOpen(true);
@@ -146,55 +170,50 @@ function PostDetail() {
                 </div>
               </Carousel>
               {/* Hiển thị Lightbox khi click vào ảnh */}
-              {isOpen && (
+
+              {isOpen && data.images.length > 0 && (
                 <Lightbox
-                  mainSrc={Object.values(imgPreview)[currentIndex]}
-                  nextSrc={Object.values(imgPreview)[(currentIndex + 1) % Object.values(imgPreview).length]}
-                  prevSrc={
-                    Object.values(imgPreview)[
-                      (currentIndex + Object.values(imgPreview).length - 1) % Object.values(imgPreview).length
-                    ]
-                  }
+                  mainSrc={data.images[currentIndex].image_url}
+                  nextSrc={data.images[(currentIndex + 1) % data.images.length].image_url}
+                  prevSrc={data.images[(currentIndex + data.images.length - 1) % data.images.length].image_url}
                   onCloseRequest={() => setIsOpen(false)}
                   onMovePrevRequest={() =>
-                    setCurrentIndex(
-                      (currentIndex + Object.values(imgPreview).length - 1) % Object.values(imgPreview).length,
-                    )
+                    setCurrentIndex((currentIndex + data.images.length - 1) % data.images.length)
                   }
-                  onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % Object.values(imgPreview).length)}
+                  onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data.images.length)}
                 />
               )}
             </div>
           </div>
           <div className='title mt-[8px]'>
-            <span className='text-2xl font-[500]'>{posts.title}</span>
+            <span className='text-2xl font-[500]'>{data.title}</span>
           </div>
           <div className='location mt-[8px]'>
-            <span className='text-sm font-normal'>{posts.location}</span>
+            <span className='text-sm font-normal'>{data.address}</span>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
           <div className='flex item-center justify-between'>
             <div className='price flex flex-col'>
               <span className='text-sm text-gray-500'>Mức giá</span>
               <span className='text-lg font-[500] mt-[4px]'>
-                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(posts.price)}
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
               </span>
               <span className='text-[12px] text-gray-500'>
                 {' '}
                 ~
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                  posts.price / posts.square_meters,
+                  data.price / data.squareMeters,
                 )}{' '}
                 /m²
               </span>
             </div>
             <div className='S flex flex-col'>
               <span className='text-sm text-gray-500'>Diện tích</span>
-              <span className='text-lg font-[500] mt-[4px]'>{posts.square_meters} m²</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data.squareMeters} m²</span>
             </div>
             <div className='bedroom flex flex-col'>
               <span className='text-sm text-gray-500'>Phòng ngủ</span>
-              <span className='text-lg font-[500] mt-[4px]'>{posts.bedroom} PN</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data.bedroom} PN</span>
             </div>
             <div className='icon flex items-center justify-center gap-4'>
               <Share />
@@ -220,7 +239,7 @@ function PostDetail() {
               <span className='text-2xl font-[500] '>Thông tin mô tả</span>
             </div>
             <div className=''>
-              <p className='text-sm'>{posts.description}</p>
+              <p className='text-sm'>{data.description}</p>
             </div>
           </div>
 
@@ -240,7 +259,7 @@ function PostDetail() {
                       <span>Mức giá</span>
                     </div>
                     <span>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(posts.price)}
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
                     </span>
                   </div>
                 </div>
@@ -251,7 +270,7 @@ function PostDetail() {
                       <GrMapLocation className='text-[24px]  font-[500]' />
                       <span>Diện tích</span>
                     </div>
-                    <span>{posts.square_meters} m²</span>
+                    <span>{data.squareMeters} m²</span>
                   </div>
                 </div>
 
@@ -261,7 +280,7 @@ function PostDetail() {
                       <LuBed className='text-[24px]  font-[500]' />
                       <span>Số phòng ngủ </span>
                     </div>
-                    <span>{posts.bedroom} phòng</span>
+                    <span>{data.bedroom} phòng</span>
                   </div>
                 </div>
 
@@ -271,7 +290,7 @@ function PostDetail() {
                       <MdOutlineBathroom className='text-[24px]  font-[500]' />
                       <span>Số phòng tắm, vệ sinh </span>
                     </div>
-                    <span>{posts.bathroom} phòng</span>
+                    <span>{data.bathroom} phòng</span>
                   </div>
                 </div>
               </div>
@@ -282,9 +301,7 @@ function PostDetail() {
                       <GrDirections className='text-[24px]  font-[500]' />
                       <span>Hướng nhà</span>
                     </div>
-                    <span>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(posts.price)}
-                    </span>
+                    <span>{data.direction}</span>
                   </div>
                 </div>
 
@@ -292,19 +309,28 @@ function PostDetail() {
                   <div className='flex items-center gap-[64px] text-[16px]   justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
                       <AiOutlineHome className='text-[24px]  font-[500]' />
-                      <span>Hợp đồng mua bán</span>
+                      <span>Hợp đồng</span>
                     </div>
-                    <span>{posts.square_meters} m²</span>
+                    <span></span>
                   </div>
                 </div>
 
                 <div className=''>
-                  <div className='flex items-center gap-[64px] text-[16px]  justify-between'>
-                    <div className='flex items-center gap-4 text-[16px] font-[500]'>
+                  <div className='flex items-center gap-[100px] text-[16px]  justify-between'>
+                    <div className='flex items-center justify-between gap-4 text-[16px] font-[500]'>
                       <GoLaw className='text-[24px]  font-[500]' />
                       <span>Pháp Lý </span>
                     </div>
-                    <span>{posts.bedroom} phòng</span>
+                    <div>
+                      {data.verified === true ? (
+                        <span className='text-green-500 '>Đã xác thực</span>
+                      ) : (
+                        <span className='text-red-500 '>
+                          {/* <FaCircleCheck className='text-red-500' /> */}
+                          Chưa xác thực
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -314,7 +340,7 @@ function PostDetail() {
                       <RiArmchairLine className='text-[24px]  font-[500]' />
                       <span>Nội thất </span>
                     </div>
-                    <span>{posts.bathroom} phòng</span>
+                    <span></span>
                   </div>
                 </div>
               </div>
@@ -322,32 +348,39 @@ function PostDetail() {
 
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
-              <span className='text-2xl font-[500]'>Lịch sử bán {posts.name} </span>
+              <span className='text-2xl font-[500]'>Lịch sử bán {data.title} </span>
             </div>
             <div className='w-full h-[400px]'>
-              <Chart />
+            <Chart chartData={formattedData} />
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Xem trên bản đồ</span>
             </div>
-            <div className='w-full h-[300px]'>
-              <iframe src={posts.map} width='100%' height='100%' style={{ border: 'none' }}></iframe>
+            <div className='w-[800px] h-[300px] z-0'>
+              {/* <iframe src={posts.map} width='100%' height='100%' style={{ border: 'none' }}></iframe> */}
+              <MapComponent address={data.address} />
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
           <div className='flex items-center justify-between'>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày đăng</span>
-              <span className='font-[500]'>{posts.postDate}</span>
+              <span className='font-[500]'> {new Date(data.createdAt).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày hết hạn</span>
-              <span className='font-[500]'>{posts.expirationDate}</span>
+              <span className='font-[500]'>{new Date(data.expiredDate).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Loại tin</span>
-              <span className='font-[500]'>{posts.type}</span>
+              {data.priority === 1 ? (
+                <span className='font-[500]'>Kim cương</span>
+              ) : data.priority === 2 ? (
+                <span className='font-[500]'>Vàng</span>
+              ) : (
+                <span className='font-[500]'>đồng</span>
+              )}
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>mã tin</span>
@@ -355,6 +388,23 @@ function PostDetail() {
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
+          <div className='tag-search '>
+            <div className='my-[20px]'>
+              <span className='text-2xl font-[500] '>Tìm kiếm theo từ khóa</span>
+            </div>
+            {data.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
+              <div key={tagItem.id} className='flex-wrap gap-2'>
+                <span className='text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 '>
+                  {tagItem.tag.tagName}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className='border border-gray-100 my-[20px]'></div>
+          {isAuthenticated === true && (
+            <BdsForU />
+          )}
+          
           {/* Bất động sản dành cho bạn */}
           {/* <div>
             <div className='my-[20px]'>
@@ -386,7 +436,7 @@ function PostDetail() {
                 <BsSendFill
                   className={cn(
                     'absolute right-3 bottom-3 transition-all',
-                    send ? 'text-blue-500 cursor-pointer' : 'text-gray-400 opacity-70'
+                    send ? 'text-blue-500 cursor-pointer' : 'text-gray-400 opacity-70',
                   )}
                 />
               </div>
@@ -415,81 +465,17 @@ function PostDetail() {
           </div>
 
           <div className='border border-gray-100 my-[10px] my-[30px]'></div>
-          
         </div>
-        
 
         {/* Thông tin chi tiết */}
-        <div className='col-span-12 lg:col-span-3'>
+        <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
-            <div className='bg-white rounded-lg p-4 '>
-              {/* Header - Môi giới chuyên nghiệp */}
-              <div className='flex items-center gap-3 mb-4'>
-                <img
-                  src={posts.author.image}
-                  alt='avatar'
-                  className='w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#00A870]'
-                />
-                <div className='flex-1 min-w-0'>
-                  <div className='flex items-center gap-2 flex-wrap'>
-                    <h3 className='font-medium text-sm sm:text-base'>Môi giới chuyên nghiệp</h3>
-                    <FaCircleCheck className='text-[#00A870] w-4 h-4 shrink-0' />
-                  </div>
-                  <h2 className='font-bold text-base sm:text-lg truncate'>{posts.author.name}</h2>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className='grid grid-cols-3 gap-2 sm:gap-4 mb-4 text-center'>
-                <div className=''>
-                  <p className='text-xs sm:text-sm text-gray-500'>Tham gia BĐS</p>
-                  <p className='font-medium mt-1 text-sm sm:text-base'>{posts.author.time} năm</p>
-                </div>
-                <div className=''>
-                  <p className='text-xs sm:text-sm text-gray-500'>Tin đăng</p>
-                  <p className='font-medium mt-1 text-sm sm:text-base'>{posts.author.numberPost}</p>
-                </div>
-                <div className=''>
-                  <p className='text-xs sm:text-sm text-gray-500'>Chứng chỉ</p>
-                  <div className='mt-1'>
-                    <FaCircleCheck className='mx-auto text-[#00A870] w-4 h-4 sm:w-5 sm:h-5' />
-                  </div>
-                </div>
-              </div>
-
-              {/* Project Info */}
-              <div className='bg-[#F8F8F8] rounded-lg p-2 sm:p-3 mb-4'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <div className='w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center shrink-0'>
-                    <span className='text-base sm:text-xl'>💡</span>
-                  </div>
-                  <p className='text-xs sm:text-sm'>Có 6 tin căn hộ chung cư cùng dự án Vinhomes Grand Park</p>
-                </div>
-                <button className='w-full text-xs sm:text-sm text-gray-600 hover:text-[#00A870] transition-colors duration-200'>
-                  Xem trang cá nhân →
-                </button>
-              </div>
-
-              {/* Contact Buttons */}
-              <div className='space-y-2 sm:space-y-3'>
-                <button
-                  className='w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg border border-gray-200 
-                  bg-white hover:bg-gray-50 transition-colors duration-200 
-                  flex items-center justify-center gap-2 text-sm sm:text-base'
-                >
-                  <img src='/zalo-icon.png' alt='Zalo' className='w-4 h-4 sm:w-5 sm:h-5' />
-                  Chat qua Zalo
-                </button>
-                <button
-                  className='w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg 
-                  bg-[#E03C31] hover:bg-[#FF837A] text-white transition-colors duration-200 
-                  flex items-center justify-center gap-2 text-sm sm:text-base'
-                >
-                  <FiPhoneCall className='w-4 h-4 sm:w-5 sm:h-5' />
-                  <span className='font-medium'>{posts.author.phone}</span>
-                </button>
-              </div>
-            </div>
+            <InforBrokerPpost user={{
+              name: data.user.fullname,
+              email: data.user.email, 
+              phone: data.user.phone,
+              avatar: data.user.avatar,
+            }}             />
           </div>
         </div>
 
@@ -500,4 +486,3 @@ function PostDetail() {
 }
 
 export default PostDetail;
-

@@ -41,15 +41,7 @@ const CommentItem = ({
 }: CommentItemProps) => {
   return (
     <div className='relative'>
-      {/* Vẽ đường nối cho mọi cấp độ trừ cấp 0 */}
-      {level > 0 && (
-        <div className="absolute left-[-67px] top-[-5px] w-[65px] h-[20px] border-t-[0px] border-r-[0px] border border-l-gray-200 rounded-bl-full"></div>
-      )}
-
-      {/* Vẽ đường kẻ dọc cho bất kỳ comment nào có replies */}
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="absolute left-[15px] top-[32px] bottom-0 w-[2px] bg-gray-200"></div>
-      )}
+      
 
       <div className='flex gap-2'>
         <div className='shrink-0'>
