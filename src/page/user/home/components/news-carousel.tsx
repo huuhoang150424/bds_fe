@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 export default function NewsCarousel() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetAllNews( 5 );
     const newsList = data?.pages.flatMap( (page: { data: any; }) => page.data ) || [];
-   return (
+    return (
     <div className="max-w-6xl mx-auto py-[60px]">
       <div className="title flex justify-between items-center pb-[20px]">
         <h2 className="text-[22px] font-bold">Tin tức bất động sản</h2>

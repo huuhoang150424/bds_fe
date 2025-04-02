@@ -1,11 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { useEffect, useState, useRef, Suspense, lazy } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetAuthState, selectMessage, selectSuccess, selectUser } from "@/redux/authReducer";
 import type { AppDispatch } from "@/redux/store";
 import { toast } from "@/hooks/use-toast";
-import MessengerClone from "@/components/user/chat-box";
-import type { CityInfo } from "@/constant/const-home";
 import BannerSearch from "./components/banner-search";
 import { Loading } from "@/components/common";
 
@@ -99,7 +96,7 @@ function Home ()
 
       <LazySection Component={ NewsSection } />
       <div className="fixed ">
-        <MessengerClone />
+        
       </div>
       <LazySection Component={ PropertyListings } />
       <LazySection Component={ LocationSection } />
