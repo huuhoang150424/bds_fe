@@ -109,7 +109,7 @@ function PostDetail() {
   };
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetPostDetail(slug || '');
-  console.log('data:', data);
+  //console.log('data:', data);
 
   if (isLoading)
     return (
@@ -404,23 +404,6 @@ function PostDetail() {
           {isAuthenticated === true && (
             <BdsForU />
           )}
-          
-          {/* Bất động sản dành cho bạn */}
-          {/* <div>
-            <div className='my-[20px]'>
-              <span className='text-2xl font-[500] '>Bất động sản dành cho bạn</span>
-            </div>
-            <div>
-              
-            </div>
-          </div> */}
-          {/* Bất động sản dành cho bạn */}
-
-          {/* đặc điểm */}
-
-          {/* Thông tin mô tả */}
-
-          {/* Comment section */}
           <div className='space-y-6 my-[30px]'>
             {/* Comment input */}
             <div className='flex items-start gap-2'>
@@ -444,7 +427,6 @@ function PostDetail() {
 
             <div className='border border-gray-100 my-[10px]'></div>
 
-            {/* Comments list */}
             <div className='space-y-4'>
               {comments.map((comment) => (
                 <CommentItem
@@ -466,8 +448,6 @@ function PostDetail() {
 
           <div className='border border-gray-100 my-[10px] my-[30px]'></div>
         </div>
-
-        {/* Thông tin chi tiết */}
         <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
             <InforBrokerPpost user={{
@@ -478,8 +458,6 @@ function PostDetail() {
             }}             />
           </div>
         </div>
-
-        {/* Thông tin chi tiết */}
       </div>
     </div>
   );
