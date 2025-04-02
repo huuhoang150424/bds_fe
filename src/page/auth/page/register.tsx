@@ -5,43 +5,48 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { FcGoogle } from 'react-icons/fc';
-import formSchema, { FormRegister } from './schema/schema-register';
+import formSchema, { FormRegister } from '../schema/schema-register';
 import { useAuthModal } from '@/context/auth-modal';
 import Loader from '@/components/common/loading/loader/loading';
 import { useMutation } from '@tanstack/react-query';
-import { register } from '@/page/auth/register/service/register';
+import { register } from '@/page/auth/service/register';
 import { toast } from '@/hooks/use-toast';
 
 
-function RegisterScreen() {
-  const {  openModal } = useAuthModal();
-  const form = useForm<FormRegister>({
-    resolver: zodResolver(formSchema),
+function RegisterScreen ()
+{
+  const { openModal,setEmail } = useAuthModal();
+  const form = useForm<FormRegister>( {
+    resolver: zodResolver( formSchema ),
     defaultValues: {
       email: '',
       fullname: '',
       password: '',
       confirmPassword: '',
     },
-  });
-  const mutation = useMutation({
+  } );
+  const mutation = useMutation( {
     mutationFn: register,
-    onSuccess: (data) => {
-      toast({
+    onSuccess: ( data,variables ) =>
+    {
+      toast( {
         variant: 'success',
-        title : data.message
-      })
-      openModal('login');
+        title: data.message
+      } )
+      setEmail(variables.email);
+      openModal( 'verifyEmail' );
     },
-    onError: (error) => {
-      console.log("Lỗi khi đăng ký",error);
+    onError: ( error ) =>
+    {
+      console.log( "Lỗi khi đăng ký", error );
     }
-  });
-  
-  const {isPending}=mutation;
+  } );
 
-  function onSubmit(values: FormRegister) {
-    mutation.mutate(values);
+  const { isPending } = mutation;
+
+  function onSubmit ( values: FormRegister )  {
+    console.log(values)
+    mutation.mutate( values );
   }
 
   return (
@@ -64,91 +69,95 @@ function RegisterScreen() {
           </div>
         </div>
         {
-          isPending ? (<Loader className='my-[170px] ' />) : (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+          isPending ? ( <Loader className='my-[170px] ' /> ) : (
+            <Form { ...form }>
+              <form onSubmit={ form.handleSubmit( onSubmit ) } className='space-y-4'>
                 <FormField
-                  control={form.control}
+                  control={ form.control }
                   name='email'
-                  render={({ field }) => (
+                  render={ ( { field } ) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 font-medium'>Email</FormLabel>
                       <FormControl>
                         <Input
                           type='email'
                           placeholder='Nhập email'
-                          {...field}
+                          { ...field }
                           className='w-full border p-[10px] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
+                  ) }
                 />
                 <FormField
-                  control={form.control}
+                  control={ form.control }
                   name='fullname'
-                  render={({ field }) => (
+                  render={ ( { field } ) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 font-medium'>Họ và tên</FormLabel>
                       <FormControl>
                         <Input
                           type='text'
                           placeholder='Nhập họ và tên'
-                          {...field}
+                          { ...field }
                           className='w-full border p-[10px] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
+                  ) }
                 />
                 <FormField
-                  control={form.control}
+                  control={ form.control }
                   name='password'
-                  render={({ field }) => (
+                  render={ ( { field } ) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 font-medium'>Mật khẩu</FormLabel>
                       <FormControl>
                         <Input
                           type='password'
                           placeholder='Nhập mật khẩu'
-                          {...field}
+                          { ...field }
                           className='w-full border p-[10px] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
+                  ) }
                 />
                 <FormField
-                  control={form.control}
+                  control={ form.control }
                   name='confirmPassword'
-                  render={({ field }) => (
+                  render={ ( { field } ) => (
                     <FormItem>
                       <FormLabel className='text-gray-700 font-medium'>Xác nhận mật khẩu</FormLabel>
                       <FormControl>
                         <Input
                           type='password'
                           placeholder='Nhập lại mật khẩu'
-                          {...field}
+                          { ...field }
                           className='w-full border p-[10px] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
+                  ) }
                 />
-                <div className='flex justify-center'>
+                <div className='flex flex-col gap-[20px] justify-center'>
                   <Button
                     type='submit'
+                    disabled={ isPending }
                     className='w-full bg-[#E03C31] hover:bg-[#FF837A] text-white font-semibold py-[15px] px-[15px] rounded-md'
                   >
                     Đăng Ký
                   </Button>
+                  <div className="flex items-center mx-auto gap-[5px] ">
+                    <h4 className="text-[15px] ">Bạn đã có tài khoản ?</h4> <span onClick={ () => openModal( 'login' ) } className="text-[16px] font-[500] text-[#E03C31] cursor-pointer">Đăng nhập</span>
+                  </div>
                 </div>
               </form>
-            </Form>)
+            </Form> )
         }
       </div>
     </div>

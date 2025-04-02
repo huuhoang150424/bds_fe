@@ -1,10 +1,41 @@
 import type { CityInfo } from "@/constant/const-home"
 
-interface LocationSectionProps {
-  cityInfos: CityInfo[]
-}
 
-export default function LocationSection({ cityInfos }: LocationSectionProps) {
+export default function LocationSection() {
+  const getPostCountByCity = () =>
+    {
+      const cityCounts: { [ key: string ]: number } = {};
+      return cityCounts;
+    };
+    const cityInfos: CityInfo[] = [
+      {
+        name: "TP. Hồ Chí Minh",
+        count: 63542,
+        image: "https://file4.batdongsan.com.vn/images/newhome/cities/HCM-web-1.jpg",
+      },
+      {
+        name: "Hà Nội",
+        count: getPostCountByCity()[ "Hà Nội" ] || 0,
+        image: "https://file4.batdongsan.com.vn/images/newhome/cities/HN-web-1.jpg",
+      },
+      {
+        name: "Đà Nẵng",
+        count: 9813,
+        image: "https://file4.batdongsan.com.vn/images/newhome/cities/DN-web-1.jpg",
+      },
+      {
+        name: "Bình Dương",
+        count: 8071,
+        image: "https://file4.batdongsan.com.vn/images/newhome/cities/BD-web-1.jpg",
+      },
+      {
+        name: "Đồng Nai",
+        count: 4322,
+        image: "https://file4.batdongsan.com.vn/images/newhome/cities/DN2-web-1.jpg",
+      },
+    ];
+
+
   return (
     <div className="max-w-6xl mx-auto px-[60px] py-[60px]">
       <div className="title flex justify-between items-center pb-[20px]">

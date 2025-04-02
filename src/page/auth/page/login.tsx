@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { FcGoogle } from 'react-icons/fc';
-import formSchemaLogin from './schema/schema-login';
+import formSchemaLogin from '../schema/schema-login';
 import { useAuthModal } from '@/context/auth-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { selectError, selectLoading, selectMessage } from '@/redux/authReducer';
+import { selectError, selectLoading, selectMessage, selectSuccess } from '@/redux/authReducer';
 import Loader from '@/components/common/loading/loader/loading';
 import { loginAuth } from '@/redux/action/auth';
 import { useEffect } from 'react';
@@ -23,6 +23,7 @@ function LoginScreen() {
   const loading=useSelector(selectLoading);
   const message=useSelector(selectMessage);
   const error=useSelector(selectError);
+  const success=useSelector(selectSuccess);
   const dispatch = useDispatch<AppDispatch>();
   const form = useForm<z.infer<typeof formSchemaLogin>>({
     resolver: zodResolver(formSchemaLogin),
@@ -38,14 +39,21 @@ function LoginScreen() {
       toast({
         variant: 'destructive',
         title: message
-      })
+      });
     }
-  },[message,error])
+    else if (success) {
+      toast({
+        variant: 'success',
+        title: message
+      });
+      closeModal();
+    }
+
+  },[message,error,success])
 
 
   function onSubmit(values: z.infer<typeof formSchemaLogin>) {
     dispatch(loginAuth(values));
-    closeModal();
   }
   return (
     <div className='w-[45%] p-8'>
@@ -107,9 +115,9 @@ function LoginScreen() {
                 </label>
               </div>
               <div>
-                <a href='#' className='hover:underline'>
+                <span onClick={()=>openModal('forgotPassword')} className='hover:underline cursor-pointer'>
                   Quên mật khẩu?
-                </a>
+                </span>
               </div>
             </div>
             <div className='flex justify-center'>

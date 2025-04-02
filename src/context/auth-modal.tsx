@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type ScreenType = 'login' | 'forgotPassword' | 'verifyCode' | 'resetPassword' | 'register' | 'verifyEmail';
 
@@ -6,7 +6,12 @@ interface AuthModalContextType {
   isOpen: boolean;
   currentScreen: ScreenType;
   email: string;
+  otpExpires: string | null; 
+  resetToken: string | null; 
   setEmail: (email: string) => void;
+  setOtpExpires: (otpExpires: string | null) => void; 
+
+  setResetToken: (resetToken:string | null) =>void;
   openModal: (screen: ScreenType) => void;
   closeModal: () => void;
 }
@@ -17,7 +22,8 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
   const [email, setEmail] = useState('');
-
+  const [otpExpires, setOtpExpires] = useState<string | null>(null);
+  const [resetToken, setResetToken] = useState<string | null>(null);
   const openModal = (screen: ScreenType) => {
     setCurrentScreen(screen);
     setIsOpen(true);
@@ -27,8 +33,19 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const token = queryParams.get('token');
+    const emailFromUrl = queryParams.get('email');
+
+    if (token && emailFromUrl) {
+      setEmail(emailFromUrl);
+      openModal('verifyEmail');
+    }
+  }, []);
+
   return (
-    <AuthModalContext.Provider value={{ isOpen, currentScreen, email, setEmail, openModal, closeModal }}>
+    <AuthModalContext.Provider value={{ isOpen, currentScreen, email, otpExpires,resetToken, setEmail, setOtpExpires, openModal, closeModal,setResetToken }}>
       {children}
     </AuthModalContext.Provider>
   );
