@@ -40,13 +40,13 @@ function BdsForU() {
             className="w-full"
           >
             <CarouselContent className="ml-4">
-              {data.map((post : {id: string , images: { image_url: string }[], title : string,   price: number, squareMeters: number , createdAt : string, address : string }, index : number) => (
-                <CarouselItem key={post.id} className="pl-4 basis-1/3">
+              {data?.data?.map((post : {id: string , images: { image_url: string }[], title : string,   price: number, squareMeters: number , createdAt : string, address : string }, index : number) => (
+                <CarouselItem key={post?.id} className="pl-4 basis-1/3">
                   <Card className='rounded-[10px] border border-gray-200 h-full'>
                     <CardContent className='p-0 pb-[10px] relative'>
                       <div className='overflow-hidden w-full'>
                         <CustomImage
-                          src={post.images[0].image_url}
+                          src={post?.images[0]?.image_url}
                           alt='Placeholder Image'
                           width='full'
                           height='full'
@@ -56,27 +56,27 @@ function BdsForU() {
                       <div className='flex'>
                         <AiOutlinePicture className='text-[#fff] absolute top-[100px] right-[30px] text-[24px]' />
                         <p className='text-[#fff] absolute top-[100px] right-[15px] text-[16px]'>
-                          {post.images.length}
+                          {post?.images?.length}
                         </p>
                       </div>
                       <div className='px-[15px]'>
                         <div>
-                          <span className='font-[700] text-[#2C2C2C] text-sm mt-[10px]'>{post.title}</span>
+                          <span className='font-[700] text-[#2C2C2C] text-sm mt-[10px]'>{post?.title}</span>
                         </div>
                         <div className='text-red flex'>
                           <div className='text-[#E03C31] mr-[30px] font-[500]'>
-                            <span>{post.price}</span>
+                            <span>{post?.price}</span>
                           </div>
                           <div className='text-[#E03C31] font-[500]'>
-                            <span>{post.squareMeters}</span>
+                            <span>{post?.squareMeters}</span>
                           </div>
                         </div>
                         <div className='flex justify-start items-center mt-[5px]'>
                           <IoLocationOutline />
-                          <span className='text-sm ml-[5px] font-[0]'>{post.address}</span>
+                          <span className='text-sm ml-[5px] font-[0]'>{post?.address}</span>
                         </div>
                         <div className='flex justify-between items-center mt-[10px]'>
-                          <span className='text-[14px] text-gray-400'>Đăng vào {new Date(post.createdAt).toLocaleDateString()}</span>
+                          <span className='text-[14px] text-gray-400'>Đăng vào {new Date(post?.createdAt).toLocaleDateString()}</span>
                           <HoverCard>
                             <HoverCardTrigger className='border p-[5px] rounded-[5px]'>
                               <CiHeart className='font-bold text-[18px]' />

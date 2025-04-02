@@ -23,7 +23,7 @@ export default class Chart extends PureComponent<ChartProps> {
   render() {
     const { chartData } = this.props;
 
-    console.log("chartData:", chartData);
+    //console.log("chartData:", chartData);
 
     return (
       <ResponsiveContainer width="100%" height="100%">
