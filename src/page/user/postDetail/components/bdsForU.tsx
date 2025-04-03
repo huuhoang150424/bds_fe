@@ -42,15 +42,15 @@ function BdsForU() {
             <CarouselContent className="ml-4">
               {data?.data?.map((post : {id: string , images: { image_url: string }[], title : string,   price: number, squareMeters: number , createdAt : string, address : string }, index : number) => (
                 <CarouselItem key={post?.id} className="pl-4 basis-1/3">
-                  <Card className='rounded-[10px] border border-gray-200 h-full'>
+                  <Card className='rounded-[10px] border border-gray-200 h-full '>
                     <CardContent className='p-0 pb-[10px] relative'>
-                      <div className='overflow-hidden w-full'>
+                      <div className='overflow-hidden w-full '>
                         <CustomImage
                           src={post?.images[0]?.image_url}
                           alt='Placeholder Image'
                           width='full'
                           height='full'
-                          className='rounded-[5px]'
+                          className='rounded-t-[5px] object-cover h-[150px] w-full'
                         />
                       </div>
                       <div className='flex'>
@@ -61,18 +61,18 @@ function BdsForU() {
                       </div>
                       <div className='px-[15px]'>
                         <div>
-                          <span className='font-[700] text-[#2C2C2C] text-sm mt-[10px]'>{post?.title}</span>
+                          <span className='font-[700] text-[#2C2C2C] text-lg my-[10px]'>{post?.title}</span>
                         </div>
                         <div className='text-red flex'>
                           <div className='text-[#E03C31] mr-[30px] font-[500]'>
-                            <span>{post?.price}</span>
+                            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(post?.price)}</span>
                           </div>
                           <div className='text-[#E03C31] font-[500]'>
-                            <span>{post?.squareMeters}</span>
+                            <span>{post?.squareMeters} m²</span>
                           </div>
                         </div>
                         <div className='flex justify-start items-center mt-[5px]'>
-                          <IoLocationOutline />
+                          <IoLocationOutline className='text-[30px]'/>
                           <span className='text-sm ml-[5px] font-[0]'>{post?.address}</span>
                         </div>
                         <div className='flex justify-between items-center mt-[10px]'>

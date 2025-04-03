@@ -192,7 +192,7 @@ function PostDetail() {
             <div className='price flex flex-col'>
               <span className='text-sm text-gray-500'>Mức giá</span>
               <span className='text-lg font-[500] mt-[4px]'>
-                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data?.price)}
               </span>
               <span className='text-[12px] text-gray-500'>
                 {' '}
@@ -205,11 +205,11 @@ function PostDetail() {
             </div>
             <div className='S flex flex-col'>
               <span className='text-sm text-gray-500'>Diện tích</span>
-              <span className='text-lg font-[500] mt-[4px]'>{data.squareMeters} m²</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data?.squareMeters} m²</span>
             </div>
             <div className='bedroom flex flex-col'>
               <span className='text-sm text-gray-500'>Phòng ngủ</span>
-              <span className='text-lg font-[500] mt-[4px]'>{data.bedroom} PN</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data?.bedroom} PN</span>
             </div>
             <div className='icon flex items-center justify-center gap-4'>
               <Share />
@@ -235,7 +235,7 @@ function PostDetail() {
               <span className='text-2xl font-[500] '>Thông tin mô tả</span>
             </div>
             <div className=''>
-              <p className='text-sm'>{data.description}</p>
+              <p className='text-sm'>{data?.description}</p>
             </div>
           </div>
 
@@ -255,7 +255,7 @@ function PostDetail() {
                       <span>Mức giá</span>
                     </div>
                     <span>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data?.price)}
                     </span>
                   </div>
                 </div>
@@ -266,7 +266,7 @@ function PostDetail() {
                       <GrMapLocation className='text-[24px]  font-[500]' />
                       <span>Diện tích</span>
                     </div>
-                    <span>{data.squareMeters} m²</span>
+                    <span>{data?.squareMeters} m²</span>
                   </div>
                 </div>
 
@@ -276,7 +276,7 @@ function PostDetail() {
                       <LuBed className='text-[24px]  font-[500]' />
                       <span>Số phòng ngủ </span>
                     </div>
-                    <span>{data.bedroom} phòng</span>
+                    <span>{data?.bedroom} phòng</span>
                   </div>
                 </div>
 
@@ -286,7 +286,7 @@ function PostDetail() {
                       <MdOutlineBathroom className='text-[24px]  font-[500]' />
                       <span>Số phòng tắm, vệ sinh </span>
                     </div>
-                    <span>{data.bathroom} phòng</span>
+                    <span>{data?.bathroom} phòng</span>
                   </div>
                 </div>
               </div>
@@ -297,7 +297,7 @@ function PostDetail() {
                       <GrDirections className='text-[24px]  font-[500]' />
                       <span>Hướng nhà</span>
                     </div>
-                    <span>{data.direction}</span>
+                    <span>{data?.direction}</span>
                   </div>
                 </div>
 
@@ -318,7 +318,7 @@ function PostDetail() {
                       <span>Pháp Lý </span>
                     </div>
                     <div>
-                      {data.verified === true ? (
+                      {data?.verified === true ? (
                         <span className='text-green-500 '>Đã xác thực</span>
                       ) : (
                         <span className='text-red-500 '>
@@ -336,7 +336,16 @@ function PostDetail() {
                       <RiArmchairLine className='text-[24px]  font-[500]' />
                       <span>Nội thất </span>
                     </div>
-                    <span></span>
+                    <div>
+                    {data?.isFurniture === true ? (
+                        <span className=''>Có </span>
+                      ) : (
+                        <span className=' '>
+                          {/* <FaCircleCheck className='text-red-500' /> */}
+                          không
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -344,7 +353,7 @@ function PostDetail() {
 
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
-              <span className='text-2xl font-[500]'>Lịch sử bán {data.title} </span>
+              <span className='text-2xl font-[500]'>Lịch sử bán {data?.title} </span>
             </div>
             <div className='w-full h-[400px]'>
             <Chart chartData={formattedData} />
@@ -355,24 +364,24 @@ function PostDetail() {
             </div>
             <div className='w-[800px] h-[300px] z-0'>
               {/* <iframe src={posts.map} width='100%' height='100%' style={{ border: 'none' }}></iframe> */}
-              <MapComponent address={data.address} />
+              <MapComponent address={data?.address} />
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
           <div className='flex items-center justify-between'>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày đăng</span>
-              <span className='font-[500]'> {new Date(data.createdAt).toLocaleDateString('vi-VN')}</span>
+              <span className='font-[500]'> {new Date(data?.createdAt).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày hết hạn</span>
-              <span className='font-[500]'>{new Date(data.expiredDate).toLocaleDateString('vi-VN')}</span>
+              <span className='font-[500]'>{new Date(data?.expiredDate).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Loại tin</span>
-              {data.priority === 1 ? (
+              {data?.priority === 1 ? (
                 <span className='font-[500]'>Kim cương</span>
-              ) : data.priority === 2 ? (
+              ) : data?.priority === 2 ? (
                 <span className='font-[500]'>Vàng</span>
               ) : (
                 <span className='font-[500]'>đồng</span>
@@ -388,7 +397,7 @@ function PostDetail() {
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Tìm kiếm theo từ khóa</span>
             </div>
-            {data.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
+            {data?.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
               <div key={tagItem.id} className='flex-wrap gap-2'>
                 <span className='text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 '>
                   {tagItem.tag.tagName}
@@ -447,10 +456,10 @@ function PostDetail() {
         <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
             <InforBrokerPpost user={{
-              name: data.user.fullname,
-              email: data.user.email, 
-              phone: data.user.phone,
-              avatar: data.user.avatar,
+              name: data?.user.fullname,
+              email: data?.user.email, 
+              phone: data?.user.phone,
+              avatar: data?.user.avatar,
             }}             />
           </div>
         </div>

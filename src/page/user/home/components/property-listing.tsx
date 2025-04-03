@@ -38,15 +38,15 @@ export default function PropertyListings() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
           {data?.posts?.map((post:any,index:number) => (
             <Link key={`${post?.id}-index`} to={`/post/${post?.slug}`}>
-              <Card  className="rounded-[5px]">
-                <CardContent className="p-0 pb-[10px] relative">
+              <Card  className="rounded-[5px] ">
+                <CardContent className="p-0 pb-[10px] relative ">
                   <div className="overflow-hidden w-full">
                     <CustomImage
                       src={post?.images[0]?.image_url}
                       alt="Placeholder Image"
                       width="full"
                       height="full"
-                      className="rounded-t-[5px]"
+                      className="rounded-t-[5px] h-[150px] w-full"
                     />
                   </div>
                   <div className="flex">
@@ -59,7 +59,7 @@ export default function PropertyListings() {
                     </div>
                     <div className=" flex">
                       <div className="text-[#E03C31] mr-[30px] font-[500]">
-                        <span>{post?.price?.toLocaleString('vi-VN')}</span>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(post?.price)}
                       </div>
                       <div className="text-[#E03C31] font-[500] text-[15px] ">
                       <span>{post?.squareMeters} m²</span>
