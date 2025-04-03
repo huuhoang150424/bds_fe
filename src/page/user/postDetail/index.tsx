@@ -105,7 +105,7 @@ function PostDetail() {
   };
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetPostDetail(slug || '');
-  //console.log('data:', data);
+  console.log('data:', data);
 
   if (isLoading)
     return (

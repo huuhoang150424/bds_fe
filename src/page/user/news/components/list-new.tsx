@@ -2,6 +2,7 @@ import { Loading } from "@/components/common";
 import { useGetAllNews } from "../hook/use-getall-news";
 import { convertDate } from "@/lib/convert-date";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function ListNew ()
 {
@@ -17,8 +18,9 @@ export default function ListNew ()
         <Loading className="my-[150px]" />
       ) : (
         <div>
-          { newsList.map( ( news: any,index:number ) => (
+          { newsList.slice(5).map( ( news: any,index:number ) => (
             <div key={`${news?.id}-${index}`} className="grid grid-cols-12 mb-[20px] w-full space-x-5">
+              <Link to={`/new/${news?.slug}`} className="col-span-12 grid grid-cols-12 gap-4">
               <div className="col-span-4 relative">
                 <img src={ news?.imageUrl } alt="ảnh new" className="rounded-[8px] w-[260px] h-[150px] object-cover" />
                 <div className="absolute top-[10px] bg-[#505050] rounded-br-[5px] rounded-tr-[5px] px-[10px] py-[2px] text-[#fff] text-sm">
@@ -37,6 +39,7 @@ export default function ListNew ()
                   <span className="text-sm font-[400] w-full line-clamp-3">{ news?.content }</span>
                 </div>
               </div>
+              </Link>
               <div className="border border-gray-100 col-span-12 mt-[20px]"></div>
             </div>
           ) ) }
