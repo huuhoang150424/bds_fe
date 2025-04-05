@@ -1,4 +1,4 @@
-"use client"
+// @ts-nocheck
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"

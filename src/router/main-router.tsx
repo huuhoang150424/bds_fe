@@ -12,7 +12,6 @@ import Business from "@/page/user/Business";
 import BusinessDetail from "@/page/user/BusinessDetail";
 import RealEstateAgentDirectory from "@/page/user/Brokers";
 import UltilitySuport from "@/page/user/ultility-suport";
-import MessengerClone from "@/components/user/chat-box";
 
 
 
@@ -33,7 +32,6 @@ export default function MainRouter() {
           {/* <Route path='/business' element={<Business/>} />
           <Route path='/business/:id' element={<BusinessDetail/>} /> */}
           <Route path='/support' element={<UltilitySuport/>} />
-          <Route path='/message' element={<MessengerClone/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />
         </Route>

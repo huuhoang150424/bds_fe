@@ -3,12 +3,14 @@ import Footer from '@/components/user/footer';
 import Header from '@/components/user/header/header';
 import { Outlet } from 'react-router-dom';
 import AuthModal from './auth-modal';
+import RealEstateChat from '@/page/user/chat/real-estate-chat';
 
 const MainLayout: React.FC = () => {
   return (
     <div className="">
       <Header />
       <AuthModal />
+      <RealEstateChat />
       <main className="">
         <Outlet />
       </main>
