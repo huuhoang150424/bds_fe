@@ -36,9 +36,11 @@ function RegisterScreen ()
       setEmail(variables.email);
       openModal( 'verifyEmail' );
     },
-    onError: ( error ) =>
-    {
-      console.log( "Lỗi khi đăng ký", error );
+    onError: ( error:any ) =>{
+      toast({
+        variant: 'destructive',
+        title: error?.response?.data?.message || 'Đăng ký thất bại'
+      })
     }
   } );
 

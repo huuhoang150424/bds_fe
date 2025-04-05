@@ -1,3 +1,4 @@
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { loginAuth } from '../action/auth'
 
@@ -10,6 +11,8 @@ interface User {
   phone: string;
   balance:number;
   score:number;
+
+  emailVerified: boolean ;
 
 }
 
@@ -55,6 +58,17 @@ const authSlice = createSlice({
         ...action.payload.data
       };
     },
+    updateVerifiedMail: (state) => {
+      if (state.user) {
+        state.user.emailVerified = true;
+      }
+    },
+    updatePhoneStore: (state,action)=>{
+      if (state.user) {
+        state.user.phone=action.payload.phone;
+      }
+    }
+    
   },
   extraReducers: (builder) => {
     builder
@@ -79,7 +93,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout,updateToken ,resetAuthState,updateAuth} = authSlice.actions;
+export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore} = authSlice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;

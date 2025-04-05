@@ -33,7 +33,7 @@ import { AppDispatch } from '@/redux/store';
 import { handleApi } from '@/service';
 import { toast } from '@/hooks/use-toast';
 import { Loading } from '../common';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -86,6 +86,7 @@ function Header() {
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const [read, setRead] = useState(false);
+  const navigate=useNavigate();
 
   const toggleMenu = (menu: string) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
@@ -103,7 +104,17 @@ function Header() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, []);
+
+  const handleNavigateCreatePost=()=>{
+    if (user?.phone && user?.emailVerified) {
+      navigate('/agent/create-post');
+    } else if (!user?.emailVerified) {
+      openModal( 'verifyEmail' );
+    } else if (!user?.phone) {
+      openModal('updatePhone');
+    }
+  }
 
   const handleLogout=async()=>{
     setLoading(true);
@@ -171,30 +182,12 @@ function Header() {
                 })}
               </ul>
             </li>
-            {/* <li className='relative mr-[30px] group text-[16px]'>
-              <Link to={"/"} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out'>
-                Dự án
-              </Link>
-              <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                {menuItemsRent.map((item) => {
-                  return (
-                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
-                      <a href='#'>{item}</a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li> */}
             <li className='mr-[30px] text-[16px]'>
               <Link to={'/new'} className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Tin tức
               </Link>
             </li>
-            {/* <li className='mr-[30px] text-[16px]'>
-              <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
-                Phân tích đánh giá
-              </a>
-            </li> */}
+
             <li className='relative mr-[30px] group text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
                 Danh bạ
@@ -202,9 +195,6 @@ function Header() {
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 <li className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
                   <Link to={"/brokers"}>Nhà môi giới</Link>
-                </li>
-                <li className='p-[4px] px-[8px] hover:bg-gray-100 text-[14px]'>
-                  <Link to={"/business"}>Doanh nghiệp</Link>
                 </li>
               </ul>
             </li>
@@ -312,7 +302,7 @@ function Header() {
                     <div className='h-full w-full  py-2 '>
                       {/* Menu Items */ }
                       <ul className=' text-black cursor-pointer '>
-                        <Link to={'/agent/dashboard'} className='hover:bg-[#F2F2F2]'>
+                        <Link to={'/agent/overview'} className='hover:bg-[#F2F2F2]'>
                           <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
                             <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
                           </li>
@@ -374,12 +364,13 @@ function Header() {
         )
         }
         <Button
+          onClick={handleNavigateCreatePost}
           variant={ 'outline' }
           className=' text-[17px] text-black hover:bg-[#FAFAFA] ml-[15px] px-[15px] py-[20px] '
         >
-          <a href='#' className='py-[30px]'>
+          <span  className='py-[30px]'>
             Đăng tin
-          </a>
+          </span>
         </Button>
       </div>
       <div className='lg:hidden lg:ml-[15px] flex justify-end absolute right-[50px]'>

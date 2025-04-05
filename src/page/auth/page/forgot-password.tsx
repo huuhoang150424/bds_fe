@@ -19,8 +19,8 @@ import { useForgotPassword } from "../hook/use-forgot-password";
 
 function ForgotPassword ()
 {
-  const { openModal,setOtpExpires,setEmail } = useAuthModal();
-  const forgotPasswordMutation = useForgotPassword( openModal,setOtpExpires,"SEND" );
+  const { openModal,setEmail } = useAuthModal();
+  const forgotPasswordMutation = useForgotPassword("SEND" );
   const { isPending } = forgotPasswordMutation;
   const form = useForm<FormForgotPassword>( {
     resolver: zodResolver( formSchemaForgotPassword ),

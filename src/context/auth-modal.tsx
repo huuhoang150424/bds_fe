@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type ScreenType = 'login' | 'forgotPassword' | 'verifyCode' | 'resetPassword' | 'register' | 'verifyEmail';
+type ScreenType = 'login' | 'forgotPassword' | 'verifyCode' | 'resetPassword' | 'register' | 'verifyEmail' | 'updatePhone';
 
 interface AuthModalContextType {
   isOpen: boolean;

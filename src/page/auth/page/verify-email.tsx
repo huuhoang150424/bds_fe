@@ -5,15 +5,20 @@ import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useEmailVerification } from "../hook/use-email-verification";
 import { useVerifyToken } from "../hook/use-verify-token";
+import { useDispatch, useSelector } from "react-redux";
+import { selectIsAuthenticated, selectUser, updateVerifiedMail } from "@/redux/authReducer";
+import { AppDispatch } from "@/redux/store";
 
 function EmailVerification() {
+  const isAuthenticated=useSelector(selectIsAuthenticated);
+  const dispatch=useDispatch<AppDispatch>();
   const { closeModal, email,openModal } = useAuthModal();
   const [resendDisabled, setResendDisabled] = useState(false);
   const verificationMutation = useEmailVerification(email);
 
   const queryParams = new URLSearchParams(window.location.search);
   const token = queryParams.get("token") || "";
-  const verifyTokenMutation = useVerifyToken(email, token,openModal);
+  const verifyTokenMutation = useVerifyToken(email, token);
 
   useEffect(() => {
     if (token && !verifyTokenMutation.isPending && !verifyTokenMutation.isSuccess) {
@@ -23,8 +28,13 @@ function EmailVerification() {
 
   useEffect(() => {
     if (verifyTokenMutation.isSuccess) {
-      closeModal();
       window.history.pushState({}, document.title, window.location.pathname); 
+      dispatch(updateVerifiedMail());
+      if (isAuthenticated) {
+        closeModal();
+      } else {
+        openModal("login");
+      }
     }
   }, [verifyTokenMutation.isSuccess, closeModal]);
 

@@ -8,6 +8,7 @@ import ForgotPassword from '@/page/auth/page/forgot-password';
 import VerificationCode from '@/page/auth/page/verify-code';
 import ResetPassword from '@/page/auth/page/reset-password';
 import EmailVerification from '@/page/auth/page/verify-email';
+import UpdatePhone from '@/page/auth/page/update-phone';
 VerificationCode
 const AuthModal: React.FC = () =>
 {
@@ -26,6 +27,7 @@ const AuthModal: React.FC = () =>
           { currentScreen === 'verifyCode' && <VerificationCode /> }
           { currentScreen === 'resetPassword' && <ResetPassword /> }
           { currentScreen === 'verifyEmail' && <EmailVerification /> }
+          { currentScreen === 'updatePhone' && <UpdatePhone /> }
         </AuthLayout>
       </DialogContent>
     </Dialog>
