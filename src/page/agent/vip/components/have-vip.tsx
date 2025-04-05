@@ -20,7 +20,7 @@ export default function VIPRequired() {
         <CardFooter className="flex flex-col gap-2">
           <Button className="w-full bg-[#E03C31] hover:bg-[#2e2b2b]">Nâng cấp lên hội viên</Button>
           <Button variant="outline" className="w-full">
-           <Link to={'/overview'}> Quay lại</Link>
+            <Link to={'/overview'}> Quay lại</Link>
           </Button>
         </CardFooter>
       </Card>
