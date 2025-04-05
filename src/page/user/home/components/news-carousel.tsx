@@ -27,13 +27,13 @@ export default function NewsCarousel() {
         className="w-full"
       >
         
-        <CarouselContent className="flex gap-4">
+        <CarouselContent className="flex gap-4 ">
         { isLoading ? (
           <Loading className="my-[150px]" />
         ) : (
           
             newsList.map( (news: any, index: number) => (
-              <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3">
+              <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3" key={news?.id}>
               <Card className="border border-gray-200 rounded-[10px] h-full  ">
                 <Link key={`${news?.id}-index`} to={`/news/${news?.slug}`}>
                 <CardContent className="p-0 flex-grow">

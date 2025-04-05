@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import CustomImage from '../common/images';
+import CustomImage from '../../common/images';
 import { CiHeart } from 'react-icons/ci';
 import { Button } from '@/components/ui/button';
 import { FaBarsStaggered } from 'react-icons/fa6';
@@ -32,8 +32,9 @@ import { MdDashboard, MdManageAccounts } from 'react-icons/md';
 import { AppDispatch } from '@/redux/store';
 import { handleApi } from '@/service';
 import { toast } from '@/hooks/use-toast';
-import { Loading } from '../common';
+import { Loading } from '../../common';
 import { Link } from 'react-router-dom';
+import Wishlist from './components/wishlist';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -212,7 +213,7 @@ function Header() {
         </div>
       </div>
       <div className='hidden lg:block flex items-center lg:flex'>
-        <Popover >
+        {/* <Popover >
           <PopoverTrigger >
             <CiHeart size={ 22 } className='mr-[20px] ' />
           </PopoverTrigger>
@@ -232,7 +233,8 @@ function Header() {
               </div>
             </div>
           </PopoverContent>
-        </Popover>
+        </Popover> */}
+        <Wishlist />
 
         { isAuthenticated ? (
           <div className='flex items-center gap-[20px] mr-[15px]'>

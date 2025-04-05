@@ -1,6 +1,6 @@
 import React from 'react';
 import Footer from '@/components/user/footer';
-import Header from '@/components/user/header';
+import Header from '@/components/user/header/header';
 import { Outlet } from 'react-router-dom';
 import AuthModal from './auth-modal';
 

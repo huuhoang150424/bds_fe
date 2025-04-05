@@ -36,13 +36,17 @@ import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-import CommentItem from './components/comment-item';
+
 import InforBrokerPpost from './components/infor-broker-post';
 import { useGetPostDetail } from './hooks/use-get-post-detail';
 import { useParams } from 'react-router-dom';
 import { Loading } from '@/components/common';
 import MapComponent from './components/Map/map';
 import { selectIsAuthenticated } from '@/redux/authReducer';
+import { Button } from '@/components/ui/button';
+import WishlistButton from './components/like';
+
+
 
 
 function PostDetail() {
@@ -105,7 +109,8 @@ function PostDetail() {
   };
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetPostDetail(slug || '');
-  console.log('data:', data);
+  const postId = data?.id;
+  //console.log('data:', data);
 
   if (isLoading)
     return (
@@ -214,18 +219,8 @@ function PostDetail() {
             <div className='icon flex items-center justify-center gap-4'>
               <Share />
               <Warning />
-              <div className='like'>
-                <HoverCard>
-                  <HoverCardTrigger>
-                    <div className='text-[24px]' onClick={() => setLike(!like)}>
-                      {like === true ? <IoMdHeartEmpty className='text-red-500' /> : <IoMdHeartEmpty />}
-                    </div>
-                  </HoverCardTrigger>
-                  <HoverCardContent side='top' className='mt-[10px]'>
-                    Bấm để lưu tin
-                  </HoverCardContent>
-                </HoverCard>
-              </div>
+              <WishlistButton postId={postId} />
+              
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
@@ -411,7 +406,7 @@ function PostDetail() {
           )}
           <div className='space-y-6 my-[30px]'>
             {/* Comment input */}
-            <div className='flex items-start gap-2'>
+            {/* <div className='flex items-start gap-2'>
               <div className='shrink-0'>
                 <img className='w-[32px] h-[32px] rounded-full' src={user?.avatar} alt='avatar' />
               </div>
@@ -428,26 +423,12 @@ function PostDetail() {
                   )}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className='border border-gray-100 my-[10px]'></div>
 
             <div className='space-y-4'>
-              {comments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  onReply={handleReply}
-                  onLike={toggleLike}
-                  replyingTo={replyingTo}
-                  replyContent={replyContent}
-                  setReplyContent={setReplyContent}
-                  user={user}
-                  fillLike={fillLike}
-                  likeCount={likeCount}
-                  handleSubmitReply={handleSubmitReply}
-                />
-              ))}
+            {/* <CommentSection postId={postId} /> */}
             </div>
           </div>
 
