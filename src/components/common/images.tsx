@@ -8,7 +8,7 @@ interface CustomImageProps {
   className?: string;
   loading?: "lazy" | "eager";
   placeholder?: string; 
-  onClick?: () => void; // Thêm sự kiện onClick
+  onClick?: () => void; 
 }
 
 const CustomImage: React.FC<CustomImageProps> = ({
@@ -19,19 +19,19 @@ const CustomImage: React.FC<CustomImageProps> = ({
   className = "",
   loading = "lazy",
   placeholder = "",
-  onClick, // Nhận sự kiện onClick từ props
+  onClick,
 }) => {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <div
-      className={` ${className}`}
+      className={`relative ${className}`}
       style={{
         width: typeof width === "number" ? `${width}px` : width,
         height: typeof height === "number" ? `${height}px` : height,
         overflow: "hidden",
       }}
-      onClick={onClick} // Gán sự kiện onClick vào div chứa ảnh
+      onClick={onClick}
     >
       {!loaded && placeholder && (
         <div
@@ -49,16 +49,15 @@ const CustomImage: React.FC<CustomImageProps> = ({
         src={src}
         alt={alt}
         loading={loading}
-        className={`transition-opacity duration-500 z-[-1] ${
+        className={`w-full h-full transition-opacity duration-500 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
         onLoad={() => setLoaded(true)}
-        style={{
-          objectFit: "cover",
-        }}
+        style={{ objectFit: "contain" }}
       />
     </div>
   );
 };
+
 
 export default CustomImage;

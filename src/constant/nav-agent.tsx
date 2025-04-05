@@ -44,6 +44,10 @@ export const data = {
           title: "Quản lí khách hàng",
           url: "customer-infor",
         },
+        {
+          title: "Nhắn tin",
+          url: "chat",
+        },
       ],
     },
     {
@@ -92,6 +96,7 @@ export const data = {
         },
       ],
     },
+    
 
   ]
   
