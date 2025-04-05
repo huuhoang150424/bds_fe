@@ -28,25 +28,25 @@ import { GoLaw } from 'react-icons/go';
 import { RiArmchairLine } from 'react-icons/ri';
 import Chart from './components/line-chart';
 import BdsForU from './components/bdsForU';
-import { FaCircleCheck } from 'react-icons/fa6';
-import { Button } from '@/components/ui/button';
-import { FiPhoneCall } from 'react-icons/fi';
-import { Card, CardContent } from '@/components/ui/card';
-import { CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+
 import { useSelector } from 'react-redux';
 import { selectToken, selectUser } from '@/redux/authReducer';
 import { Textarea } from '@/components/ui/textarea';
 import { BsSendFill } from 'react-icons/bs';
 import { color } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { AiFillLike } from 'react-icons/ai';
-import CommentItem from './components/comment-item';
+
+
 import InforBrokerPpost from './components/infor-broker-post';
 import { useGetPostDetail } from './hooks/use-get-post-detail';
 import { useParams } from 'react-router-dom';
 import { Loading } from '@/components/common';
 import MapComponent from './components/Map/map';
 import { selectIsAuthenticated } from '@/redux/authReducer';
+import { Button } from '@/components/ui/button';
+import WishlistButton from './components/like';
+
+
 
 
 function PostDetail() {
@@ -109,6 +109,7 @@ function PostDetail() {
   };
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetPostDetail(slug || '');
+  const postId = data?.id;
   //console.log('data:', data);
 
   if (isLoading)
@@ -196,7 +197,7 @@ function PostDetail() {
             <div className='price flex flex-col'>
               <span className='text-sm text-gray-500'>Mức giá</span>
               <span className='text-lg font-[500] mt-[4px]'>
-                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data?.price)}
               </span>
               <span className='text-[12px] text-gray-500'>
                 {' '}
@@ -209,27 +210,17 @@ function PostDetail() {
             </div>
             <div className='S flex flex-col'>
               <span className='text-sm text-gray-500'>Diện tích</span>
-              <span className='text-lg font-[500] mt-[4px]'>{data.squareMeters} m²</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data?.squareMeters} m²</span>
             </div>
             <div className='bedroom flex flex-col'>
               <span className='text-sm text-gray-500'>Phòng ngủ</span>
-              <span className='text-lg font-[500] mt-[4px]'>{data.bedroom} PN</span>
+              <span className='text-lg font-[500] mt-[4px]'>{data?.bedroom} PN</span>
             </div>
             <div className='icon flex items-center justify-center gap-4'>
               <Share />
               <Warning />
-              <div className='like'>
-                <HoverCard>
-                  <HoverCardTrigger>
-                    <div className='text-[24px]' onClick={() => setLike(!like)}>
-                      {like === true ? <IoMdHeartEmpty className='text-red-500' /> : <IoMdHeartEmpty />}
-                    </div>
-                  </HoverCardTrigger>
-                  <HoverCardContent side='top' className='mt-[10px]'>
-                    Bấm để lưu tin
-                  </HoverCardContent>
-                </HoverCard>
-              </div>
+              <WishlistButton postId={postId} />
+              
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
@@ -239,7 +230,7 @@ function PostDetail() {
               <span className='text-2xl font-[500] '>Thông tin mô tả</span>
             </div>
             <div className=''>
-              <p className='text-sm'>{data.description}</p>
+              <p className='text-sm'>{data?.description}</p>
             </div>
           </div>
 
@@ -259,7 +250,7 @@ function PostDetail() {
                       <span>Mức giá</span>
                     </div>
                     <span>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price)}
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data?.price)}
                     </span>
                   </div>
                 </div>
@@ -270,7 +261,7 @@ function PostDetail() {
                       <GrMapLocation className='text-[24px]  font-[500]' />
                       <span>Diện tích</span>
                     </div>
-                    <span>{data.squareMeters} m²</span>
+                    <span>{data?.squareMeters} m²</span>
                   </div>
                 </div>
 
@@ -280,7 +271,7 @@ function PostDetail() {
                       <LuBed className='text-[24px]  font-[500]' />
                       <span>Số phòng ngủ </span>
                     </div>
-                    <span>{data.bedroom} phòng</span>
+                    <span>{data?.bedroom} phòng</span>
                   </div>
                 </div>
 
@@ -290,7 +281,7 @@ function PostDetail() {
                       <MdOutlineBathroom className='text-[24px]  font-[500]' />
                       <span>Số phòng tắm, vệ sinh </span>
                     </div>
-                    <span>{data.bathroom} phòng</span>
+                    <span>{data?.bathroom} phòng</span>
                   </div>
                 </div>
               </div>
@@ -301,7 +292,7 @@ function PostDetail() {
                       <GrDirections className='text-[24px]  font-[500]' />
                       <span>Hướng nhà</span>
                     </div>
-                    <span>{data.direction}</span>
+                    <span>{data?.direction}</span>
                   </div>
                 </div>
 
@@ -322,7 +313,7 @@ function PostDetail() {
                       <span>Pháp Lý </span>
                     </div>
                     <div>
-                      {data.verified === true ? (
+                      {data?.verified === true ? (
                         <span className='text-green-500 '>Đã xác thực</span>
                       ) : (
                         <span className='text-red-500 '>
@@ -340,7 +331,16 @@ function PostDetail() {
                       <RiArmchairLine className='text-[24px]  font-[500]' />
                       <span>Nội thất </span>
                     </div>
-                    <span></span>
+                    <div>
+                    {data?.isFurniture === true ? (
+                        <span className=''>Có </span>
+                      ) : (
+                        <span className=' '>
+                          {/* <FaCircleCheck className='text-red-500' /> */}
+                          không
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -348,7 +348,7 @@ function PostDetail() {
 
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
-              <span className='text-2xl font-[500]'>Lịch sử bán {data.title} </span>
+              <span className='text-2xl font-[500]'>Lịch sử bán {data?.title} </span>
             </div>
             <div className='w-full h-[400px]'>
             <Chart chartData={formattedData} />
@@ -359,24 +359,24 @@ function PostDetail() {
             </div>
             <div className='w-[800px] h-[300px] z-0'>
               {/* <iframe src={posts.map} width='100%' height='100%' style={{ border: 'none' }}></iframe> */}
-              <MapComponent address={data.address} />
+              <MapComponent address={data?.address} />
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
           <div className='flex items-center justify-between'>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày đăng</span>
-              <span className='font-[500]'> {new Date(data.createdAt).toLocaleDateString('vi-VN')}</span>
+              <span className='font-[500]'> {new Date(data?.createdAt).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Ngày hết hạn</span>
-              <span className='font-[500]'>{new Date(data.expiredDate).toLocaleDateString('vi-VN')}</span>
+              <span className='font-[500]'>{new Date(data?.expiredDate).toLocaleDateString('vi-VN')}</span>
             </div>
             <div className='flex flex-col gap-2 items-start'>
               <span className='text-sm text-gray-500'>Loại tin</span>
-              {data.priority === 1 ? (
+              {data?.priority === 1 ? (
                 <span className='font-[500]'>Kim cương</span>
-              ) : data.priority === 2 ? (
+              ) : data?.priority === 2 ? (
                 <span className='font-[500]'>Vàng</span>
               ) : (
                 <span className='font-[500]'>đồng</span>
@@ -392,7 +392,7 @@ function PostDetail() {
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Tìm kiếm theo từ khóa</span>
             </div>
-            {data.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
+            {data?.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
               <div key={tagItem.id} className='flex-wrap gap-2'>
                 <span className='text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 '>
                   {tagItem.tag.tagName}
@@ -406,7 +406,7 @@ function PostDetail() {
           )}
           <div className='space-y-6 my-[30px]'>
             {/* Comment input */}
-            <div className='flex items-start gap-2'>
+            {/* <div className='flex items-start gap-2'>
               <div className='shrink-0'>
                 <img className='w-[32px] h-[32px] rounded-full' src={user?.avatar} alt='avatar' />
               </div>
@@ -423,26 +423,12 @@ function PostDetail() {
                   )}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className='border border-gray-100 my-[10px]'></div>
 
             <div className='space-y-4'>
-              {comments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  onReply={handleReply}
-                  onLike={toggleLike}
-                  replyingTo={replyingTo}
-                  replyContent={replyContent}
-                  setReplyContent={setReplyContent}
-                  user={user}
-                  fillLike={fillLike}
-                  likeCount={likeCount}
-                  handleSubmitReply={handleSubmitReply}
-                />
-              ))}
+            {/* <CommentSection postId={postId} /> */}
             </div>
           </div>
 
@@ -451,10 +437,10 @@ function PostDetail() {
         <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
             <InforBrokerPpost user={{
-              name: data.user.fullname,
-              email: data.user.email, 
-              phone: data.user.phone,
-              avatar: data.user.avatar,
+              name: data?.user.fullname,
+              email: data?.user.email, 
+              phone: data?.user.phone,
+              avatar: data?.user.avatar,
             }}             />
           </div>
         </div>

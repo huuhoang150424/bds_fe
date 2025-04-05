@@ -28,9 +28,9 @@ export default function MainRouter() {
           <Route path='/post/:slug' element={<PostDetail/>} />
           <Route path='/brokers' element={<RealEstateAgentDirectory/>} />
           <Route path='/profile/:id' element={<Profile/>} />
-          <Route path='/new/:id' element={<NewsDetail/>} />
-          <Route path='/business' element={<Business/>} />
-          <Route path='/business/:id' element={<BusinessDetail/>} />
+          <Route path='/new/:slug' element={<NewsDetail/>} />
+          {/* <Route path='/business' element={<Business/>} />
+          <Route path='/business/:id' element={<BusinessDetail/>} /> */}
           <Route path='/support' element={<UltilitySuport/>} />
 
           <Route path='*' element={<NotFoundScreen/>} />

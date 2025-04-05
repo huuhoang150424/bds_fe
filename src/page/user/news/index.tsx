@@ -26,7 +26,7 @@ function News() {
         <NewsTitle/>
       </div>
       <div className='grid grid-cols-12 gap-4'>
-        <div className='col-span-8 '>
+        <div className='col-span-8 my-[60px]'>
           <ListNew/>
         </div>
         <div className='col-span-4 col-start-9 my-[30px] '>
