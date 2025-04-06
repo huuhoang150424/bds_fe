@@ -35,6 +35,8 @@ import { selectIsAuthenticated } from '@/redux/authReducer';
 import { Button } from '@/components/ui/button';
 import WishlistButton from './components/like';
 
+import { PostCommentSection } from './components/comment/post-comment-section';
+
 
 
 
@@ -404,7 +406,7 @@ function PostDetail() {
             <div className='border border-gray-100 my-[10px]'></div>
 
             <div className='space-y-4'>
-            {/* <CommentSection postId={postId} /> */}
+            <PostCommentSection postId={postId} />
             </div>
           </div>
 

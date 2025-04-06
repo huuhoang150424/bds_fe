@@ -34,13 +34,14 @@ const WishlistButton = ({ postId }: { postId: string }) => {
   return (
     <Button onClick={handleClick} variant='ghost' className='p-0 hover:bg-transparent'>
       {liked ? (
-        <div className='text-[24px]'>
-          <FaHeart className=' text-red-500 transition-all' />
+        <div className=''>
+          <FaHeart size={30} className=' text-red-500 transition-all !w-[22px] !h-[22px]' />
         </div>
         
       ) : (
         <div  className='text-[24px]'>
-          <FaRegHeart className='transition-all' />
+          <FaRegHeart size={50} className='transition-all !w-[22px] !h-[22px]' />
+
         </div>
       )}
     </Button>

@@ -1,14 +1,28 @@
 import { handleApi } from '@/service';
+import { Comment } from './get-comment-by-post';
 
-export const addComment = async (data: { postId: string; content: string }) => {
+interface CommentData {
+  postId: string;
+  content: string;
+  parentId?: string | null;
+}
+
+export const addComment = async (data: CommentData): Promise<Comment & { postId: string; parentId?: string | null }> => {
   try {
-    console.log('Adding comment with data:', data);
-    const url = '/comment/createComment'; // Kiểm tra endpoint thực tế từ API
+    const url = '/comment/createComment';
     const response = await handleApi(url, data, 'POST');
-    console.log('Response from addComment:', response);
-    return response.data; // Hoặc response.data.data tùy cấu trúc
+    
+    // Đảm bảo trả về dữ liệu với cấu trúc nhất quán
+    const responseData = response.data.data || response.data;
+    
+    // Đảm bảo trả về thông tin cần thiết cho các invalidateQueries
+    return {
+      ...responseData,
+      postId: data.postId,
+      parentId: data.parentId
+    };
   } catch (error) {
     console.error('Error adding comment:', error);
-    throw error; // Ném lỗi để React Query xử lý
+    throw error;
   }
 };

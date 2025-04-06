@@ -18,6 +18,7 @@ import NewsPopular from '../news/components/news-popular';
 
 
 
+
 function NewsArticle() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetNewsDetail(slug || '');

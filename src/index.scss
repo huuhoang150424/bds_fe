@@ -346,3 +346,58 @@
   scrollbar-width: thin;
   scrollbar-color: #c3c3c3 #f1f1f1;
 }
+
+
+.edit-description {
+
+
+  h1 {
+    font-size: 5rem;
+    color: red;
+     // 24px
+  }
+
+  h2 {
+    font-size: 1.25rem; // 20px
+  }
+
+  h3 {
+    font-size: 1.125rem; // 18px
+  }
+
+  // Kiểu cho span bên trong
+  span {
+    display: block; // Đảm bảo span chiếm toàn bộ chiều rộng
+    line-height: 1.5; // Khoảng cách dòng hợp lý
+
+    // Định kiểu cho các thẻ heading (h1, h2, h3, v.v.)
+    
+    // Định kiểu cho danh sách không thứ tự (ul)
+    ul {
+      margin: 1em 0; // Khoảng cách trên dưới
+      padding-left: 1.5em; // Thụt đầu dòng
+      list-style-type: disc; // Kiểu dấu đầu dòng (chấm tròn)
+    }
+
+    // Định kiểu cho mục danh sách (li)
+    li {
+      margin: 0.5em 0; // Khoảng cách giữa các mục
+      font-size: 1rem; // Kích thước chữ
+      line-height: 1.5; // Khoảng cách dòng
+    }
+
+    // Định kiểu bổ sung cho các thẻ khác nếu cần
+    p {
+      margin: 1em 0; // Khoảng cách đoạn văn
+      font-size: 1rem;
+    }
+
+    strong {
+      font-weight: 700; // Chữ đậm
+    }
+
+    em {
+      font-style: italic; // Chữ nghiêng
+    }
+  }
+}
