@@ -7,7 +7,6 @@ export const usePostWishlist = () => {
         mutationFn: (data: { postId: string }) => postWishlist(data),
         onSuccess: (newWishlist) => {
             queryClient.invalidateQueries({ queryKey: ['getWishlist'] });
-            console.log("Wishlist added successfully:", newWishlist);
         },
         
         onError: (error) => {

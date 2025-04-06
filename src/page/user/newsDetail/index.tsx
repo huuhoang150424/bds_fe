@@ -21,8 +21,6 @@ import NewsPopular from '../news/components/news-popular';
 function NewsArticle() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetNewsDetail(slug || '');
-  console.log('slug is:', slug);
-  console.log('data is:', data);
   
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading article</div>;

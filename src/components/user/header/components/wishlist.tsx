@@ -10,10 +10,9 @@ import { X } from 'lucide-react';
 
 function Wishlist() {
   const { data, isLoading, isError } = useGetWishlist();
-  const { mutate: deleteWishlist } = useDeleteWishlist(); // Lấy hàm `mutate`
+  const { mutate: deleteWishlist } = useDeleteWishlist();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  console.log('Wishlist data:', data?.data);
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading wishlist.</div>;
 

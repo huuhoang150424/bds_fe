@@ -37,7 +37,6 @@ axiosClient.interceptors.request.use(
           if (data && data.data && data.data.accessToken) {
             accessToken = data.data.accessToken;
             store.dispatch(updateToken({ token: accessToken }));
-            console.log("cập nhật token thành công");
           }
         }
         config.headers.authorization = `Bearer ${accessToken}`;

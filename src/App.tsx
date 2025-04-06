@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
+import { AppProvider } from '@/context/chat';
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
   const smallDot = useRef<HTMLDivElement | null>(null);
@@ -50,7 +51,9 @@ function App() {
         ref={smallDot}
         className='w-2 h-2 rounded-full bg-primaryColor absolute left-[17px] top-[17px] z-[999999] transition-transform duration-500 ease-out pointer-events-none'
       ></div>
-      <Router />
+      <AppProvider>
+        <Router />
+      </AppProvider>
     </div>
   );
 }

@@ -9,7 +9,6 @@ export const getAllNews = async (limit: number, lastCreatedAt: string) => {
     const url = `/new/getAllNew?limit=${limit}&lastCreatedAt=${encodeURI(lastCreatedAt)}`;
 
     const response = await handleApi(url, undefined, "GET");
-    console.log("API response:", response.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching news:", error);

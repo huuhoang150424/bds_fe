@@ -17,7 +17,6 @@ import {useGetPostHabbit} from '../hooks/use-get-post-habbit'
 function BdsForU() {
   const {data, isLoading, isError} = useGetPostHabbit();
 
-  console.log("data", data);
   if (isLoading) return <div><Loading /></div>
   if (isError) return <div>Something went wrong</div>
   return (

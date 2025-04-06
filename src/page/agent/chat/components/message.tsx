@@ -1,25 +1,25 @@
 import { cn } from '@/lib/utils';
-import { Check } from 'lucide-react';
+import { selectUser } from '@/redux/authReducer';
+import { useSelector } from 'react-redux';
 
-const avatarUser="https://phunuvietnam.mediacdn.vn/media/news/33abffcedac43a654ac7f501856bf700/anh-profile-tiet-lo-g-ve-ban-1.jpg";
 export default function Message({message}: {message:any}) {
+  const user=useSelector(selectUser);
+
+
   return (
-    <div  className={cn('flex', message.isUser ? 'justify-end' : 'justify-start')}>
-      <div className={`flex gap-[10px] ${message.type === 'sender' ? 'flex-row' : 'flex-row-reverse'} max-w-[80%]`}>
-        <img src={avatarUser} alt='Avatar' className='rounded-full w-8 h-8 object-cover ' />
+    <div  
+      className={cn('flex',user?.id=== message?.sender?.id ? 'justify-end' : 'justify-start')}
+    >
+      <div className={`flex gap-[10px] ${user?.id=== message?.sender?.id ? 'flex-row-reverse' : ' flex-row'} max-w-[80%]`}>
+        <img src={message?.sender?.avatar} alt='Avatar' className='rounded-full w-8 h-8 object-cover ' />
         <div>
           <div className='flex items-center'>
-            <span className='font-medium text-sm text-gray-700'>{message.sender}</span>
-            <span className='ml-2 text-xs text-gray-500'>{message.time}</span>
-            {message.isUser && <Check className='ml-1 h-4 w-4 text-green-500' />}
+            {/* <span className='font-medium text-sm text-gray-700'>{message?.sender?.fullname}</span> */}
           </div>
           <div
-            className={cn(
-              'mt-1 p-3 rounded-lg',
-              message.isUser ? 'bg-sky-500 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none',
-            )}
+            className={ 'mt-1 p-3 rounded-lg bg-sky-500 text-white rounded-tr-none' }
           >
-            <p>{message.content}</p>
+            <p>{message?.content}</p>
           </div>
         </div>
       </div>

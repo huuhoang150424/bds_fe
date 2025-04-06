@@ -10,9 +10,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60000, // 1 phút
-      gcTime: 300000,   // 5 phút
-      refetchOnWindowFocus: false, // Không refetch khi window được focus
+      staleTime: 60000, 
+      gcTime: 300000,   
+      refetchOnWindowFocus: false, 
     },
   },
 });
@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')!).render(
       <PersistGate loading={null} persistor={persistor}>
         <App />
       </PersistGate>
-      <ReactQueryDevtools initialIsOpen={true} />
+      {/* <ReactQueryDevtools initialIsOpen={true} /> */}
     </QueryClientProvider>
   </Provider>
 );

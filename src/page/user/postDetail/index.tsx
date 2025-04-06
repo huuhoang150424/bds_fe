@@ -1,7 +1,7 @@
-import React, { ReactNode, useState } from 'react';
+import  {  useState } from 'react';
 import { EmblaOptionsType } from 'embla-carousel';
 import Carousel, {
-  Slider,
+
   SliderContainer,
   SliderNextButton,
   SliderPrevButton,
@@ -10,13 +10,9 @@ import Carousel, {
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
 import SliderItem from './components/slide-item';
-import { ChevronLeft, ChevronRight, GitGraph } from 'lucide-react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { IoShareSocialOutline } from 'react-icons/io5';
-import { IoMdHeartEmpty } from 'react-icons/io';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Warning from './components/warning';
-import { comments, imgPreview, posts } from '../../../constant/constPostDetail';
+import { comments, posts } from '../../../constant/constPostDetail';
 import Share from './components/share';
 import { CiMoneyCheck1 } from 'react-icons/ci';
 import { GrMapLocation } from 'react-icons/gr';
@@ -28,15 +24,8 @@ import { GoLaw } from 'react-icons/go';
 import { RiArmchairLine } from 'react-icons/ri';
 import Chart from './components/line-chart';
 import BdsForU from './components/bdsForU';
-
 import { useSelector } from 'react-redux';
 import { selectToken, selectUser } from '@/redux/authReducer';
-import { Textarea } from '@/components/ui/textarea';
-import { BsSendFill } from 'react-icons/bs';
-import { color } from 'framer-motion';
-import { cn } from '@/lib/utils';
-
-
 import InforBrokerPpost from './components/infor-broker-post';
 import { useGetPostDetail } from './hooks/use-get-post-detail';
 import { useParams } from 'react-router-dom';
@@ -50,7 +39,6 @@ import WishlistButton from './components/like';
 
 
 function PostDetail() {
-  const token = useSelector(selectToken)
   const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [like, setLike] = useState<Boolean>(false);
@@ -100,17 +88,14 @@ function PostDetail() {
 
   const handleSubmitReply = (commentId: number) => {
     if (replyContent.trim()) {
-      // Xử lý logic submit reply ở đây
 
-      // Reset state
       setReplyingTo(null);
       setReplyContent('');
     }
   };
   const { slug } = useParams<{ slug: string }>();
-  const { data, isLoading, isError } = useGetPostDetail(slug || '');
+  const { data, isLoading } = useGetPostDetail(slug || '');
   const postId = data?.id;
-  //console.log('data:', data);
 
   if (isLoading)
     return (
@@ -145,8 +130,6 @@ function PostDetail() {
                     />
                   ))}
                 </SliderContainer>
-
-                {/* Nút điều hướng */}
                 <SliderPrevButton
                   className='absolute left-4 top-1/2 -translate-y-1/2 z-10 
                     bg-white/80 hover:bg-white p-2 rounded-full shadow-md 
@@ -165,12 +148,10 @@ function PostDetail() {
                   <ChevronRight className='w-6 h-6' />
                 </SliderNextButton>
 
-                {/* Thumbnail slider */}
                 <div className='mt-4'>
                   <ThumsSlider />
                 </div>
               </Carousel>
-              {/* Hiển thị Lightbox khi click vào ảnh */}
 
               {isOpen && data.images.length > 0 && (
                 <Lightbox
@@ -233,8 +214,6 @@ function PostDetail() {
               <p className='text-sm'>{data?.description}</p>
             </div>
           </div>
-
-          {/* đặc điểm */}
           <div className='characteristic'>
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Đặc điểm bất động sản</span>
@@ -317,7 +296,6 @@ function PostDetail() {
                         <span className='text-green-500 '>Đã xác thực</span>
                       ) : (
                         <span className='text-red-500 '>
-                          {/* <FaCircleCheck className='text-red-500' /> */}
                           Chưa xác thực
                         </span>
                       )}
@@ -336,7 +314,6 @@ function PostDetail() {
                         <span className=''>Có </span>
                       ) : (
                         <span className=' '>
-                          {/* <FaCircleCheck className='text-red-500' /> */}
                           không
                         </span>
                       )}
@@ -358,7 +335,6 @@ function PostDetail() {
               <span className='text-2xl font-[500] '>Xem trên bản đồ</span>
             </div>
             <div className='w-[800px] h-[300px] z-0'>
-              {/* <iframe src={posts.map} width='100%' height='100%' style={{ border: 'none' }}></iframe> */}
               <MapComponent address={data?.address} />
             </div>
           </div>
@@ -436,12 +412,7 @@ function PostDetail() {
         </div>
         <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
-            <InforBrokerPpost user={{
-              name: data?.user.fullname,
-              email: data?.user.email, 
-              phone: data?.user.phone,
-              avatar: data?.user.avatar,
-            }}             />
+            <InforBrokerPpost user={data?.user} />
           </div>
         </div>
       </div>
