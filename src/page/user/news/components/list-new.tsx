@@ -35,8 +35,8 @@ export default function ListNew ()
                 <div>
                   <span className="font-[400] text-[18px] line-clamp-2">{ news?.title }</span>
                 </div>
-                <div>
-                  <span className="text-sm font-[400] w-full line-clamp-3">{ news?.content }</span>
+                <div className="">
+                  <span className="text-sm font-[400] w-full line-clamp-3 "dangerouslySetInnerHTML={{ __html: news?.content || '' }} ></span>
                 </div>
               </div>
               </Link>

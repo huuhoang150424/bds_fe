@@ -1,87 +1,148 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Heart, Loader2, MessageCircle } from "lucide-react";
-import { Comment as CommentType } from "@/page/user/postDetail/services/get-comment-by-post";
-import { formatDistanceToNow } from "date-fns";
-import { useAddComment } from "../../hooks/use-post-comment";
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Heart, Loader2, MessageCircle, Trash2 } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
+import { usePostCommentReply } from "../../hooks/use-post-comment-reply"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useDeleteCommentByPost } from "../../hooks/use-delete-comment-by-post"
 
-
-interface CommentProps {
-  comment: CommentType;
-  replies: CommentType[];
-  commentMap: Map<string, CommentType[]>;
-  postId: string; // Thêm postId từ CommentSection
+interface User {
+  id?: string
+  fullname: string
+  avatar?: string
 }
 
-export function CommentSection({ comment, replies, commentMap, postId }: CommentProps) {
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(0);
-  const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
-  const { mutate: addReply, isPending: isAddingReply } = useAddComment(); // Sử dụng mutation
+export interface CommentType {
+  id: string
+  createdAt: string
+  userId: string
+  postId: string
+  content: string
+  status: string
+  parentId: string | null
+  user: User
+}
+
+interface CommentProps {
+  comment: CommentType
+  replies: CommentType[]
+  commentMap: Map<string, CommentType[]>
+  postId: string
+  onDelete?: (commentId: string) => void
+}
+
+export function Comment({ comment, replies, commentMap, postId }: CommentProps) {
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(0)
+  const [showReplyForm, setShowReplyForm] = useState(false)
+  const [replyContent, setReplyContent] = useState("")
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const { mutate: submitReply, isPending } = usePostCommentReply()
+  const { mutate: deleteComment } = useDeleteCommentByPost()
+
+  console.log("Comment component rendered with comment:", comment)
+  console.log("Replies for this comment:", replies)
 
   const handleLike = () => {
-    if (liked) {
-      setLikes(likes - 1);
-    } else {
-      setLikes(likes + 1);
-    }
-    setLiked(!liked);
-  };
+    setLiked((prev) => !prev)
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
+  }
 
-  const handleAddReply = () => {
-    if (!replyContent.trim()) return;
+  const handleReplySubmit = () => {
+    const trimmed = replyContent.trim()
+    if (!trimmed) return
 
-    addReply(
-      { 
-        postId, 
-        content: replyContent,
-        // parentId: comment.id // Thêm parentId để tạo reply
+    submitReply(
+      {
+        parentId: comment.id,
+        content: trimmed,
+        postId: postId,
       },
       {
         onSuccess: () => {
-          setReplyContent(""); // Clear input
-          setShowReplyForm(false); // Ẩn form sau khi thêm
+          setReplyContent("")
+          setShowReplyForm(false)
         },
-      }
-    );
-  };
+      },
+    )
+  }
 
-  const formattedDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+  
+
+  const handleDeleteComment = async () => {
+    setIsDeleting(true);
+    deleteComment(comment.id, {
+      onSuccess: () => {
+        setShowDeleteDialog(false);
+      },
+      onError: (error) => {
+        console.error("Error deleting comment:", error);
+      },
+      onSettled: () => {
+        setIsDeleting(false);
+      },
+    });
+  };
+  
+
+  const formattedDate = formatDistanceToNow(new Date(comment.createdAt), {
+    addSuffix: true,
+  })
 
   return (
     <div className="space-y-4">
       <div className="flex gap-3">
         <Avatar className="w-10 h-10">
           <AvatarImage
-            src={`/placeholder.svg?height=40&width=40&text=${comment.user.fullname.charAt(0)}`}
+            src={comment.user.avatar || `/placeholder.svg?text=${comment.user.fullname.charAt(0)}`}
             alt={comment.user.fullname}
           />
           <AvatarFallback>{comment.user.fullname.charAt(0)}</AvatarFallback>
         </Avatar>
+
         <div className="flex-1">
           <div className="bg-muted/50 p-3 rounded-lg">
             <div className="flex items-center justify-between mb-1">
-              <div className="font-medium">{comment.user.fullname}</div>
-              <div className="text-xs text-muted-foreground">{formattedDate}</div>
+              <span className="font-medium">{comment.user.fullname}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{formattedDate}</span>
+                <button
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  onClick={() => setShowDeleteDialog(true)}
+                  aria-label="Xóa bình luận"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
             <p className="text-sm">{comment.content}</p>
           </div>
+
           <div className="flex items-center gap-4 mt-1 ml-1">
             <button
               className={`flex items-center gap-1 text-xs ${liked ? "text-red-500" : "text-muted-foreground"}`}
               onClick={handleLike}
             >
               <Heart className={`h-4 w-4 ${liked ? "fill-red-500" : ""}`} />
-              <span>{likes}</span>
+              <span>{likeCount}</span>
             </button>
             <button
               className="flex items-center gap-1 text-xs text-muted-foreground"
-              onClick={() => setShowReplyForm(!showReplyForm)}
+              onClick={() => setShowReplyForm((prev) => !prev)}
             >
               <MessageCircle className="h-4 w-4" />
               <span>Trả lời</span>
@@ -91,23 +152,23 @@ export function CommentSection({ comment, replies, commentMap, postId }: Comment
           {showReplyForm && (
             <div className="mt-3 ml-1">
               <Textarea
-                placeholder="Bình luận..."
+                placeholder="Nhập phản hồi..."
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 className="min-h-[60px] resize-none text-sm"
-                disabled={isAddingReply} // Vô hiệu hóa khi đang gửi
+                disabled={isPending}
               />
               <div className="mt-2 flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={() => setShowReplyForm(false)} disabled={isAddingReply}>
+                <Button variant="outline" size="sm" onClick={() => setShowReplyForm(false)} disabled={isPending}>
                   Hủy
                 </Button>
                 <Button
-                  className="bg-[#E03C31]"
                   size="sm"
-                  onClick={handleAddReply}
-                  disabled={isAddingReply}
+                  onClick={handleReplySubmit}
+                  disabled={isPending || !replyContent.trim()}
+                  className="bg-[#E03C31] hover:bg-[#c73129]"
                 >
-                  {isAddingReply ? <Loader2 className="h-4 w-4 animate-spin" /> : "Bình luận"}
+                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Phản hồi"}
                 </Button>
               </div>
             </div>
@@ -116,18 +177,43 @@ export function CommentSection({ comment, replies, commentMap, postId }: Comment
           {replies.length > 0 && (
             <div className="mt-4 ml-6 space-y-4 border-l-2 border-muted pl-4">
               {replies.map((reply) => (
-                <CommentSection
+                <Comment
                   key={reply.id}
                   comment={reply}
                   replies={commentMap.get(reply.id) || []}
                   commentMap={commentMap}
-                  postId={postId} // Truyền postId tiếp tục cho replies
+                  postId={postId}
+                  
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa bình luận</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa bình luận này? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteComment}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  );
+  )
 }
+

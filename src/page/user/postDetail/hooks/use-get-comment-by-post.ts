@@ -6,5 +6,6 @@ export const useGetCommentByPost = (postId: string) => {
         queryKey: ["commentByPost", postId],
         queryFn: () => getCommentByPost(postId),
         enabled: !!postId,
-    })
+        staleTime: 0, // Đảm bảo luôn refetch khi dữ liệu stale
+    });
 };

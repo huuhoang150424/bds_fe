@@ -30,7 +30,8 @@ export default function NewsTitle() {
             <h2 className='text-white text-[24px] font-semibold leading-[32px]'>
               {latestPost?.title || 'Tin tức bất động sản mới nhất'}
             </h2>
-            <p className='text-white text-[16px] font-normal leading-[26px]'>{latestPost?.content}</p>
+            <div className='text-white text-[16px] font-normal leading-[26px] line-clamp-2'
+            dangerouslySetInnerHTML={{ __html: latestPost?.content || '' }} ></div>
           </div>
         </Link>
       </div>
