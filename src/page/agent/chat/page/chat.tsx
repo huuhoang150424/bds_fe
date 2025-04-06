@@ -29,20 +29,26 @@ export default function Chat() {
   useEffect(() => {
     if (userConversation) {
       setActiveReceiverId(userConversation.id);
-      setReceiverStatus({ active: userConversation.active || false, lastActive: userConversation.lastActive || null });
+      setReceiverStatus({
+        active: userConversation.active || false,
+        lastActive: userConversation.lastActive ? new Date(userConversation.lastActive) : null,
+      });
     }
   }, [userConversation]);
 
   useEffect(() => {
     if (selectedUser?.id) {
       setActiveReceiverId(selectedUser.id);
-      setReceiverStatus({ active: selectedUser.active || false, lastActive: selectedUser.lastActive || null });
+      setReceiverStatus({
+        active: selectedUser.active || false,
+        lastActive: selectedUser.lastActive ? new Date(selectedUser.lastActive) : null,
+      });
     }
   }, [selectedUser]);
 
   useEffect(() => {
     if (getAllMessages) {
-      setAllMessages(getAllMessages?.data);
+      setAllMessages(getAllMessages.data);
     }
   }, [getAllMessages]);
 
@@ -54,6 +60,10 @@ export default function Chat() {
     if (activeReceiverId) {
       connectSocket();
       socket.emit('joinChatConversation', user?.id);
+
+      // Yêu cầu trạng thái của activeReceiverId khi kết nối
+      socket.emit('getUserStatus', activeReceiverId);
+
       const handleNewMessage = (msg: any) => {
         console.log('check tin nhắn mới nhất ', msg);
         setAllMessages((prev) => {
@@ -64,21 +74,53 @@ export default function Chat() {
           return prev;
         });
       };
-      const handleUserStatusUpdate = (data: { userId: string; active: boolean; lastActive: string }) => {
-        console.log(' check hoạt động', data);
-        if (data.userId === user.id) {
-          setReceiverStatus({ active: data.active, lastActive: new Date(data.lastActive) });
+
+      const handleAllUserStatus = (userStatusList: any) => {
+        console.log('check all user status', userStatusList);
+        const receiverStatusData = userStatusList.find((status: any) => status.userId === activeReceiverId);
+        if (receiverStatusData) {
+          setReceiverStatus({
+            active: receiverStatusData.active,
+            lastActive: receiverStatusData.lastActive ? new Date(receiverStatusData.lastActive) : null,
+          });
         }
       };
+
+      const handleUserStatusUpdate = (data: any) => {
+        console.log('check hoạt động', data);
+        if (data.userId === activeReceiverId) {
+          setReceiverStatus({
+            active: data.active,
+            lastActive: data.lastActive ? new Date(data.lastActive) : null,
+          });
+        }
+      };=
+      const handleUserStatus = (data: any) => {
+        console.log('check trạng thái cụ thể', data);
+        if (data.userId === activeReceiverId) {
+          setReceiverStatus({
+            active: data.active,
+            lastActive: data.lastActive ? new Date(data.lastActive) : null,
+          });
+        }
+      };
+
       socket.on('newMessageChat', handleNewMessage);
+      socket.on('allUserStatus', handleAllUserStatus);
       socket.on('userStatusUpdate', handleUserStatusUpdate);
+      socket.on('userStatus', handleUserStatus);
+
       return () => {
         socket.off('newMessageChat', handleNewMessage);
+        socket.off('allUserStatus', handleAllUserStatus);
         socket.off('userStatusUpdate', handleUserStatusUpdate);
+        socket.off('userStatus', handleUserStatus);
       };
     }
   }, [socket, user?.id, activeReceiverId]);
+
   console.log('hoạt động ', receiverStatus);
+
   const handleSendMessages = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -88,7 +130,6 @@ export default function Chat() {
 
   return (
     <div className='flex h-screen bg-white'>
-      {/* Sidebar trái */}
       <div className='w-80 border-r border-gray-200 flex flex-col'>
         <div className='p-4 border-b border-gray-200 flex justify-between items-center'>
           <h1 className='text-xl font-semibold text-gray-600'>Chats</h1>
@@ -96,14 +137,12 @@ export default function Chat() {
             <Plus className='h-5 w-5' />
           </Button>
         </div>
-
         <div className='p-4'>
           <div className='relative'>
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
             <Input placeholder='Search here..' className='pl-10 bg-gray-100 outline-none py-2' />
           </div>
         </div>
-
         <ListUser getReceiverId={setUserConversation} />
       </div>
       <div className='flex-1 flex flex-col'>
@@ -122,13 +161,13 @@ export default function Chat() {
                   </h2>
                   {receiverStatus.active ? (
                     <div className='flex items-center gap-[10px]'>
-                      <div className='h-2 w-2 bg-green-500 rounded-full '></div>
+                      <div className='h-2 w-2 bg-green-500 rounded-full'></div>
                       <p className='text-sm text-gray-500'>Hoạt động</p>
                     </div>
                   ) : (
                     <div className='flex items-center gap-[10px]'>
-                      <div className='h-2 w-2 bg-red-500 rounded-full '></div>
-                      <p className='text-sm text-gray-500'>Không hoạt động</p>
+                      <div className='h-2 w-2 bg-red-500 rounded-full'></div>
+                      <p className='text-sm text-gray-500'>{getTimeAgo(receiverStatus.lastActive)}</p>
                     </div>
                   )}
                 </div>
