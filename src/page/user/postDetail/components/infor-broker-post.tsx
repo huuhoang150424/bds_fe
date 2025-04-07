@@ -75,7 +75,7 @@ function InforBrokerPpost(data: { user: any }) {
           <FiPhoneCall className='w-4 h-4 sm:w-5 sm:h-5' />
           <span className='font-medium'>{data.user.phone}</span>
         </Button>
-        {user?.id === data?.user?.id ? null : (
+        {(user?.id === data?.user?.id || user===null) ? null : (
           <Button
             variant={'outline'}
             onClick={handleSendMessage}

@@ -1,12 +1,6 @@
-import  {  useState } from 'react';
+import { useState } from 'react';
 import { EmblaOptionsType } from 'embla-carousel';
-import Carousel, {
-
-  SliderContainer,
-  SliderNextButton,
-  SliderPrevButton,
-  ThumsSlider,
-} from '@/components/core/carousel';
+import Carousel, { SliderContainer, SliderNextButton, SliderPrevButton, ThumsSlider } from '@/components/core/carousel';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
 import SliderItem from './components/slide-item';
@@ -34,11 +28,8 @@ import MapComponent from './components/Map/map';
 import { selectIsAuthenticated } from '@/redux/authReducer';
 import { Button } from '@/components/ui/button';
 import WishlistButton from './components/like';
-
+import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
 import { PostCommentSection } from './components/comment/post-comment-section';
-
-
-
 
 function PostDetail() {
   const user = useSelector(selectUser);
@@ -90,7 +81,6 @@ function PostDetail() {
 
   const handleSubmitReply = (commentId: number) => {
     if (replyContent.trim()) {
-
       setReplyingTo(null);
       setReplyContent('');
     }
@@ -105,13 +95,12 @@ function PostDetail() {
         <Loading />
       </div>
     );
-    
 
-    const formattedData = data.priceHistory.map((item: { price: number; changed_at: string | number | Date; }) => ({
-      price: item.price,
-      changed_at: new Date(item.changed_at).toLocaleDateString('vi-VN'),
-    }));
-  
+  const formattedData = data.priceHistory.map((item: { price: number; changed_at: string | number | Date }) => ({
+    price: item.price,
+    changed_at: new Date(item.changed_at).toLocaleDateString('vi-VN'),
+  }));
+
   return (
     <div className='max-w-6xl h-full mx-auto pt-[80px] px-4 md:px-6 lg:px-8'>
       <div className='grid grid-cols-12 gap-6'>
@@ -201,9 +190,13 @@ function PostDetail() {
             </div>
             <div className='icon flex items-center justify-center gap-4'>
               <Share />
-              <Warning />
-              <WishlistButton postId={postId} />
-              
+              <AuthGuard actionType='warning'>
+                <Warning />
+              </AuthGuard>
+
+              <AuthGuard actionType='like'>
+                <WishlistButton postId={postId} />
+              </AuthGuard>
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
@@ -297,9 +290,7 @@ function PostDetail() {
                       {data?.verified === true ? (
                         <span className='text-green-500 '>Đã xác thực</span>
                       ) : (
-                        <span className='text-red-500 '>
-                          Chưa xác thực
-                        </span>
+                        <span className='text-red-500 '>Chưa xác thực</span>
                       )}
                     </div>
                   </div>
@@ -312,13 +303,7 @@ function PostDetail() {
                       <span>Nội thất </span>
                     </div>
                     <div>
-                    {data?.isFurniture === true ? (
-                        <span className=''>Có </span>
-                      ) : (
-                        <span className=' '>
-                          không
-                        </span>
-                      )}
+                      {data?.isFurniture === true ? <span className=''>Có </span> : <span className=' '>không</span>}
                     </div>
                   </div>
                 </div>
@@ -330,7 +315,7 @@ function PostDetail() {
               <span className='text-2xl font-[500]'>Lịch sử bán {data?.title} </span>
             </div>
             <div className='w-full h-[400px]'>
-            <Chart chartData={formattedData} />
+              <Chart chartData={formattedData} />
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
@@ -370,7 +355,7 @@ function PostDetail() {
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Tìm kiếm theo từ khóa</span>
             </div>
-            {data?.tagPosts.map( (tagItem: { id: string; tag: { tagName: string } }, index: number) => (
+            {data?.tagPosts.map((tagItem: { id: string; tag: { tagName: string } }, index: number) => (
               <div key={tagItem.id} className='flex-wrap gap-2'>
                 <span className='text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 '>
                   {tagItem.tag.tagName}
@@ -379,9 +364,7 @@ function PostDetail() {
             ))}
           </div>
           <div className='border border-gray-100 my-[20px]'></div>
-          {isAuthenticated === true && (
-            <BdsForU />
-          )}
+          {isAuthenticated === true && <BdsForU />}
           <div className='space-y-6 my-[30px]'>
             {/* Comment input */}
             {/* <div className='flex items-start gap-2'>
@@ -406,7 +389,9 @@ function PostDetail() {
             <div className='border border-gray-100 my-[10px]'></div>
 
             <div className='space-y-4'>
-            <PostCommentSection postId={postId} />
+              <AuthGuard actionType="comment">
+                <PostCommentSection postId={ postId } />
+              </AuthGuard>
             </div>
           </div>
 

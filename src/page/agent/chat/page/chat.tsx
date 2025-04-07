@@ -60,8 +60,6 @@ export default function Chat() {
     if (activeReceiverId) {
       connectSocket();
       socket.emit('joinChatConversation', user?.id);
-
-      // Yêu cầu trạng thái của activeReceiverId khi kết nối
       socket.emit('getUserStatus', activeReceiverId);
 
       const handleNewMessage = (msg: any) => {
@@ -94,7 +92,7 @@ export default function Chat() {
             lastActive: data.lastActive ? new Date(data.lastActive) : null,
           });
         }
-      };=
+      };
       const handleUserStatus = (data: any) => {
         console.log('check trạng thái cụ thể', data);
         if (data.userId === activeReceiverId) {

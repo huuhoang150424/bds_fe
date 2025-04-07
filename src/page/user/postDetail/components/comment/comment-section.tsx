@@ -1,12 +1,10 @@
-"use client"
-
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Heart, Loader2, MessageCircle, Trash2 } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
-import { usePostCommentReply } from "../../hooks/use-post-comment-reply"
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Heart, Loader2, MessageCircle, Trash2 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { usePostCommentReply } from "../../hooks/use-post-comment-reply";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,55 +14,65 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { useDeleteCommentByPost } from "../../hooks/use-delete-comment-by-post"
+} from "@/components/ui/alert-dialog";
+import { useDeleteCommentByPost } from "../../hooks/use-delete-comment-by-post";
 
 interface User {
-  id?: string
-  fullname: string
-  avatar?: string
+  id?: string;
+  fullname: string;
+  avatar?: string;
 }
 
 export interface CommentType {
-  id: string
-  createdAt: string
-  userId: string
-  postId: string
-  content: string
-  status: string
-  parentId: string | null
-  user: User
+  id: string;
+  createdAt: string;
+  userId: string;
+  postId: string;
+  content: string;
+  status: string;
+  parentId: string | null;
+  user: User;
 }
 
 interface CommentProps {
-  comment: CommentType
-  replies: CommentType[]
-  commentMap: Map<string, CommentType[]>
-  postId: string
-  onDelete?: (commentId: string) => void
+  comment: CommentType;
+  replies: CommentType[];
+  commentMap: Map<string, CommentType[]>;
+  postId: string;
+  isAuthenticated?: boolean;
+  onAuthRequired?: () => void;
 }
 
-export function Comment({ comment, replies, commentMap, postId }: CommentProps) {
-  const [liked, setLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(0)
-  const [showReplyForm, setShowReplyForm] = useState(false)
-  const [replyContent, setReplyContent] = useState("")
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const { mutate: submitReply, isPending } = usePostCommentReply()
-  const { mutate: deleteComment } = useDeleteCommentByPost()
-
-  console.log("Comment component rendered with comment:", comment)
-  console.log("Replies for this comment:", replies)
+export function Comment({
+  comment,
+  replies,
+  commentMap,
+  postId,
+  isAuthenticated = false,
+  onAuthRequired,
+}: CommentProps) {
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { mutate: submitReply, isPending } = usePostCommentReply();
+  const { mutate: deleteComment } = useDeleteCommentByPost();
 
   const handleLike = () => {
-    setLiked((prev) => !prev)
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
-  }
+    setLiked((prev) => !prev);
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+  };
 
   const handleReplySubmit = () => {
-    const trimmed = replyContent.trim()
-    if (!trimmed) return
+    if (!isAuthenticated) {
+      if (onAuthRequired) onAuthRequired();
+      return;
+    }
+
+    const trimmed = replyContent.trim();
+    if (!trimmed) return;
 
     submitReply(
       {
@@ -74,16 +82,19 @@ export function Comment({ comment, replies, commentMap, postId }: CommentProps) 
       },
       {
         onSuccess: () => {
-          setReplyContent("")
-          setShowReplyForm(false)
+          setReplyContent("");
+          setShowReplyForm(false);
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
-  
+  const handleDeleteComment = () => {
+    if (!isAuthenticated) {
+      if (onAuthRequired) onAuthRequired();
+      return;
+    }
 
-  const handleDeleteComment = async () => {
     setIsDeleting(true);
     deleteComment(comment.id, {
       onSuccess: () => {
@@ -97,11 +108,18 @@ export function Comment({ comment, replies, commentMap, postId }: CommentProps) 
       },
     });
   };
-  
+
+  const handleShowDeleteDialog = () => {
+    if (!isAuthenticated) {
+      if (onAuthRequired) onAuthRequired();
+      return;
+    }
+    setShowDeleteDialog(true);
+  };
 
   const formattedDate = formatDistanceToNow(new Date(comment.createdAt), {
     addSuffix: true,
-  })
+  });
 
   return (
     <div className="space-y-4">
@@ -122,7 +140,7 @@ export function Comment({ comment, replies, commentMap, postId }: CommentProps) 
                 <span className="text-xs text-muted-foreground">{formattedDate}</span>
                 <button
                   className="text-muted-foreground hover:text-destructive transition-colors"
-                  onClick={() => setShowDeleteDialog(true)}
+                  onClick={handleShowDeleteDialog} // Sử dụng hàm kiểm tra đăng nhập
                   aria-label="Xóa bình luận"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -183,7 +201,8 @@ export function Comment({ comment, replies, commentMap, postId }: CommentProps) 
                   replies={commentMap.get(reply.id) || []}
                   commentMap={commentMap}
                   postId={postId}
-                  
+                  isAuthenticated={isAuthenticated}
+                  onAuthRequired={onAuthRequired}
                 />
               ))}
             </div>
@@ -214,6 +233,5 @@ export function Comment({ comment, replies, commentMap, postId }: CommentProps) 
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }
-
