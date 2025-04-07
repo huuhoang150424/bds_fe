@@ -59,6 +59,7 @@ export default function PropertyListings() {
   const { data, isLoading, isError } = useGetListPosts(5, page);
   console.log('data', data);
   console.log('total Page:', data?.totalPages);
+  console.log('total post', data?.posts.length);
 
   return (
     <div className='post w-full lg:w-[75%] p-[15px] overflow-y-auto'>
