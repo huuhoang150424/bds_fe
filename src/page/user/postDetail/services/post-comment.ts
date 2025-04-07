@@ -11,11 +11,7 @@ export const addComment = async (data: CommentData): Promise<Comment & { postId:
   try {
     const url = '/comment/createComment';
     const response = await handleApi(url, data, 'POST');
-    
-    // Đảm bảo trả về dữ liệu với cấu trúc nhất quán
     const responseData = response.data.data || response.data;
-    
-    // Đảm bảo trả về thông tin cần thiết cho các invalidateQueries
     return {
       ...responseData,
       postId: data.postId,

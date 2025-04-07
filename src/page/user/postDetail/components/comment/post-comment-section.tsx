@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { useGetCommentByPost } from '../../hooks/use-get-comment-by-post';
-import { useAddComment } from '../../hooks/use-post-comment';
-import { CommentType } from './comment-section';
+import { useAddComment } from '../../hooks/use-post-comment';;
 import { Comment } from './comment-section';
-import { useDeleteCommentByPost } from '../../hooks/use-delete-comment-by-post';
 import { Input } from '@/components/ui/input';
 
 interface PostCommentSectionProps {
@@ -19,22 +16,7 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
   const { data: commentResponse, isLoading } = useGetCommentByPost(postId);
   const [newComment, setNewComment] = useState('');
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
-  const { mutate: addCommentReply, isPending: isAddingCommentReply } = useAddComment();
-  const { mutate: deleteComment, isPending: isDeletingComment } = useDeleteCommentByPost();
 
-  const rootComments: CommentType[] = [];
-  const commentMap = new Map<string, CommentType[]>();
-
-  commentResponse?.forEach((comment: CommentType) => {
-    if (!comment.parentId) {
-      rootComments.push(comment);
-    } else {
-      if (!commentMap.has(comment.parentId)) {
-        commentMap.set(comment.parentId, []);
-      }
-      commentMap.get(comment.parentId)!.push(comment);
-    }
-  });
 
   const handleAddComment = () => {
     if (!isAuthenticated) {
@@ -55,35 +37,6 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
     );
   };
 
-  const handleAddCommentReply = (parentId: string, content: string) => {
-    if (!isAuthenticated) {
-      if (onAuthRequired) onAuthRequired();
-      return;
-    }
-
-    const trimmed = content.trim();
-    if (!trimmed) return;
-
-    addCommentReply(
-      { parentId, content, postId },
-      {
-        onSuccess: () => {
-          setNewComment('');
-        },
-      },
-    );
-  };
-
-  const handleDeleteComment = (commentId: string) => {
-    if (!isAuthenticated) {
-      if (onAuthRequired) onAuthRequired();
-      return;
-    }
-
-    deleteComment(commentId, {});
-  };
-
-  const commentCount = commentResponse?.length ?? 0;
 
   return (
     <div className='space-y-6 p-4'>
@@ -108,14 +61,12 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
 
       {isLoading ? (
         <div className='text-center'>Đang tải bình luận...</div>
-      ) : rootComments.length > 0 ? (
+      ) : commentResponse?.data?.data.length > 0 ? (
         <div className='space-y-6'>
-          {rootComments.map((comment) => (
+          {commentResponse?.data?.data.map((comment:any) => (
             <Comment
               key={comment.id}
               comment={comment}
-              replies={commentMap.get(comment.id) || []}
-              commentMap={commentMap}
               postId={postId}
               isAuthenticated={isAuthenticated}
               onAuthRequired={onAuthRequired}
@@ -127,6 +78,8 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
           Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
         </div>
       )}
+
+    
     </div>
   );
 }

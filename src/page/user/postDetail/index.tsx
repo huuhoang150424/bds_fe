@@ -19,25 +19,21 @@ import { RiArmchairLine } from 'react-icons/ri';
 import Chart from './components/line-chart';
 import BdsForU from './components/bdsForU';
 import { useSelector } from 'react-redux';
-import { selectToken, selectUser } from '@/redux/authReducer';
 import InforBrokerPpost from './components/infor-broker-post';
 import { useGetPostDetail } from './hooks/use-get-post-detail';
 import { useParams } from 'react-router-dom';
 import { Loading } from '@/components/common';
 import MapComponent from './components/Map/map';
 import { selectIsAuthenticated } from '@/redux/authReducer';
-import { Button } from '@/components/ui/button';
 import WishlistButton from './components/like';
 import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
 import { PostCommentSection } from './components/comment/post-comment-section';
 
 function PostDetail() {
-  const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [like, setLike] = useState<Boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [send, setSend] = useState(false);
   const [fillLike, setFillLike] = useState<{ [key: number]: boolean }>({});
   const [numberLike, setNumberLike] = useState(comments);
   const [likeCount, setLikeCount] = useState<{ [key: number]: number }>({});
