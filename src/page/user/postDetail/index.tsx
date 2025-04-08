@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { EmblaOptionsType } from 'embla-carousel';
 import Carousel, { SliderContainer, SliderNextButton, SliderPrevButton, ThumsSlider } from '@/components/core/carousel';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css';
-import SliderItem from './components/slide-item';
+import { useSelector } from 'react-redux';
+import { useGetPostDetail } from './hooks/use-get-post-detail';
+import { useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Warning from './components/warning';
-import {  posts } from '../../../constant/constPostDetail';
-import Share from './components/share';
 import { CiMoneyCheck1 } from 'react-icons/ci';
 import { GrMapLocation } from 'react-icons/gr';
 import { LuBed } from 'react-icons/lu';
@@ -16,18 +13,24 @@ import { GrDirections } from 'react-icons/gr';
 import { AiOutlineHome } from 'react-icons/ai';
 import { GoLaw } from 'react-icons/go';
 import { RiArmchairLine } from 'react-icons/ri';
-import Chart from './components/line-chart';
-import BdsForU from './components/bdsForU';
-import { useSelector } from 'react-redux';
-import InforBrokerPpost from './components/infor-broker-post';
-import { useGetPostDetail } from './hooks/use-get-post-detail';
-import { useParams } from 'react-router-dom';
-import { Loading } from '@/components/common';
-import MapComponent from './components/Map/map';
 import { selectIsAuthenticated } from '@/redux/authReducer';
-import WishlistButton from './components/like';
+import { Loading } from '@/components/common';
 import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
-import { PostCommentSection } from './components/comment/post-comment-section';
+import SliderItem from './components/slide-item';
+import Share from './components/share';
+import Warning from './components/warning';
+import WishlistButton from './components/like';
+import InforBrokerPpost from './components/infor-broker-post';
+import { posts } from '../../../constant/constPostDetail';
+
+// Tải động các thành phần nội bộ
+const Lightbox = lazy(() => import('react-image-lightbox'));
+const Chart = lazy(() => import('./components/line-chart'));
+const MapComponent = lazy(() => import('./components/Map/map'));
+const BdsForU = lazy(() => import('./components/bds-outstanding'));
+const PostCommentSection = lazy(() => import('./components/comment/post-comment-section'));
+
+import 'react-image-lightbox/style.css';
 
 function PostDetail() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -48,7 +51,7 @@ function PostDetail() {
   if (isLoading)
     return (
       <div>
-        <Loading />
+        <Loading className="mx-auto my-[100px] "/>
       </div>
     );
 
@@ -98,16 +101,18 @@ function PostDetail() {
                 </div>
               </Carousel>
               {isOpen && data.images.length > 0 && (
-                <Lightbox
-                  mainSrc={data.images[currentIndex].image_url}
-                  nextSrc={data.images[(currentIndex + 1) % data.images.length].image_url}
-                  prevSrc={data.images[(currentIndex + data.images.length - 1) % data.images.length].image_url}
-                  onCloseRequest={() => setIsOpen(false)}
-                  onMovePrevRequest={() =>
-                    setCurrentIndex((currentIndex + data.images.length - 1) % data.images.length)
-                  }
-                  onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data.images.length)}
-                />
+                <Suspense fallback={<Loading className="mx-auto my-[100px] "/>}>
+                  <Lightbox
+                    mainSrc={data.images[currentIndex].image_url}
+                    nextSrc={data.images[(currentIndex + 1) % data.images.length].image_url}
+                    prevSrc={data.images[(currentIndex + data.images.length - 1) % data.images.length].image_url}
+                    onCloseRequest={() => setIsOpen(false)}
+                    onMovePrevRequest={() =>
+                      setCurrentIndex((currentIndex + data.images.length - 1) % data.images.length)
+                    }
+                    onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data.images.length)}
+                  />
+                </Suspense>
               )}
             </div>
           </div>
@@ -258,14 +263,18 @@ function PostDetail() {
               <span className='text-2xl font-[500]'>Lịch sử bán {data?.title} </span>
             </div>
             <div className='w-full h-[400px]'>
-              <Chart chartData={formattedData} />
+              <Suspense fallback={<Loading className="mx-auto my-[100px] "/>}>
+                <Chart chartData={formattedData} />
+              </Suspense>
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Xem trên bản đồ</span>
             </div>
             <div className='w-[800px] h-[300px] z-0'>
-              <MapComponent address={data?.address} />
+              <Suspense fallback={<Loading className="mx-auto my-[100px] "/>}>
+                <MapComponent address={data?.address} />
+              </Suspense>
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
@@ -307,12 +316,19 @@ function PostDetail() {
             ))}
           </div>
           <div className='border border-gray-100 my-[20px]'></div>
-          {isAuthenticated === true && <BdsForU />}
+          {isAuthenticated === true && (
+            <Suspense fallback={<Loading className="mx-auto my-[100px] "/>}>
+              <BdsForU />
+            </Suspense>
+          )}
           <div className='space-y-6 my-[30px]'>
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='space-y-4'>
               <AuthGuard actionType="comment">
-                <PostCommentSection postId={ postId } />
+                {/* <Suspense fallback={<Loading className="mx-auto my-[100px] "/>}>
+                  <PostCommentSection postId={postId} />
+                </Suspense> */}
+                <PostCommentSection postId={postId} />
               </AuthGuard>
             </div>
           </div>

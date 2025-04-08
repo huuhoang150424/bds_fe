@@ -5,7 +5,7 @@ import { useGetCommentByPost } from '../../hooks/use-get-comment-by-post';
 import { useAddComment } from '../../hooks/use-post-comment';
 import { Comment } from './comment-section';
 import { Input } from '@/components/ui/input';
-import { Pagination } from '../../../../../components/user/pagination';
+import { Pagination } from '@/components/user/pagination';
 
 interface PostCommentSectionProps {
   postId: string;
@@ -13,7 +13,7 @@ interface PostCommentSectionProps {
   onAuthRequired?: () => void;
 }
 
-export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequired }: PostCommentSectionProps) {
+export default function PostCommentSection({ postId, isAuthenticated = false, onAuthRequired }: PostCommentSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5); 
   const [newComment, setNewComment] = useState('');
@@ -43,8 +43,6 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  console.log('Meta:', commentResponse?.data.meta);
 
   return (
     <div className='space-y-6 p-4'>

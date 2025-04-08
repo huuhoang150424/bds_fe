@@ -85,7 +85,6 @@ export default function Chat() {
       };
 
       const handleUserStatusUpdate = (data: any) => {
-        console.log('check hoạt động', data);
         if (data.userId === activeReceiverId) {
           setReceiverStatus({
             active: data.active,
@@ -94,7 +93,6 @@ export default function Chat() {
         }
       };
       const handleUserStatus = (data: any) => {
-        console.log('check trạng thái cụ thể', data);
         if (data.userId === activeReceiverId) {
           setReceiverStatus({
             active: data.active,
@@ -116,8 +114,6 @@ export default function Chat() {
       };
     }
   }, [socket, user?.id, activeReceiverId]);
-
-  console.log('hoạt động ', receiverStatus);
 
   const handleSendMessages = (e: React.FormEvent) => {
     e.preventDefault();

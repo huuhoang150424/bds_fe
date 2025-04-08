@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import CustomImage from '../../common/images';
-import { CiHeart } from 'react-icons/ci';
+import CustomImage from '@/components/common/images';
 import { Button } from '@/components/ui/button';
 import { FaBarsStaggered } from 'react-icons/fa6';
 import { useState } from 'react';
@@ -10,14 +9,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTrigger } from
 import { useAuthModal } from '@/context/auth-modal';
 import { logout, selectIsAuthenticated, selectUser } from '@/redux/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
-import { cn } from '@/lib/utils';
-import { PiBellRinging } from 'react-icons/pi';
 import { IoChevronDownOutline } from 'react-icons/io5';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { BsCheckAll } from 'react-icons/bs';
 import { AiFillDashboard } from 'react-icons/ai';
 import { FaLock, FaSignOutAlt, FaClipboardList, FaUsers, FaWallet, FaGift, FaMoneyBillWave } from 'react-icons/fa';
 import { MdDashboard, MdManageAccounts } from 'react-icons/md';
@@ -29,6 +22,7 @@ import { Loading } from '../../common';
 import Wishlist from './components/wishlist';
 import CreatePostButton from './components/create-post';
 import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
+import Notification from './components/notification';
 const menuItemsSell = [
   'Bán căn hộ chung cư',
   'Bán chung cư mini, căn hộ dịch vụ',
@@ -80,7 +74,7 @@ function Header() {
   const [loading, setLoading] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
-  const [read, setRead] = useState(false);
+
   const navigate = useNavigate();
 
   const toggleMenu = (menu: string) => {
@@ -186,52 +180,8 @@ function Header() {
         {isAuthenticated ? (
           <div className='flex items-center gap-[20px] mr-[15px]'>
             <Wishlist />
-            <Popover>
-              <PopoverTrigger>
-                <PiBellRinging size={22} />
-              </PopoverTrigger>
-              <PopoverContent className='z-[100] w-[500px] mt-[10px]'>
-                <div className='flex items-center justify-between mb-[10px]'>
-                  <span>Thông báo</span>
-                  <div className='flex items-center space-x-2'>
-                    <Switch id='airplane-mode' />
-                    <label htmlFor='airplane-mode'>Chưa đọc</label>
-                    <HoverCard>
-                      <HoverCardTrigger>
-                        <div className='text-[24px]'>
-                          <BsCheckAll
-                            className={cn(read === true ? 'opacity-20' : 'font-bold')}
-                            onClick={() => setRead(!read)}
-                          />
-                        </div>
-                      </HoverCardTrigger>
-                      <HoverCardContent>Đánh dấu tất cả đã đọc thông báo</HoverCardContent>
-                    </HoverCard>
-                  </div>
-                </div>
-                <div className='border border-gray-100 w-full flex justify-center'></div>
-                <div>
-                  <Tabs defaultValue='account' className='w-[500px] '>
-                    <TabsList className='bg-[#fff]'>
-                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='account'>
-                        Tất cả
-                      </TabsTrigger>
-                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
-                        Tin đăng
-                      </TabsTrigger>
-                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
-                        Tài chính
-                      </TabsTrigger>
-                      <TabsTrigger className='bg-[#fff] hover:text-[#E03C31]' value='password'>
-                        Khuyến mãi
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value='account'>Make changes to your account here.</TabsContent>
-                    <TabsContent value='password'>Change your password here.</TabsContent>
-                  </Tabs>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <Notification />
+
             <HoverCard>
               <HoverCardTrigger>
                 <div className='avt flex items-center gap-[10px] relative'>
