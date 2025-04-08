@@ -1,5 +1,4 @@
 import { handleApi } from "@/service";
-import { Comment } from "./get-comment-by-post";
 
 
 

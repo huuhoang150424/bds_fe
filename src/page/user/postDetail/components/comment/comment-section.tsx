@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Heart, Loader2, MessageCircle, Trash2 } from 'lucide-react';
+import { Loader2, MessageCircle, Trash2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { usePostCommentReply } from '../../hooks/use-post-comment-reply';
 import { useGetCommentReply } from '../../hooks/use-get-comment-reply';
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { useDeleteCommentByPost } from '../../hooks/use-delete-comment-by-post';
+import { useToggleLikeComment } from '../../hooks/use-toggle-likecomment';
 import { vi } from 'date-fns/locale';
 
 interface User {
@@ -35,6 +36,10 @@ export interface CommentType {
   parentId: string | null;
   user: User;
   level: number;
+  likeCount: number;
+  dislikeCount: number;
+  liked?: boolean | undefined;
+  disliked?: boolean | undefined;
 }
 
 interface CommentProps {
@@ -45,28 +50,82 @@ interface CommentProps {
 }
 
 export function Comment({ comment, postId, isAuthenticated = false, onAuthRequired }: CommentProps) {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState<boolean | undefined>(comment.liked || false);
+  const [disliked, setDisliked] = useState<boolean | undefined>(comment.disliked || false);
+  const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
+  const [dislikeCount, setDislikeCount] = useState(comment.dislikeCount || 0);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showReplies, setShowReplies] = useState(false); 
+  const [showReplies, setShowReplies] = useState(false);
   const { mutate: submitReply, isPending } = usePostCommentReply();
   const { mutate: deleteCommentMutate } = useDeleteCommentByPost();
+  const { mutate: toggleLike, isPending: isTogglingLike } = useToggleLikeComment();
   const { data: repliesComment, isLoading: isLoadingReplies } = useGetCommentReply(comment.id, {
     enabled: true,
   });
 
-  useEffect(() => {
-    if (repliesComment?.length > 0) {
-      setShowReplies(true); 
+  useEffect(()=>{
+    if (comment) {
+      setLiked(comment.liked);
+      setDisliked(comment.disliked);
     }
-  }, [repliesComment]);
 
-  const handleLike = () => {
-    setLiked((prev) => !prev);
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+
+  },[comment])
+
+
+  const handleLike = (type: 'like' | 'dislike') => {
+    if (!isAuthenticated) {
+      if (onAuthRequired) onAuthRequired();
+      return;
+    }
+
+    const wasLiked = liked;
+    const wasDisliked = disliked;
+    if (type === 'like') {
+      setLiked(!liked);
+      setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+      if (disliked) {
+        setDisliked(false);
+        setDislikeCount(dislikeCount - 1);
+      }
+    } else {
+      setDisliked(!disliked);
+      setDislikeCount(disliked ? dislikeCount - 1 : dislikeCount + 1);
+      if (liked) {
+        setLiked(false);
+        setLikeCount(likeCount - 1);
+      }
+    }
+
+    toggleLike(
+      {
+        commentId: comment.id,
+        type: type,
+        parentId: comment.parentId,
+      },
+      {
+        onSuccess: (response) => {
+          const newStatus = response.data.status;
+          if (type === 'like') {
+            setLiked(newStatus === 'LIKE');
+            if (wasDisliked) setDisliked(false);
+          } else {
+            setDisliked(newStatus === 'DISLIKE');
+            if (wasLiked) setLiked(false); 
+          }
+        },
+        onError: (error) => {
+          console.error('Error toggling like:', error);
+          setLiked(wasLiked);
+          setDisliked(wasDisliked);
+          setLikeCount(comment.likeCount);
+          setDislikeCount(comment.dislikeCount);
+        },
+      }
+    );
   };
 
   const handleReplySubmit = () => {
@@ -166,13 +225,30 @@ export function Comment({ comment, postId, isAuthenticated = false, onAuthRequir
           </div>
 
           <div className='flex items-center gap-4 mt-1 ml-1'>
-            <button
-              className={`flex items-center gap-1 text-xs ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
-              onClick={handleLike}
-            >
-              <Heart className={`h-4 w-4 ${liked ? 'fill-red-500' : ''}`} />
-              <span>{likeCount}</span>
-            </button>
+            <div className="flex items-center gap-[5px]">
+              <Button
+                variant="outline"
+                className={`flex items-center gap-1 text-xs border-none shadow-none hover:bg-transparent p-0 h-auto ${
+                  liked ? 'text-red-500' : 'text-muted-foreground'
+                }`}
+                onClick={() => handleLike('like')}
+                disabled={isTogglingLike}
+              >
+                <ThumbsUp className={`h-4 w-4 ${liked ? 'fill-red-500' : ''}`} />
+                <span>{likeCount}</span>
+              </Button>
+              <Button
+                variant="outline"
+                className={`flex items-center gap-1 text-xs border-none shadow-none hover:bg-transparent p-0 h-auto ${
+                  disliked ? 'text-blue-500' : 'text-muted-foreground'
+                }`}
+                onClick={() => handleLike('dislike')}
+                disabled={isTogglingLike}
+              >
+                <ThumbsDown className={`h-4 w-4 ${disliked ? 'fill-blue-500' : ''}`} />
+                <span>{dislikeCount}</span>
+              </Button>
+            </div>
             <button
               className='flex items-center gap-1 text-xs text-muted-foreground'
               onClick={() => setShowReplyForm((prev) => !prev)}

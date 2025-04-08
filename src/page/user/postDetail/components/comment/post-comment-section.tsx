@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useGetCommentByPost } from '../../hooks/use-get-comment-by-post';
-import { useAddComment } from '../../hooks/use-post-comment';;
+import { useAddComment } from '../../hooks/use-post-comment';
 import { Comment } from './comment-section';
 import { Input } from '@/components/ui/input';
+import { Pagination } from './pagination';
 
 interface PostCommentSectionProps {
   postId: string;
@@ -13,10 +14,11 @@ interface PostCommentSectionProps {
 }
 
 export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequired }: PostCommentSectionProps) {
-  const { data: commentResponse, isLoading } = useGetCommentByPost(postId);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(5); 
   const [newComment, setNewComment] = useState('');
+  const { data: commentResponse, isLoading } = useGetCommentByPost(postId, currentPage, pageSize);
   const { mutate: addComment, isPending: isAddingComment } = useAddComment();
-
 
   const handleAddComment = () => {
     if (!isAuthenticated) {
@@ -32,21 +34,27 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
       {
         onSuccess: () => {
           setNewComment('');
+          setCurrentPage(1); 
         },
       },
     );
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  console.log('Meta:', commentResponse?.data.meta);
 
   return (
     <div className='space-y-6 p-4'>
-      <h3 className='font-semibold text-lg'>Bình luận </h3>
-      <div className='mb-6 flex items-center gap-[20px] '>
+      <h3 className='font-semibold text-lg'>Bình luận</h3>
+      <div className='mb-6 flex items-center gap-[20px]'>
         <Input
           placeholder='Viết bình luận của bạn...'
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className='outline-none px-[18px] py-[8px] shadow-none '
+          className='outline-none px-[18px] py-[8px] shadow-none'
           disabled={isAddingComment}
         />
         <Button
@@ -63,7 +71,7 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
         <div className='text-center'>Đang tải bình luận...</div>
       ) : commentResponse?.data?.data.length > 0 ? (
         <div className='space-y-6'>
-          {commentResponse?.data?.data.map((comment:any) => (
+          {commentResponse?.data?.data.map((comment: any) => (
             <Comment
               key={comment.id}
               comment={comment}
@@ -79,7 +87,13 @@ export function PostCommentSection({ postId, isAuthenticated = false, onAuthRequ
         </div>
       )}
 
-    
+      {!isLoading && commentResponse?.data?.data.length > 0 && (
+        <Pagination
+          currentPage={currentPage} 
+          totalPages={commentResponse?.data.meta.totalPages || 1}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }

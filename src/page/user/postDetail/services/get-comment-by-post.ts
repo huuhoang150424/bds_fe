@@ -16,23 +16,30 @@ export interface Comment {
   status: string;
   parentId: string | null;
   user: User;
+  likeCount: number;
+  dislikeCount: number;
+  liked?: boolean;
+  disliked?: boolean;
 }
 
 export interface CommentResponse {
   status: number;
   message: string;
-  data: Comment[];
-  meta?: {
-    hasNextPage: boolean;
-    nextCreatedAt: string;
-    total: number;
+  data: {
+    data: Comment[];
+    meta: {
+      currentPage: number;
+      totalPages: number;
+      total: number;
+      hasNextPage: boolean;
+    };
   };
 }
 
-export const getCommentByPost = async (postId: string) => {
+export const getCommentByPost = async (postId: string, page: number = 1, pageSize: number = 10) => {
   try {
-    const response = await handleApi(`/comment/${postId}/getCommentByPostId`, null, 'GET');
-    console.log("check data" ,response.data)
+    const offset = (page - 1) * pageSize;
+    const response = await handleApi(`/comment/${postId}/getCommentByPostId?page=${page}&limit=${pageSize}&offset=${offset}`, null, 'GET');
     return response.data;
   } catch (error) {
     console.error('Error fetching comment by post:', error);

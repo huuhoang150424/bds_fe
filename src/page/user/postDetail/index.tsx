@@ -6,7 +6,7 @@ import 'react-image-lightbox/style.css';
 import SliderItem from './components/slide-item';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Warning from './components/warning';
-import { comments, posts } from '../../../constant/constPostDetail';
+import {  posts } from '../../../constant/constPostDetail';
 import Share from './components/share';
 import { CiMoneyCheck1 } from 'react-icons/ci';
 import { GrMapLocation } from 'react-icons/gr';
@@ -31,36 +31,8 @@ import { PostCommentSection } from './components/comment/post-comment-section';
 
 function PostDetail() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
-  const [like, setLike] = useState<Boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [fillLike, setFillLike] = useState<{ [key: number]: boolean }>({});
-  const [numberLike, setNumberLike] = useState(comments);
-  const [likeCount, setLikeCount] = useState<{ [key: number]: number }>({});
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [replyContent, setReplyContent] = useState('');
-
-  const toggleLike = (id: number) => {
-    setFillLike((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-
-    setLikeCount((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + (fillLike[id] ? -1 : 1),
-    }));
-  };
-
-  const toggleNumberLike = (id: number) => {
-    setNumberLike((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === id
-          ? { ...comment, likes: comment.likes + 1 } // Tăng like
-          : comment,
-      ),
-    );
-  };
 
   const OPTIONS: EmblaOptionsType = {
     loop: true,
@@ -68,18 +40,6 @@ function PostDetail() {
     containScroll: 'trimSnaps',
     dragFree: false,
     skipSnaps: false,
-  };
-
-  const handleReply = (commentId: number | null) => {
-    setReplyingTo(replyingTo === commentId ? null : commentId);
-    setReplyContent('');
-  };
-
-  const handleSubmitReply = (commentId: number) => {
-    if (replyContent.trim()) {
-      setReplyingTo(null);
-      setReplyContent('');
-    }
   };
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading } = useGetPostDetail(slug || '');
@@ -125,7 +85,6 @@ function PostDetail() {
                 >
                   <ChevronLeft className='w-6 h-6' />
                 </SliderPrevButton>
-
                 <SliderNextButton
                   className='absolute right-4 top-1/2 -translate-y-1/2 z-10 
                     bg-white/80 hover:bg-white p-2 rounded-full shadow-md 
@@ -134,12 +93,10 @@ function PostDetail() {
                 >
                   <ChevronRight className='w-6 h-6' />
                 </SliderNextButton>
-
                 <div className='mt-4'>
                   <ThumsSlider />
                 </div>
               </Carousel>
-
               {isOpen && data.images.length > 0 && (
                 <Lightbox
                   mainSrc={data.images[currentIndex].image_url}
@@ -189,14 +146,12 @@ function PostDetail() {
               <AuthGuard actionType='warning'>
                 <Warning />
               </AuthGuard>
-
               <AuthGuard actionType='like'>
                 <WishlistButton postId={postId} />
               </AuthGuard>
             </div>
           </div>
           <div className='border border-gray-100 my-[10px]'></div>
-          {/* Thông tin mô tả */}
           <div className='des'>
             <div className='my-[20px]'>
               <span className='text-2xl font-[500] '>Thông tin mô tả</span>
@@ -210,7 +165,6 @@ function PostDetail() {
               <span className='text-2xl font-[500] '>Đặc điểm bất động sản</span>
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
-
             <div className='flex item-center justify-between'>
               <div className='space-y-6'>
                 <div className=''>
@@ -224,7 +178,6 @@ function PostDetail() {
                     </span>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[64px] text-[16px]  justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
@@ -234,7 +187,6 @@ function PostDetail() {
                     <span>{data?.squareMeters} m²</span>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[64px] text-[16px]  justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
@@ -244,7 +196,6 @@ function PostDetail() {
                     <span>{data?.bedroom} phòng</span>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[64px] text-[16px]  justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
@@ -265,7 +216,6 @@ function PostDetail() {
                     <span>{data?.direction}</span>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[64px] text-[16px]   justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
@@ -275,7 +225,6 @@ function PostDetail() {
                     <span></span>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[100px] text-[16px]  justify-between'>
                     <div className='flex items-center justify-between gap-4 text-[16px] font-[500]'>
@@ -291,7 +240,6 @@ function PostDetail() {
                     </div>
                   </div>
                 </div>
-
                 <div className=''>
                   <div className='flex items-center gap-[64px] text-[16px]  justify-between'>
                     <div className='flex items-center gap-4 text-[16px] font-[500]'>
@@ -305,7 +253,6 @@ function PostDetail() {
                 </div>
               </div>
             </div>
-
             <div className='border border-gray-100 my-[10px]'></div>
             <div className='my-[20px]'>
               <span className='text-2xl font-[500]'>Lịch sử bán {data?.title} </span>
@@ -362,36 +309,13 @@ function PostDetail() {
           <div className='border border-gray-100 my-[20px]'></div>
           {isAuthenticated === true && <BdsForU />}
           <div className='space-y-6 my-[30px]'>
-            {/* Comment input */}
-            {/* <div className='flex items-start gap-2'>
-              <div className='shrink-0'>
-                <img className='w-[32px] h-[32px] rounded-full' src={user?.avatar} alt='avatar' />
-              </div>
-              <div className='w-full relative'>
-                <Textarea
-                  className='rounded-[10px] w-full p-2 border border-gray-300 bg-[#F0F2F5]'
-                  placeholder='Viết bình luận...'
-                  onChange={(e) => setSend(e.target.value.trim() !== '')}
-                />
-                <BsSendFill
-                  className={cn(
-                    'absolute right-3 bottom-3 transition-all',
-                    send ? 'text-blue-500 cursor-pointer' : 'text-gray-400 opacity-70',
-                  )}
-                />
-              </div>
-            </div> */}
-
             <div className='border border-gray-100 my-[10px]'></div>
-
             <div className='space-y-4'>
               <AuthGuard actionType="comment">
                 <PostCommentSection postId={ postId } />
               </AuthGuard>
             </div>
           </div>
-
-          <div className='border border-gray-100 my-[10px] my-[30px]'></div>
         </div>
         <div className='col-span-12 lg:col-span-3 ml-[15px]'>
           <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>

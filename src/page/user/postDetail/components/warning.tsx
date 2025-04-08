@@ -15,9 +15,9 @@ function Warning({ isAuthenticated = false, onAuthRequired }: WarningProps) {
 
   const handleClick = () => {
     if (isAuthenticated) {
-      setIsOpen(true); // Chỉ mở modal báo cáo nếu đã đăng nhập
+      setIsOpen(true);
     } else if (onAuthRequired) {
-      onAuthRequired(); // Hiển thị modal yêu cầu đăng nhập nếu chưa đăng nhập
+      onAuthRequired(); 
     }
   };
 
