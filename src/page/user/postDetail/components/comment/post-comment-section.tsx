@@ -5,7 +5,7 @@ import { useGetCommentByPost } from '../../hooks/use-get-comment-by-post';
 import { useAddComment } from '../../hooks/use-post-comment';
 import { Comment } from './comment-section';
 import { Input } from '@/components/ui/input';
-import { Pagination } from './pagination';
+import { Pagination } from '../../../../../components/user/pagination';
 
 interface PostCommentSectionProps {
   postId: string;
