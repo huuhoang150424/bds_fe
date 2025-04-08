@@ -71,6 +71,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.483.0",
     "path": "^0.12.7",
+    "push.js": "^1.0.12",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
     "react-day-picker": "8.10.1",

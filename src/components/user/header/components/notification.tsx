@@ -12,29 +12,106 @@ import { useAppContext } from '@/context/chat';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/authReducer';
 import { useGetAllNotification } from '../hooks/use-get-notifications';
+import { useReadAllNotification } from '../hooks/use-read-all-notification';
+import { useReadNotification } from '../hooks/use-read-notification';
 import { LoadingSpinner } from '@/components/common';
 import { convertDate } from '@/lib/convert-date';
+import Push from 'push.js';
 
 export default function Notification() {
   const { socket, connectSocket } = useAppContext();
   const user = useSelector(selectUser);
   const [read, setRead] = useState(false);
-  const [showUnread, setShowUnread] = useState(false);
+  const [allNotification, setAllNotification] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('all');
-  const { data, isLoading, isError } = useGetAllNotification();
+  const { data, isLoading } = useGetAllNotification();
+  const readAllMutation = useReadAllNotification();
+  const readMutation = useReadNotification();
+
+  const originalTitle = document.title;
 
   useEffect(() => {
     connectSocket();
     socket.emit('subscribeToNotifications', user?.id);
-  }, [socket]);
+
+    const getAllNotification = (notification: any) => {
+      console.log('Thông báo mới:', notification);
+      setAllNotification((prev) => [notification, ...prev]);
+
+      Push.create("Thông báo mới", {
+        body: notification.message,
+        icon: "https://png.pngtree.com/png-clipart/20190705/original/pngtree-vector-notification-icon-png-image_4187244.jpg", 
+        timeout: 5000, 
+        onClick: function (this:any) {
+          window.focus();
+          this.close();
+        },
+      });
+
+      let isBlinking = false;
+      const blinkInterval = setInterval(() => {
+        document.title = isBlinking ? `📢 ${notification.message}` : originalTitle;
+        isBlinking = !isBlinking;
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(blinkInterval);
+        document.title = originalTitle;
+      }, 5000);
+    };
+    socket.on('newNotification', getAllNotification);
+
+    return () => {
+      socket.off('newNotification', getAllNotification);
+    };
+  }, [socket, user?.id]);
+
+  useEffect(() => {
+    if (data?.data) {
+      const sortedNotifications = [...data.data].sort((a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setAllNotification(sortedNotifications);
+    }
+  }, [data]);
 
   const handleMarkAllAsRead = () => {
-    setRead(true);
-    //
+    readAllMutation.mutate(undefined, {
+      onSuccess: () => {
+        setRead(true);
+        setAllNotification((prev) =>
+          prev.map((notification) => ({ ...notification, isRead: true }))
+        );
+      },
+      onError: (error) => {
+        console.error('Lỗi khi đánh dấu tất cả:', error);
+      },
+    });
   };
+  const handleMarkAsRead = (notificationId: string) => {
+    readMutation.mutate(
+      { notificationId },
+      {
+        onSuccess: () => {
+          setAllNotification((prev) =>
+            prev.map((notification) =>
+              notification.id === notificationId ? { ...notification, isRead: true } : notification
+            )
+          );
+        },
+        onError: (error) => {
+          console.error('Lỗi khi đánh dấu thông báo:', error);
+        },
+      }
+    );
+  };
+  const unreadNotifications = allNotification
+    .filter((notification) => !notification.isRead)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const unreadNotifications = data?.data?.filter((notification: any) => !notification.isRead) || [];
-  const readNotifications = data?.data?.filter((notification: any) => notification.isRead) || [];
+  const readNotifications = allNotification
+    .filter((notification) => notification.isRead)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <Popover>
@@ -52,9 +129,16 @@ export default function Notification() {
             <span className='font-medium text-lg'>Thông báo</span>
             <div className='flex items-center space-x-2'>
               <div className='flex items-center space-x-1'>
-                <Switch id='unread-mode' checked={showUnread} onCheckedChange={setShowUnread} />
-                <label htmlFor='unread-mode' className='text-sm text-gray-600'>
-                  Chưa đọc
+                <Switch
+                  id='mark-all-read'
+                  checked={read}
+                  onCheckedChange={(checked) => {
+                    if (checked) handleMarkAllAsRead();
+                    setRead(checked);
+                  }}
+                />
+                <label htmlFor='mark-all-read' className='text-sm text-gray-600'>
+                  Đánh dấu tất cả
                 </label>
               </div>
               <HoverCard>
@@ -102,21 +186,21 @@ export default function Notification() {
               </div>
             </ScrollArea>
           </div>
-
           <TabsContent value='all' className='m-0'>
             {isLoading ? (
               <LoadingSpinner className='mx-auto my-[100px]' />
             ) : (
               <>
-                {data?.data?.length > 0 ? (
+                {allNotification.length > 0 ? (
                   <ScrollArea className='h-[300px]'>
-                    {data.data.map((notification: any) => (
+                    {allNotification.map((notification: any) => (
                       <div
                         key={notification?.id}
                         className={cn(
                           'flex items-start p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer',
                           !notification?.isRead && 'bg-gray-50',
                         )}
+                        onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
                       >
                         <div className='relative mr-3 mt-1'>
                           <div className='bg-gray-200 rounded-full p-2'>
@@ -146,7 +230,6 @@ export default function Notification() {
               </>
             )}
           </TabsContent>
-
           <TabsContent value='unread' className='m-0'>
             {isLoading ? (
               <LoadingSpinner className='mx-auto my-[100px]' />
@@ -161,6 +244,7 @@ export default function Notification() {
                           'flex items-start p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer',
                           !notification?.isRead && 'bg-gray-50',
                         )}
+                        onClick={() => handleMarkAsRead(notification.id)}
                       >
                         <div className='relative mr-3 mt-1'>
                           <div className='bg-gray-200 rounded-full p-2'>
@@ -190,7 +274,6 @@ export default function Notification() {
               </>
             )}
           </TabsContent>
-
           <TabsContent value='read' className='m-0'>
             {isLoading ? (
               <LoadingSpinner className='mx-auto my-[100px]' />
