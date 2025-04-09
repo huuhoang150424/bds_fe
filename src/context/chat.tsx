@@ -31,14 +31,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const connectSocket = () => {
     if (!socket.connected) {
       socket.connect();
-      console.log('Socket đã kết nối');
     }
   };
 
   const disconnectSocket = () => {
     if (socket.connected) {
       socket.disconnect();
-      console.log('Socket đã ngắt kết nối');
     }
   };
 

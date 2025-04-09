@@ -35,7 +35,6 @@ export default function Notification() {
     socket.emit('subscribeToNotifications', user?.id);
 
     const getAllNotification = (notification: any) => {
-      console.log('Thông báo mới:', notification);
       setAllNotification((prev) => [notification, ...prev]);
 
       Push.create("Thông báo mới", {

@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/carousel"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {useGetPostHabbit} from '../hooks/use-get-post-habbit'
+import { useNavigate } from 'react-router-dom'
 function BdsForU() {
+  const navigate=useNavigate()
   const {data, isLoading, isError} = useGetPostHabbit();
 
   if (isLoading) return <div><Loading /></div>
@@ -39,9 +41,9 @@ function BdsForU() {
             className="w-full"
           >
             <CarouselContent className="ml-4">
-              {data?.data?.map((post : {id: string , images: { image_url: string }[], title : string,   price: number, squareMeters: number , createdAt : string, address : string }, index : number) => (
+              {data?.data?.map((post : any, index : number) => (
                 <CarouselItem key={post?.id} className="pl-4 basis-1/3">
-                  <Card className='rounded-[10px] border border-gray-200 h-full '>
+                  <Card onClick={()=>navigate(`/post/${post?.slug}`)} className='rounded-[10px] border border-gray-200 h-full cursor-pointer'>
                     <CardContent className='p-0 pb-[10px] relative'>
                       <div className='overflow-hidden w-full '>
                         <CustomImage

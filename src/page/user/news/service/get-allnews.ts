@@ -4,8 +4,6 @@ import { handleApi } from "@/service";
 
 export const getAllNews = async (limit: number, lastCreatedAt: string) => {
   try {
-    console.log("lastCreatedAt:", lastCreatedAt);
-
     const url = `/new/getAllNew?limit=${limit}&lastCreatedAt=${encodeURI(lastCreatedAt)}`;
 
     const response = await handleApi(url, undefined, "GET");
