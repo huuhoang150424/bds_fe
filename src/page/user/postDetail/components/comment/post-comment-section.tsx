@@ -46,7 +46,6 @@ export default function PostCommentSection({ postId, isAuthenticated = false, on
 
   return (
     <div className='space-y-6 p-4'>
-      <h3 className='font-semibold text-lg'>Bình luận</h3>
       <div className='mb-6 flex items-center gap-[20px]'>
         <Input
           placeholder='Viết bình luận của bạn...'
