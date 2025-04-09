@@ -1,15 +1,19 @@
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { loginAuth } from '../action/auth'
 
 interface User {
   id: number;
-  name: string;
+  fullname: string;
   email: string;
   avatar: string;
-  phone: number;
-  gender: string;
-  address: string[];
-  birth_date: any | "";
+  roles: string;
+  phone: string;
+  balance:number;
+  score:number;
+
+  emailVerified: boolean ;
+
 }
 
 interface AuthState {
@@ -18,8 +22,8 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   error: boolean;
+  success: boolean;
   message: string;
-  success: boolean
 }
 
 const initialState: AuthState = {
@@ -46,36 +50,50 @@ const authSlice = createSlice({
       state.message='';
       state.loading=false;
       state.error=false;
+      state.success=false;
     },
     updateAuth: (state, action:  PayloadAction<{ data: User }>) => {
-      console.log(action.payload.data);
       state.user = {
         ...state.user, 
         ...action.payload.data
       };
     },
+    updateVerifiedMail: (state) => {
+      if (state.user) {
+        state.user.emailVerified = true;
+      }
+    },
+    updatePhoneStore: (state,action)=>{
+      if (state.user) {
+        state.user.phone=action.payload.phone;
+      }
+    }
+    
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginAuth.pending, (state) => {
         state.loading = true;
       })
-      .addCase(loginAuth.fulfilled, (state, action: PayloadAction<{ accessToken: string; message: string; user: User }>) => {
+      .addCase(loginAuth.fulfilled, (state, action: PayloadAction<{  message: string; data: any }>) => {
         state.isAuthenticated = true;
+        state.success = true;
         state.loading = false;
-        state.token = action.payload.accessToken;
+        state.token = action.payload.data.accessToken;
         state.message = action.payload.message;
-        state.user = action.payload.user;
+        state.user = action.payload.data.user;
       })
       .addCase(loginAuth.rejected, (state,action:any) => {
+        console.log(action.payload)
+        state.message=action.payload.message
+        state.success = false;
         state.loading = false;
         state.error = true;
-        state.message =action.payload.data.non_field_errors[0];
       });
   },
 });
 
-export const { logout,updateToken ,resetAuthState,updateAuth} = authSlice.actions;
+export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore} = authSlice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;

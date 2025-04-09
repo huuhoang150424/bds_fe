@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
-
+import { AppProvider } from '@/context/chat';
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
-  const smallDot = useRef<HTMLDivElement | null>(null); 
+  const smallDot = useRef<HTMLDivElement | null>(null);
   const mousePosition = useRef({ x: 0, y: 0 });
   const lastMousePosition = useRef({ x: 0, y: 0 });
   //update Color
-  useEffect(()=>{
-    document.documentElement.style.setProperty("--primary-color", localStorage.getItem("themColor") || "#6c7de2");
-  },[])
+
+  if (typeof global === "undefined") {
+    window.global = window;
+  }
+
   const updateCursorPosition = () => {
     const { x, y } = mousePosition.current;
     if (x !== lastMousePosition.current.x || y !== lastMousePosition.current.y) {
@@ -37,6 +39,7 @@ function App() {
     };
   }, []);
 
+  
   return (
     <div className=''>
       <Toaster/>
@@ -48,9 +51,10 @@ function App() {
         ref={smallDot}
         className='w-2 h-2 rounded-full bg-primaryColor absolute left-[17px] top-[17px] z-[999999] transition-transform duration-500 ease-out pointer-events-none'
       ></div>
-      <Router />
+      <AppProvider>
+        <Router />
+      </AppProvider>
     </div>
   );
 }
-
 export default App;
