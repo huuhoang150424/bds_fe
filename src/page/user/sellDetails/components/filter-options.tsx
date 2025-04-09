@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-import { X } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -19,94 +19,168 @@ import {
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { useDebounce } from 'use-debounce';
+import { vietnameseProvinces } from '@/constant/const-sell-detail';
 
 interface FilterOptionsProps {
-  showAreaFilter: boolean;
-  setShowAreaFilter: (show: boolean) => void;
-  minArea: string;
-  setMinArea: (area: string) => void;
-  maxArea: string;
-  setMaxArea: (area: string) => void;
-  selectedAreaOption: string;
-  handleAreaOptionChange: (value: string) => void;
-  showPriceFilter: boolean;
-  setShowPriceFilter: (show: boolean) => void;
-  minPrice: string;
-  setMinPrice: (price: string) => void;
-  maxPrice: string;
-  setMaxPrice: (price: string) => void;
-  selectedPriceOption: string;
-  handlePriceOptionChange: (value: string) => void;
+  bedrooms: number;
+  setBedrooms: (value: number) => void;
+  bathrooms: number;
+  setBathrooms: (value: number) => void;
+  floors: number;
+  setFloors: (value: number) => void;
+  direction: string;
+  setDirection: (value: string) => void;
+  priceRange: [number, number];
+  setPriceRange: (value: [number, number]) => void;
+  areaRange: [number, number];
+  setAreaRange: (value: [number, number]) => void;
+  selectedProvinces: string[];
+  setSelectedProvinces: (value: string[]) => void;
+ 
+  onFilterSearch: (filters: any) => void;
 }
 
 export default function FilterOptions({
-  showAreaFilter,
-  setShowAreaFilter,
-  minArea,
-  setMinArea,
-  maxArea,
-  setMaxArea,
-  selectedAreaOption,
-  handleAreaOptionChange,
-  showPriceFilter,
-  setShowPriceFilter,
-  minPrice,
-  setMinPrice,
-  maxPrice,
-  setMaxPrice,
-  selectedPriceOption,
-  handlePriceOptionChange,
+  bedrooms,
+  setBedrooms,
+  bathrooms,
+  setBathrooms,
+  floors,
+  setFloors,
+  direction,
+  setDirection,
+  priceRange,
+  setPriceRange,
+  areaRange,
+  setAreaRange,
+  selectedProvinces,
+  setSelectedProvinces,
+  onFilterSearch,
 }: FilterOptionsProps) {
-  const areaOptions = [
-    { value: 'all', label: 'Tất cả diện tích' },
-    { value: '0-30', label: 'Dưới 30 m²' },
-    { value: '30-50', label: '30 - 50 m²' },
-    { value: '50-80', label: '50 - 80 m²' },
-    { value: '80-100', label: '80 - 100 m²' },
-  ];
-
-  const priceOptions = [
-    { value: 'all', label: 'Tất cả mức giá' },
-    { value: '0-500', label: 'Dưới 500 triệu' },
-    { value: '500-800', label: '500 - 800 triệu' },
-    { value: '800-1000', label: '800 triệu - 1 tỷ' },
-    { value: '1000-2000', label: '1 - 2 tỷ' },
-  ];
-  // House directions
   const houseDirections = ['Đông', 'Tây', 'Nam', 'Bắc', 'Đông Bắc', 'Đông Nam', 'Tây Bắc', 'Tây Nam'];
 
-  // Sample tag IDs
-  const tagIds = ['residential', 'commercial', 'new', 'resale', 'furnished', 'unfurnished', 'premium', 'budget'];
-  const [bedrooms, setBedrooms] = useState<string>('');
-  const [bathrooms, setBathrooms] = useState<string>('');
-  const [floors, setFloors] = useState<string>('');
-  const [direction, setDirection] = useState<string>('');
-  const [tagId, setTagId] = useState<string>('');
-  const [setSelectedAreaOption, setAreaOption] = React.useState<string>('all');
-  const [setSelectedPriceOption, setPriceOption] = React.useState<string>('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [debouncedSearchInput] = useDebounce(searchInput, 300);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const handleReset = () => {
-    setBedrooms('');
-    setBathrooms('');
-    setFloors('');
+    setBedrooms(0);
+    setBathrooms(0);
+    setFloors(0);
     setDirection('');
-    setTagId('');
+    setPriceRange([0, 20]);
+    setAreaRange([0, 500]);
+    setSelectedProvinces([]);
+  };
+  const filteredProvinces = vietnameseProvinces.filter(
+    (province) => province.toLowerCase().includes(searchInput.toLowerCase()) && !selectedProvinces.includes(province),
+  );
+
+  const handleProvinceSelect = (province: string) => {
+    setSelectedProvinces([province]); // Thay thế toàn bộ mảng bằng một giá trị mới
+    setSearchInput('');
+    setIsDropdownOpen(false);
+  };
+
+  const handleRemoveProvince = () => {
+    setSelectedProvinces([]); // Xóa lựa chọn hiện tại
+  };
+  // Hàm xử lý nút tìm kiếm
+  const handleSearchClick = () => {
+    // Tạo object chứa dữ liệu lọc
+    const filters = {
+      bedrooms,
+      bathrooms,
+      floors,
+      direction,
+      minPrice: priceRange[0] * 1000000000, // Chuyển sang số lớn
+      maxPrice: priceRange[1] * 1000000000, // Chuyển sang số lớn
+      minArea: areaRange[0],
+      maxArea: areaRange[1],
+      keyword: selectedProvinces, // Truyền selectedProvinces làm keyword
+    };
+
+    onFilterSearch(filters); // Gọi hàm callback với dữ liệu
+    setIsPopoverOpen(false); // Đóng popover
   };
   return (
     <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 w-full sm:w-[80%]'>
-      <Popover>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='w-full sm:w-[66%] justify-between bg-white text-gray-600 border'>
+          <Button variant='outline' className='w-full sm:w-[100%] justify-between bg-white text-gray-600 border'>
             <span className='text-sm truncate'>Lọc</span>
             <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-[1000px] sm:w-[1000px] p-0' align='start'>
+          <div className='relative w-full'>
+            <div className='flex items-center border rounded-lg p-2 bg-white'>
+              <Search className='h-5 w-5 text-gray-400 mr-2' />
+
+              <div className='flex flex-wrap gap-2 flex-1'>
+                {selectedProvinces.map((province) => (
+                  <div key={province} className='flex items-center bg-gray-100 rounded-md px-2 py-1'>
+                    <span className='text-sm'>{province}</span>
+                    <button
+                      onClick={() => handleRemoveProvince()}
+                      className='ml-1 text-gray-500 hover:text-gray-700'
+                    >
+                      <X className='h-3 w-3' />
+                    </button>
+                  </div>
+                ))}
+
+                <div className='relative flex-1 min-w-[120px]'>
+                  <input
+                    type='text'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    // onBlur={handleBlur}
+                    placeholder={selectedProvinces.length === 0 ? 'Tìm kiếm tỉnh thành...' : ''}
+                    className='w-full border-none outline-none text-sm'
+                  />
+                </div>
+              </div>
+
+              <Button
+                className='mr-[10px]'
+                variant='ghost'
+                size='sm'
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <ChevronDown className='h-4 w-4' />
+              </Button>
+            </div>
+
+            {isDropdownOpen && (
+              <div className='absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
+                {filteredProvinces.length > 0 ? (
+                  filteredProvinces.map((province) => (
+                    <div
+                      key={province}
+                      className='px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm'
+                      onClick={() => {
+                        handleProvinceSelect(province);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      {province}
+                    </div>
+                  ))
+                ) : (
+                  <div className='px-4 py-2 text-gray-500 text-sm'>Không tìm thấy kết quả</div>
+                )}
+              </div>
+            )}
+          </div>
           <Card className='mb-6'>
             <CardContent className='pt-6'>
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
                 <div>
                   <Label htmlFor='bedrooms'>Số phòng ngủ</Label>
-                  <Select value={bedrooms} onValueChange={setBedrooms}>
+                  <Select value={bedrooms.toString()} onValueChange={(value) => setBedrooms(Number(value))}>
                     <SelectTrigger id='bedrooms'>
                       <SelectValue placeholder='Chọn số phòng' />
                     </SelectTrigger>
@@ -122,7 +196,7 @@ export default function FilterOptions({
 
                 <div>
                   <Label htmlFor='bathrooms'>Số phòng tắm</Label>
-                  <Select value={bathrooms} onValueChange={setBathrooms}>
+                  <Select value={bathrooms.toString()} onValueChange={(value) => setBathrooms(Number(value))}>
                     <SelectTrigger id='bathrooms'>
                       <SelectValue placeholder='Chọn số phòng' />
                     </SelectTrigger>
@@ -138,7 +212,7 @@ export default function FilterOptions({
 
                 <div>
                   <Label htmlFor='floors'>Số tầng</Label>
-                  <Select value={floors} onValueChange={setFloors}>
+                  <Select value={floors.toString()} onValueChange={(value) => setFloors(Number(value))}>
                     <SelectTrigger id='floors'>
                       <SelectValue placeholder='Chọn số tầng' />
                     </SelectTrigger>
@@ -168,202 +242,121 @@ export default function FilterOptions({
                   </Select>
                 </div>
               </div>
-
-              <div className='mt-6'>
-                <Label htmlFor='tagId'>Tag ID</Label>
-                <Select value={tagId} onValueChange={setTagId}>
-                  <SelectTrigger id='tagId'>
-                    <SelectValue placeholder='Chọn Tag ID' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tagIds.map((tag) => (
-                      <SelectItem key={tag} value={tag}>
-                        {tag}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </CardContent>
-            <CardFooter>
-              <div className=' flex justify-end gap-4'>
-                <Button variant='outline' onClick={handleReset} className='w-full md:w-auto bg-[#E03C31] hover:bg-[#FF837A] text-white'>
+          </Card>
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                <div className='space-y-6'>
+                  <div>
+                    <div className='flex justify-between mb-2'>
+                      <Label>Giá (tỷ VNĐ)</Label>
+                      <div className='text-sm'>
+                        {priceRange[0]} - {priceRange[1]} tỷ VNĐ
+                      </div>
+                    </div>
+                    <Slider
+                      defaultValue={[0, 20]}
+                      max={20}
+                      step={0.5}
+                      value={priceRange}
+                      onValueChange={(value) => setPriceRange(value as [number, number])}
+                      className='my-4'
+                    />
+                    <div className='flex justify-between'>
+                      <div className='w-[48%]'>
+                        <Label htmlFor='minPrice'>Giá nhỏ nhất </Label>
+                        <Input
+                          id='minPrice'
+                          type='number'
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number.parseFloat(e.target.value), priceRange[1]])}
+                          min={0}
+                          max={priceRange[1]}
+                          step={0.5}
+                          className='p-[4px]'
+                        />
+                      </div>
+                      <div className='w-[48%]'>
+                        <Label htmlFor='maxPrice'>Giá lớn nhất</Label>
+                        <Input
+                          id='maxPrice'
+                          type='number'
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number.parseFloat(e.target.value)])}
+                          min={priceRange[0]}
+                          max={20}
+                          step={0.5}
+                          className='p-[4px]'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='space-y-6'>
+                  <div>
+                    <div className='flex justify-between mb-2'>
+                      <Label>Diện tích (m²)</Label>
+                      <div className='text-sm'>
+                        {areaRange[0]} - {areaRange[1]} m²
+                      </div>
+                    </div>
+                    <Slider
+                      defaultValue={[0, 500]}
+                      max={500}
+                      step={10}
+                      value={areaRange}
+                      onValueChange={(value) => setAreaRange(value as [number, number])}
+                      className='my-4'
+                    />
+                    <div className='flex justify-between'>
+                      <div className='w-[48%]'>
+                        <Label htmlFor='minArea'>Diện tích nhỏ nhất</Label>
+                        <Input
+                          id='minArea'
+                          type='number'
+                          value={areaRange[0]}
+                          onChange={(e) => setAreaRange([Number.parseFloat(e.target.value), areaRange[1]])}
+                          min={0}
+                          max={areaRange[1]}
+                          step={10}
+                          className='p-[4px]'
+                        />
+                      </div>
+                      <div className='w-[48%]'>
+                        <Label htmlFor='maxArea'>Diện tích lớn nhất</Label>
+                        <Input
+                          id='maxArea'
+                          type='number'
+                          value={areaRange[1]}
+                          onChange={(e) => setAreaRange([areaRange[0], Number.parseFloat(e.target.value)])}
+                          min={areaRange[0]}
+                          max={500}
+                          step={10}
+                          className='p-[4px]'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className=' flex justify-end gap-4 mt-[20px]'>
+                <Button
+                  variant='outline'
+                  onClick={handleReset}
+                  className='w-full md:w-auto bg-[#fff] hover:bg-[#f2f2f2] text-black'
+                >
                   Đặt lại
                 </Button>
-                </div>
-            </CardFooter>
+                <Button className='bg-[#E03C31] hover:bg-[#FF837A] text-white' onClick={handleSearchClick}>Tìm kiếm</Button>
+              </div>
+            </CardContent>
           </Card>
-        </PopoverContent>
-      </Popover>
-
-      <Popover open={showAreaFilter} onOpenChange={setShowAreaFilter}>
-        <PopoverTrigger asChild>
-          <Button variant='outline' className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border'>
-            <span className='text-sm truncate'>Diện tích</span>
-            <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
-          <div className='p-4'>
-            <div className='flex items-center justify-between mb-4'>
-              <h4 className='font-medium text-base'>Diện tích</h4>
-              <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowAreaFilter(false)}>
-                <X className='h-4 w-4' />
-              </Button>
-            </div>
-
-            <div className='mb-6'>
-              <div className='flex justify-between mb-2'>
-                <span className='text-sm font-medium'>Diện tích nhỏ nhất</span>
-                <span className='text-sm font-medium'>Diện tích lớn nhất</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <Input
-                  type='text'
-                  placeholder='Từ'
-                  value={minArea}
-                  onChange={(e) => setMinArea(e.target.value)}
-                  className='flex-1'
-                />
-                <span>→</span>
-                <Input
-                  type='text'
-                  placeholder='Đến'
-                  value={maxArea}
-                  onChange={(e) => setMaxArea(e.target.value)}
-                  className='flex-1'
-                />
-              </div>
-              <div className='mt-4'>
-                <Slider
-                  defaultValue={[0, 100]}
-                  max={100}
-                  step={5}
-                  value={[Number.parseInt(minArea || '0'), Number.parseInt(maxArea || '100')]}
-                  onValueChange={(value) => {
-                    setMinArea(value[0].toString());
-                    setMaxArea(value[1].toString());
-                    setAreaOption('');
-                  }}
-                />
-              </div>
-            </div>
-
-            <RadioGroup value={selectedAreaOption} onValueChange={handleAreaOptionChange} className='space-y-2'>
-              {areaOptions.map((option) => (
-                <div key={option.value} className='flex items-center space-x-2'>
-                  <RadioGroupItem value={option.value} id={option.value} className='text-[#00B4D8] border-[#00B4D8]' />
-                  <label htmlFor={option.value} className='text-sm'>
-                    {option.label}
-                  </label>
-                </div>
-              ))}
-            </RadioGroup>
-
-            <div className='flex gap-2 mt-4 border-t pt-4'>
-              <Button
-                variant='outline'
-                className='flex-1'
-                onClick={() => {
-                  setMinArea('');
-                  setMaxArea('');
-                  handleAreaOptionChange('all');
-                }}
-              >
-                Đặt lại
-              </Button>
-              <Button className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]' onClick={() => setShowAreaFilter(false)}>
-                Áp dụng
-              </Button>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-
-      <Popover open={showPriceFilter} onOpenChange={setShowPriceFilter}>
-        <PopoverTrigger asChild>
-          <Button variant='outline' className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border'>
-            <span className='text-sm truncate'>Mức giá</span>
-            <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
-          <div className='p-4'>
-            <div className='flex items-center justify-between mb-4'>
-              <h4 className='font-medium text-base'>Mức giá</h4>
-              <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowPriceFilter(false)}>
-                <X className='h-4 w-4' />
-              </Button>
-            </div>
-
-            <div className='mb-6'>
-              <div className='flex justify-between mb-2'>
-                <span className='text-sm font-medium'>Giá thấp nhất</span>
-                <span className='text-sm font-medium'>Giá cao nhất</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <Input
-                  type='text'
-                  placeholder='Từ'
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  className='flex-1'
-                />
-                <span>→</span>
-                <Input
-                  type='text'
-                  placeholder='Đến'
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  className='flex-1'
-                />
-              </div>
-              <div className='mt-4'>
-                <Slider
-                  defaultValue={[0, 2000]}
-                  max={2000}
-                  step={100}
-                  value={[Number.parseInt(minPrice || '0'), Number.parseInt(maxPrice || '2000')]}
-                  onValueChange={(value) => {
-                    setMinPrice(value[0].toString());
-                    setMaxPrice(value[1].toString());
-                    setPriceOption('');
-                  }}
-                  className='[&_.bg-\[\#EF4444\]]:bg-[#00B4D8]'
-                />
-              </div>
-            </div>
-
-            <RadioGroup value={selectedPriceOption} onValueChange={handlePriceOptionChange} className='space-y-2'>
-              {priceOptions.map((option) => (
-                <div key={option.value} className='flex items-center space-x-2'>
-                  <RadioGroupItem value={option.value} id={option.value} className='text-[#00B4D8] border-[#00B4D8]' />
-                  <label htmlFor={option.value} className='text-sm'>
-                    {option.label}
-                  </label>
-                </div>
-              ))}
-            </RadioGroup>
-
-            <div className='flex gap-2 mt-4 border-t pt-4'>
-              <Button
-                variant='outline'
-                className='flex-1'
-                onClick={() => {
-                  setMinPrice('');
-                  setMaxPrice('');
-                  handlePriceOptionChange('all');
-                }}
-              >
-                Đặt lại
-              </Button>
-              <Button className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]' onClick={() => setShowPriceFilter(false)}>
-                Áp dụng
-              </Button>
-            </div>
-          </div>
         </PopoverContent>
       </Popover>
     </div>
   );
 }
+

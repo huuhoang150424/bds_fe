@@ -11,6 +11,8 @@ import { allCities, cityInfos, featuredCities, realEstateListings } from '@/cons
 import PropertyListings from './components/property-listing';
 import SearchInterface from './components/search-interface';
 import PropertyListingsSearch from './components/property-listing-search';
+import PropertyListingsFill from './components/proprtty-listing-fill';
+import { vietnameseProvinces } from '@/constant/const-sell-detail';
 
 function SellDetail() {
   const [selectedCity, setSelectedCity] = useState('');
@@ -26,122 +28,16 @@ function SellDetail() {
   const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSearchingFill, setIsSearchingFill] = useState(false);
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
-  const vietnameseProvinces = [
-
-    'Hà Nội',
-    'Hồ Chí Minh',
-    'Đà Nẵng',
-    'Hải Phòng',
-    'Cần Thơ',
-    'An Giang',
-    'Bà Rịa - Vũng Tàu',
-    'Bắc Giang',
-    'Bắc Kạn',
-    'Bạc Liêu',
-    'Bắc Ninh',
-    'Bến Tre',
-    'Bình Định',
-    'Bình Dương',
-    'Bình Phước',
-    'Bình Thuận',
-    'Cà Mau',
-    'Cao Bằng',
-    'Đắk Lắk',
-    'Đắk Nông',
-    'Điện Biên',
-    'Đồng Nai',
-    'Đồng Tháp',
-    'Gia Lai',
-    'Hà Giang',
-    'Hà Nam',
-    'Hà Tĩnh',
-    'Hải Dương',
-    'Hậu Giang',
-    'Hòa Bình',
-    'Hưng Yên',
-    'Khánh Hòa',
-    'Kiên Giang',
-    'Kon Tum',
-    'Lai Châu',
-    'Lâm Đồng',
-    'Lạng Sơn',
-    'Lào Cai',
-    'Long An',
-    'Nam Định',
-    'Nghệ An',
-    'Ninh Bình',
-    'Ninh Thuận',
-    'Phú Thọ',
-    'Phú Yên',
-    'Quảng Bình',
-    'Quảng Nam',
-    'Quảng Ngãi',
-    'Quảng Ninh',
-    'Quảng Trị',
-    'Sóc Trăng',
-    'Sơn La',
-    'Tây Ninh',
-    'Thái Bình',
-    'Thái Nguyên',
-    'Thanh Hóa',
-    'Thừa Thiên Huế',
-    'Tiền Giang',
-    'Trà Vinh',
-    'Tuyên Quang',
-    'Vĩnh Long',
-    'Vĩnh Phúc',
-    'Yên Bái',
-  ];
-  const handlePriceOptionChange = (value: string) => {
-    setSelectedPriceOption(value);
-    switch (value) {
-      case '0-500':
-        setMinPrice('');
-        setMaxPrice('500');
-        break;
-      case '500-800':
-        setMinPrice('500');
-        setMaxPrice('800');
-        break;
-      case '800-1000':
-        setMinPrice('800');
-        setMaxPrice('1000');
-        break;
-      case '1000-2000':
-        setMinPrice('1000');
-        setMaxPrice('2000');
-        break;
-      default:
-        setMinPrice('');
-        setMaxPrice('');
-    }
-  };
-
-  const handleAreaOptionChange = (value: string) => {
-    setSelectedAreaOption(value);
-    switch (value) {
-      case '0-30':
-        setMinArea('');
-        setMaxArea('30');
-        break;
-      case '30-50':
-        setMinArea('30');
-        setMaxArea('50');
-        break;
-      case '50-80':
-        setMinArea('50');
-        setMaxArea('80');
-        break;
-      case '80-100':
-        setMinArea('80');
-        setMaxArea('100');
-        break;
-      default:
-        setMinArea('');
-        setMaxArea('');
-    }
-  };
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20]);
+  const [areaRange, setAreaRange] = useState<[number, number]>([0, 500]);
+  const [bedrooms, setBedrooms] = useState<number>(0);
+  const [bathrooms, setBathrooms] = useState<number>(0);
+  const [floors, setFloors] = useState<number>(0);
+  const [direction, setDirection] = useState<string>('');
+  
+  
 
   const getSumByCity = () => {
     let sum = 0;
@@ -150,10 +46,28 @@ function SellDetail() {
     });
     return sum;
   };
+  
   const handleSearch = (provinces: string[]) => {
     setSelectedProvinces(provinces); // Cập nhật danh sách tỉnh/thành phố
     setIsSearching(true); // Chuyển sang chế độ tìm kiếm
+    setIsSearchingFill(false); // Đảm bảo không hiển thị kết quả lọc
   };
+  
+  // Thêm hàm mới để xử lý việc tìm kiếm bằng bộ lọc
+  const handleFilterSearch = (filters: any) => {
+    // Cập nhật state từ filters
+    setBedrooms(filters.bedrooms);
+    setBathrooms(filters.bathrooms);
+    setFloors(filters.floors);
+    setDirection(filters.direction);
+    setPriceRange([filters.minPrice / 1000000000, filters.maxPrice / 1000000000]); // Chuyển ngược lại tỷ VNĐ
+    setAreaRange([filters.minArea, filters.maxArea]);
+    setSelectedProvinces(filters.keyword); // Gán selectedProvinces từ keyword
+
+    setIsSearchingFill(true);
+    setIsSearching(false);
+  };
+  
   const filteredCities = allCities.filter((city) => city.toLowerCase().includes(searchCity.toLowerCase()));
 
   return (
@@ -171,24 +85,22 @@ function SellDetail() {
                 />
 
                 <FilterOptions
-                  showAreaFilter={showAreaFilter}
-                  setShowAreaFilter={setShowAreaFilter}
-                  minArea={minArea}
-                  setMinArea={setMinArea}
-                  maxArea={maxArea}
-                  setMaxArea={setMaxArea}
-                  selectedAreaOption={selectedAreaOption}
-                  handleAreaOptionChange={handleAreaOptionChange}
-                  showPriceFilter={showPriceFilter}
-                  setShowPriceFilter={setShowPriceFilter}
-                  minPrice={minPrice}
-                  setMinPrice={setMinPrice}
-                  maxPrice={maxPrice}
-                  setMaxPrice={setMaxPrice}
-                  selectedPriceOption={selectedPriceOption}
-                  handlePriceOptionChange={handlePriceOptionChange}
+                  bedrooms={bedrooms}
+                  setBedrooms={setBedrooms}
+                  bathrooms={bathrooms}
+                  setBathrooms={setBathrooms}
+                  floors={floors}
+                  setFloors={setFloors}
+                  direction={direction}
+                  setDirection={setDirection}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  areaRange={areaRange}
+                  setAreaRange={setAreaRange}
+                  selectedProvinces={selectedProvinces}
+                  setSelectedProvinces={setSelectedProvinces}
+                  onFilterSearch={handleFilterSearch} // Truyền hàm xử lý tìm kiếm
                 />
-                {/* <SearchInterface /> */}
               </div>
             </div>
           </div>
@@ -200,11 +112,21 @@ function SellDetail() {
             )}
           >
             {isSearching ? (
-        <PropertyListingsSearch selectedProvinces={selectedProvinces} />
-      ) : (
-        <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
-      )}
-            
+              <PropertyListingsSearch selectedProvinces={selectedProvinces} />
+            ) : isSearchingFill ? (
+              <PropertyListingsFill 
+                keyword={selectedProvinces}
+                selectedProvinces={selectedProvinces}
+                bedrooms={bedrooms}
+                bathrooms={bathrooms}
+                floors={floors}
+                direction={direction}
+                priceRange={priceRange}
+                areaRange={areaRange}
+              />
+            ) : (
+              <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
+            )}
 
             <FilterSidebar
               searchCity={searchCity}
