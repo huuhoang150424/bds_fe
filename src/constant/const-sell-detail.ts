@@ -455,7 +455,12 @@ export const vietnamProvinces = [
 ]
 
 // Add the remaining provinces with empty district arrays
-export const remainingProvinces = [
+export const vietnameseProvinces = [
+  "Hà Nội",
+  "Hồ Chí Minh",
+  "Đà Nẵng",
+  "Hải Phòng",
+  "Cần Thơ",
   "An Giang",
   "Bà Rịa - Vũng Tàu",
   "Bắc Giang",
