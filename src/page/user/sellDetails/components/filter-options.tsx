@@ -350,7 +350,7 @@ export default function FilterOptions({
                 >
                   Đặt lại
                 </Button>
-                <Button className='bg-[#E03C31] hover:bg-[#FF837A] text-white' onClick={handleSearchClick}>Tìm kiếm</Button>
+                <Button className='bg-[#E03C31] hover:bg-[#FF837A] text-white' onClick={handleSearchClick}>Ap dụng</Button>
               </div>
             </CardContent>
           </Card>
