@@ -1,122 +1,105 @@
 // @ts-nocheck
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import SearchBar from "./components/search-bar"
-import FilterOptions from "./components/filter-options"
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import SearchBar from './components/search-bar';
+import FilterOptions from './components/filter-options';
 
-import FilterSidebar from "./components/filter-sidebar"
-import Map from "@/page/user/sellDetails/components/Map"
-import { allCities, cityInfos, featuredCities, realEstateListings } from "@/constant/const-sell-detail"
-import PropertyListings from "./components/property-listing"
-
+import FilterSidebar from './components/filter-sidebar';
+import Map from '@/page/user/sellDetails/components/Map';
+import { allCities, cityInfos, featuredCities, realEstateListings } from '@/constant/const-sell-detail';
+import PropertyListings from './components/property-listing';
+import SearchInterface from './components/search-interface';
+import PropertyListingsSearch from './components/property-listing-search';
+import PropertyListingsFill from './components/proprtty-listing-fill';
+import { vietnameseProvinces } from '@/constant/const-sell-detail';
 
 function SellDetail() {
-  const [selectedCity, setSelectedCity] = useState("")
-  const [showMap, setShowMap] = useState(false)
-  const [searchCity, setSearchCity] = useState("")
-  const [showAllCities, setShowAllCities] = useState(false)
-  const [minArea, setMinArea] = useState("")
-  const [maxArea, setMaxArea] = useState("")
-  const [showAreaFilter, setShowAreaFilter] = useState(false)
-  const [selectedAreaOption, setSelectedAreaOption] = useState<string>("all")
-  const [minPrice, setMinPrice] = useState("")
-  const [maxPrice, setMaxPrice] = useState("")
-  const [selectedPriceOption, setSelectedPriceOption] = useState<string>("all")
-  const [showPriceFilter, setShowPriceFilter] = useState(false)
-
-  const handlePriceOptionChange = (value: string) => {
-    setSelectedPriceOption(value)
-    switch (value) {
-      case "0-500":
-        setMinPrice("")
-        setMaxPrice("500")
-        break
-      case "500-800":
-        setMinPrice("500")
-        setMaxPrice("800")
-        break
-      case "800-1000":
-        setMinPrice("800")
-        setMaxPrice("1000")
-        break
-      case "1000-2000":
-        setMinPrice("1000")
-        setMaxPrice("2000")
-        break
-      default:
-        setMinPrice("")
-        setMaxPrice("")
-    }
-  }
-
-  const handleAreaOptionChange = (value: string) => {
-    setSelectedAreaOption(value)
-    switch (value) {
-      case "0-30":
-        setMinArea("")
-        setMaxArea("30")
-        break
-      case "30-50":
-        setMinArea("30")
-        setMaxArea("50")
-        break
-      case "50-80":
-        setMinArea("50")
-        setMaxArea("80")
-        break
-      case "80-100":
-        setMinArea("80")
-        setMaxArea("100")
-        break
-      default:
-        setMinArea("")
-        setMaxArea("")
-    }
-  }
+  const [selectedCity, setSelectedCity] = useState('');
+  const [showMap, setShowMap] = useState(false);
+  const [searchCity, setSearchCity] = useState('');
+  const [showAllCities, setShowAllCities] = useState(false);
+  const [minArea, setMinArea] = useState('');
+  const [maxArea, setMaxArea] = useState('');
+  const [showAreaFilter, setShowAreaFilter] = useState(false);
+  const [selectedAreaOption, setSelectedAreaOption] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
+  const [showPriceFilter, setShowPriceFilter] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchingFill, setIsSearchingFill] = useState(false);
+  const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20]);
+  const [areaRange, setAreaRange] = useState<[number, number]>([0, 500]);
+  const [bedrooms, setBedrooms] = useState<number>(0);
+  const [bathrooms, setBathrooms] = useState<number>(0);
+  const [floors, setFloors] = useState<number>(0);
+  const [direction, setDirection] = useState<string>('');
+  
+  
 
   const getSumByCity = () => {
-    let sum = 0
+    let sum = 0;
     cityInfos.forEach((cityInfo) => {
-      sum += cityInfo.count
-    })
-    return sum
-  }
+      sum += cityInfo.count;
+    });
+    return sum;
+  };
+  
+  const handleSearch = (provinces: string[]) => {
+    setSelectedProvinces(provinces); // Cập nhật danh sách tỉnh/thành phố
+    setIsSearching(true); // Chuyển sang chế độ tìm kiếm
+    setIsSearchingFill(false); // Đảm bảo không hiển thị kết quả lọc
+  };
+  
+  // Thêm hàm mới để xử lý việc tìm kiếm bằng bộ lọc
+  const handleFilterSearch = (filters: any) => {
+    // Cập nhật state từ filters
+    setBedrooms(filters.bedrooms);
+    setBathrooms(filters.bathrooms);
+    setFloors(filters.floors);
+    setDirection(filters.direction);
+    setPriceRange([filters.minPrice / 1000000000, filters.maxPrice / 1000000000]); // Chuyển ngược lại tỷ VNĐ
+    setAreaRange([filters.minArea, filters.maxArea]);
+    setSelectedProvinces(filters.keyword); // Gán selectedProvinces từ keyword
 
-  const filteredCities = allCities.filter((city) => city.toLowerCase().includes(searchCity.toLowerCase()))
+    setIsSearchingFill(true);
+    setIsSearching(false);
+  };
+  
+  const filteredCities = allCities.filter((city) => city.toLowerCase().includes(searchCity.toLowerCase()));
 
   return (
-    <div className="pt-[80px]">
-      <div className={cn("flex w-full", showMap ? "h-[calc(100vh-80px)]" : "")}>
-        <div className={cn("flex flex-col transition-all duration-300", showMap ? "w-1/2" : "w-full")}>
-          <div className={cn("", showMap ? "w-full" : "max-w-7xl mx-auto w-full")}>
-            <div className="search bg-white rounded-lg w-full">
-              <div className="px-4 py-6">
+    <div className='pt-[80px]'>
+      <div className={cn('flex w-full', showMap ? 'h-[calc(100vh-80px)]' : '')}>
+        <div className={cn('flex flex-col transition-all duration-300', showMap ? 'w-1/2' : 'w-full')}>
+          <div className={cn('', showMap ? 'w-full' : 'max-w-7xl mx-auto w-full')}>
+            <div className='search bg-white rounded-lg w-full'>
+              <div className='px-4 py-6'>
                 <SearchBar
-                  selectedCity={selectedCity}
-                  setSelectedCity={setSelectedCity}
+                  allProvinces={vietnameseProvinces}
                   showMap={showMap}
                   setShowMap={setShowMap}
-                  featuredCities={featuredCities}
+                  onSearch={handleSearch}
                 />
 
                 <FilterOptions
-                  showAreaFilter={showAreaFilter}
-                  setShowAreaFilter={setShowAreaFilter}
-                  minArea={minArea}
-                  setMinArea={setMinArea}
-                  maxArea={maxArea}
-                  setMaxArea={setMaxArea}
-                  selectedAreaOption={selectedAreaOption}
-                  handleAreaOptionChange={handleAreaOptionChange}
-                  showPriceFilter={showPriceFilter}
-                  setShowPriceFilter={setShowPriceFilter}
-                  minPrice={minPrice}
-                  setMinPrice={setMinPrice}
-                  maxPrice={maxPrice}
-                  setMaxPrice={setMaxPrice}
-                  selectedPriceOption={selectedPriceOption}
-                  handlePriceOptionChange={handlePriceOptionChange}
+                  bedrooms={bedrooms}
+                  setBedrooms={setBedrooms}
+                  bathrooms={bathrooms}
+                  setBathrooms={setBathrooms}
+                  floors={floors}
+                  setFloors={setFloors}
+                  direction={direction}
+                  setDirection={setDirection}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  areaRange={areaRange}
+                  setAreaRange={setAreaRange}
+                  selectedProvinces={selectedProvinces}
+                  setSelectedProvinces={setSelectedProvinces}
+                  onFilterSearch={handleFilterSearch} // Truyền hàm xử lý tìm kiếm
                 />
               </div>
             </div>
@@ -124,11 +107,26 @@ function SellDetail() {
 
           <div
             className={cn(
-              "flex flex-col lg:flex-row flex-1 overflow-hidden",
-              showMap ? "w-full" : "max-w-7xl mx-auto w-full",
+              'flex flex-col lg:flex-row flex-1 overflow-hidden',
+              showMap ? 'w-full' : 'max-w-7xl mx-auto w-full',
             )}
           >
-            <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
+            {isSearching ? (
+              <PropertyListingsSearch selectedProvinces={selectedProvinces} />
+            ) : isSearchingFill ? (
+              <PropertyListingsFill 
+                keyword={selectedProvinces}
+                selectedProvinces={selectedProvinces}
+                bedrooms={bedrooms}
+                bathrooms={bathrooms}
+                floors={floors}
+                direction={direction}
+                priceRange={priceRange}
+                areaRange={areaRange}
+              />
+            ) : (
+              <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
+            )}
 
             <FilterSidebar
               searchCity={searchCity}
@@ -142,14 +140,13 @@ function SellDetail() {
         </div>
 
         {showMap && (
-          <div className="w-full md:w-1/2 bg-white h-[calc(100vh-80px)]">
+          <div className='w-full md:w-1/2 bg-white h-[calc(100vh-80px)]'>
             <Map />
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default SellDetail
-
+export default SellDetail;

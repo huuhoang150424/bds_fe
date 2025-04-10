@@ -54,10 +54,10 @@ interface Post {
   user : User;
 }
 export default function PropertyCard(post: Post) {
-  console.log('post', post);
-  console.log('post.user', post.user);
+  // console.log('post', post);
+  // console.log('post.user', post.user);
   return (
-    <Card className='overflow-hidden hover:shadow-lg transition-shadow border rounded-[5px] shadow-sm'>
+    <Card className='overflow-hidden hover:shadow-xl transition-shadow border rounded-[5px] '>
       <CardContent className='p-6'>
         <div className='grid grid-cols-5 grid-rows-2 gap-2 h-[250px]'>
           <div className='col-span-3 row-span-2 relative rounded-l-lg overflow-hidden'>
