@@ -327,9 +327,8 @@ function PostDetail() {
               <div className='space-y-4'>
                 <h3 className='font-semibold text-lg'>Bình luận</h3>
                 <AuthGuard actionType='comment'>
-                  <Suspense fallback={<Loading className='mx-auto my-[100px] ' />}>
-                    <PostCommentSection postId={postId} />
-                  </Suspense>
+                  <PostCommentSection postId={postId} />
+
                 </AuthGuard>
               </div>
             </div>
