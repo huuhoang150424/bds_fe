@@ -7,6 +7,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import {useGetSatisticalByViewAddress } from '../hooks/use-get-statical-by-growth';
 
 export function RegionsChart() {
   const data = [
@@ -18,6 +19,16 @@ export function RegionsChart() {
   ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const {data : dataPie ,isLoading, isError} = useGetSatisticalByViewAddress();
+  console.log("data pie", dataPie);
+  const dataPieChart = dataPie?.map((item: any) => {
+    console.log("item", item.addess);
+    console.log("value", item.viewCount);
+    return {
+      name: item.region,
+      value: item.viewCount,
+    };
+  }); 
 
   return (
     <Card className="border rounded-[10px]  border-gray-200 ">
@@ -28,7 +39,7 @@ export function RegionsChart() {
         <ResponsiveContainer width="100%" height={285}>
           <PieChart>
             <Pie
-              data={data}
+              data={dataPieChart}
               cx="50%"
               cy="50%"
               labelLine={true}

@@ -16,6 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useGetSatisticalByMonth } from "../hooks/use-get-statiscal-by-month";
 
 const chartData = [
   { month: "Tháng 1", post: 16 },
@@ -40,6 +41,18 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PostByMonth() {
+  const { data, isLoading, isError } = useGetSatisticalByMonth();
+  console.log("data satistical month", data);
+
+  const charDataMonth = data?.map((item: any) => {
+    console.log("month", item.month);
+    console.log("count", item.count);
+    return {
+      month: item.month,
+      post: item.count,
+    };
+  });
+
   return (
     <Card className="border border-gray-200 rounded-[10px] w-full ">
       <CardHeader>
@@ -50,7 +63,7 @@ export function PostByMonth() {
         <ChartContainer config={chartConfig}>
           <BarChart
             accessibilityLayer
-            data={chartData}
+            data={charDataMonth}
             width={500} // Thu nhỏ chiều rộng
             height={200} // Thu nhỏ chiều cao
           >
@@ -69,7 +82,7 @@ export function PostByMonth() {
               width={30} // Giảm chiều rộng trục Y cho gọn
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="post" fill="var(--color-post)" radius={4} /> {/* Giảm radius cho nhỏ gọn */}
+            <Bar dataKey="post" fill="red" radius={4} /> {/* Giảm radius cho nhỏ gọn */}
           </BarChart>
         </ChartContainer>
       </CardContent>

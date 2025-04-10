@@ -35,7 +35,7 @@ function InforBrokerPpost(data: { user: any }) {
       <div className='grid grid-cols-3 gap-2 sm:gap-4 mb-4 text-center'>
         <div className=''>
           <p className='text-xs sm:text-sm text-gray-500'>Tham gia BĐS</p>
-          <p className='font-medium mt-1 text-sm sm:text-base'>{posts?.author.time} năm</p>
+          <p className='font-medium mt-1 text-sm sm:text-base'>{posts?.author?.time} năm</p>
         </div>
         <div className=''>
           <p className='text-xs sm:text-sm text-gray-500'>Tin đăng</p>
@@ -73,7 +73,7 @@ function InforBrokerPpost(data: { user: any }) {
                       flex items-center justify-center gap-2 text-sm sm:text-base shadow-none'
         >
           <FiPhoneCall className='w-4 h-4 sm:w-5 sm:h-5' />
-          <span className='font-medium'>{data.user.phone}</span>
+          <span className='font-medium'>{data?.user?.phone}</span>
         </Button>
         {(user?.id === data?.user?.id || user===null) ? null : (
           <Button
