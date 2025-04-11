@@ -1,20 +1,18 @@
-// @ts-nocheck
-
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import SearchBar from './components/search-bar';
 import FilterOptions from './components/filter-options';
-
 import FilterSidebar from './components/filter-sidebar';
 import Map from '@/page/user/sellDetails/components/Map';
 import { allCities, cityInfos, featuredCities, realEstateListings } from '@/constant/const-sell-detail';
 import PropertyListings from './components/property-listing';
-import SearchInterface from './components/search-interface';
 import PropertyListingsSearch from './components/property-listing-search';
-import PropertyListingsFill from './components/proprtty-listing-fill';
 import { vietnameseProvinces } from '@/constant/const-sell-detail';
+import PropertyListingsFill from './components/proprtty-listing-fill';
 
 function SellDetail() {
+  const [searchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState('');
   const [showMap, setShowMap] = useState(false);
   const [searchCity, setSearchCity] = useState('');
@@ -36,8 +34,37 @@ function SellDetail() {
   const [bathrooms, setBathrooms] = useState<number>(0);
   const [floors, setFloors] = useState<number>(0);
   const [direction, setDirection] = useState<string>('');
-  
-  
+
+  // Đọc query string khi component mount
+  useEffect(() => {
+    const city = searchParams.get('city');
+    const keyword = searchParams.get('keyword');
+    const minPriceParam = searchParams.get('minPrice');
+    const maxPriceParam = searchParams.get('maxPrice');
+    const minSquareMeters = searchParams.get('minSquareMeters');
+    const maxSquareMeters = searchParams.get('maxSquareMeters');
+    const propertyTypeIds = searchParams.get('propertyTypeIds')?.split(',') || [];
+
+    if (city || keyword || minPriceParam || maxPriceParam || minSquareMeters || maxSquareMeters || propertyTypeIds.length > 0) {
+      setSelectedCity(city || '');
+      setSelectedProvinces(city ? [city] : keyword ? [keyword] : []);
+      setMinPrice(minPriceParam || '');
+      setMaxPrice(maxPriceParam || '');
+      setMinArea(minSquareMeters || '');
+      setMaxArea(maxSquareMeters || '');
+
+      setPriceRange([
+        minPriceParam ? Number(minPriceParam) / 1000 : 0,
+        maxPriceParam ? Number(maxPriceParam) / 1000 : 20,
+      ]);
+      setAreaRange([
+        minSquareMeters ? Number(minSquareMeters) : 0,
+        maxSquareMeters ? Number(maxSquareMeters) : 500,
+      ]);
+      setIsSearchingFill(true);
+      setIsSearching(false);
+    }
+  }, [searchParams]);
 
   const getSumByCity = () => {
     let sum = 0;
@@ -46,28 +73,40 @@ function SellDetail() {
     });
     return sum;
   };
-  
+
   const handleSearch = (provinces: string[]) => {
-    setSelectedProvinces(provinces); // Cập nhật danh sách tỉnh/thành phố
-    setIsSearching(true); // Chuyển sang chế độ tìm kiếm
-    setIsSearchingFill(false); // Đảm bảo không hiển thị kết quả lọc
+    setSelectedProvinces(provinces);
+    setIsSearching(true);
+    setIsSearchingFill(false);
   };
-  
-  // Thêm hàm mới để xử lý việc tìm kiếm bằng bộ lọc
+
   const handleFilterSearch = (filters: any) => {
-    // Cập nhật state từ filters
     setBedrooms(filters.bedrooms);
     setBathrooms(filters.bathrooms);
     setFloors(filters.floors);
     setDirection(filters.direction);
-    setPriceRange([filters.minPrice / 1000000000, filters.maxPrice / 1000000000]); // Chuyển ngược lại tỷ VNĐ
+    setPriceRange([filters.minPrice / 1000, filters.maxPrice / 1000]);
     setAreaRange([filters.minArea, filters.maxArea]);
-    setSelectedProvinces(filters.keyword); // Gán selectedProvinces từ keyword
+    setSelectedProvinces(filters.keyword || []);
 
     setIsSearchingFill(true);
     setIsSearching(false);
+
+    // Cập nhật URL với các tham số mới
+    const params = new URLSearchParams();
+    if (filters.keyword?.length > 0) params.append('keyword', filters.keyword.join(','));
+    if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters.minArea) params.append('minSquareMeters', filters.minArea.toString());
+    if (filters.maxArea) params.append('maxSquareMeters', filters.maxArea.toString());
+    if (filters.bedrooms) params.append('bedrooms', filters.bedrooms.toString());
+    if (filters.bathrooms) params.append('bathrooms', filters.bathrooms.toString());
+    if (filters.floors) params.append('floors', filters.floors.toString());
+    if (filters.direction) params.append('directions', filters.direction);
+
+    window.history.replaceState(null, '', `/filter?${params.toString()}`);
   };
-  
+
   const filteredCities = allCities.filter((city) => city.toLowerCase().includes(searchCity.toLowerCase()));
 
   return (
@@ -83,7 +122,6 @@ function SellDetail() {
                   setShowMap={setShowMap}
                   onSearch={handleSearch}
                 />
-
                 <FilterOptions
                   bedrooms={bedrooms}
                   setBedrooms={setBedrooms}
@@ -99,13 +137,12 @@ function SellDetail() {
                   setAreaRange={setAreaRange}
                   selectedProvinces={selectedProvinces}
                   setSelectedProvinces={setSelectedProvinces}
-                  onFilterSearch={handleFilterSearch} // Truyền hàm xử lý tìm kiếm
+                  onFilterSearch={handleFilterSearch}
                 />
               </div>
             </div>
           </div>
-
-          <div
+          {/* <div
             className={cn(
               'flex flex-col lg:flex-row flex-1 overflow-hidden',
               showMap ? 'w-full' : 'max-w-7xl mx-auto w-full',
@@ -114,7 +151,7 @@ function SellDetail() {
             {isSearching ? (
               <PropertyListingsSearch selectedProvinces={selectedProvinces} />
             ) : isSearchingFill ? (
-              <PropertyListingsFill 
+              <PropertyListingsFill
                 keyword={selectedProvinces}
                 selectedProvinces={selectedProvinces}
                 bedrooms={bedrooms}
@@ -127,7 +164,6 @@ function SellDetail() {
             ) : (
               <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
             )}
-
             <FilterSidebar
               searchCity={searchCity}
               setSearchCity={setSearchCity}
@@ -136,9 +172,8 @@ function SellDetail() {
               filteredCities={filteredCities}
               allCities={allCities}
             />
-          </div>
+          </div> */}
         </div>
-
         {showMap && (
           <div className='w-full md:w-1/2 bg-white h-[calc(100vh-80px)]'>
             <Map />

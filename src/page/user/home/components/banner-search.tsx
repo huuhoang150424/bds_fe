@@ -1,428 +1,295 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, MapPin, Bed, Bath, Square, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Slider } from '@/components/ui/slider';
-import { IoIosSearch } from 'react-icons/io';
-import { IoLocationOutline } from 'react-icons/io5';
-import { MdKeyboardArrowDown } from 'react-icons/md';
-import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { allCities, areaOptions, featuredCities, priceOptions, propertyTypesByTab } from '@/constant/const-home';
+import BannerFilter from './banner-filter';
 
 interface BannerSearchProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
+const properties = [
+  {
+    id: 1,
+    title: 'Nhà chung cư GS1',
+    location: 'Nam từ liêm, Hà Nội',
+    price: '10 tỷ',
+    bedrooms: 5,
+    bathrooms: 4,
+    area: '130 m^2',
+    image: 'https://noithattugia.com/wp-content/uploads/2024/08/mau-nha-dep-anh-dai-dien-2024-scaled.jpg',
+  },
+  {
+    id: 2,
+    title: 'Xóm Phú tiến, xã Đông Hiếu, thị xã Thái Hòa',
+    location: 'Nghệ An',
+    price: '10 tỷ',
+    bedrooms: 3,
+    bathrooms: 5,
+    area: '130 m^2',
+    image: 'https://noithattugia.com/wp-content/uploads/2024/08/mau-nha-dep-anh-dai-dien-2024-scaled.jpg',
+  },
+];
+const imageVariants = {
+  initial: {
+    scale: 1.1,
+    opacity: 0,
+  },
+  animate: {
+    scale: 1,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  },
+};
+
+const titleVariants = {
+  initial: {
+    y: 20,
+    opacity: 0,
+  },
+  animate: (custom:any) => ({
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.4,
+      delay: custom * 0.07,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  }),
+};
+
 export default function BannerSearch({ activeTab, setActiveTab }: BannerSearchProps) {
-  const [selectedCity, setSelectedCity] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showPropertyTypes, setShowPropertyTypes] = useState(false);
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
-  const [showPriceFilter, setShowPriceFilter] = useState(false);
-  const [selectedPriceOption, setSelectedPriceOption] = useState<string>('all');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [showAreaFilter, setShowAreaFilter] = useState(false);
-  const [selectedAreaOption, setSelectedAreaOption] = useState<string>('all');
-  const [minArea, setMinArea] = useState('');
-  const [maxArea, setMaxArea] = useState('');
-  const [show, setShow] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const autoPlayRef = useRef<any>(null);
+  const imageRefs = useRef<HTMLImageElement[]>([]);
 
-  const propertyTypes = propertyTypesByTab[activeTab as keyof typeof propertyTypesByTab];
+  useEffect(() => {
+    const preloadImages = async () => {
+      setIsLoading(true);
+      const promises = properties.map(
+        (property) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.src = property.image
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            imageRefs.current.push(img);
+          })
+      );
+      
+      await Promise.all(promises);
+      setIsLoading(false);
+    };
 
-  const handleSearch = () => {
-    console.log('Searching with:', { selectedCity, searchQuery });
-  };
+    preloadImages();
+  }, []);
 
-  const handlePropertyTypeChange = (propertyId: string) => {
-    setSelectedPropertyTypes((prev) => {
-      if (prev.includes(propertyId)) {
-        return prev.filter((id) => id !== propertyId);
-      } else {
-        return [...prev, propertyId];
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % properties.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + properties.length) % properties.length);
+  }, []);
+  useEffect(() => {
+    if (isAutoPlaying && !isLoading) {
+      autoPlayRef.current = setTimeout(() => {
+        nextSlide();
+      }, 5000);
+    }
+    
+    return () => {
+      if (autoPlayRef.current) {
+        clearTimeout(autoPlayRef.current);
       }
-    });
-  };
+    };
+  }, [isAutoPlaying, nextSlide, currentIndex, isLoading]);
 
-  const handlePriceOptionChange = (value: string) => {
-    setSelectedPriceOption(value);
-    switch (value) {
-      case '0-500':
-        setMinPrice('');
-        setMaxPrice('500');
-        break;
-      case '500-800':
-        setMinPrice('500');
-        setMaxPrice('800');
-        break;
-      case '800-1000':
-        setMinPrice('800');
-        setMaxPrice('1000');
-        break;
-      case '1000-2000':
-        setMinPrice('1000');
-        setMaxPrice('2000');
-        break;
-      default:
-        setMinPrice('');
-        setMaxPrice('');
-    }
-  };
+  const handleMouseEnter = useCallback(() => setIsAutoPlaying(false), []);
+  const handleMouseLeave = useCallback(() => setIsAutoPlaying(true), []);
 
-  const handleAreaOptionChange = (value: string) => {
-    setSelectedAreaOption(value);
-    switch (value) {
-      case '0-30':
-        setMinArea('');
-        setMaxArea('30');
-        break;
-      case '30-50':
-        setMinArea('30');
-        setMaxArea('50');
-        break;
-      case '50-80':
-        setMinArea('50');
-        setMaxArea('80');
-        break;
-      case '80-100':
-        setMinArea('80');
-        setMaxArea('100');
-        break;
-      default:
-        setMinArea('');
-        setMaxArea('');
-    }
-  };
+  const property = properties[currentIndex];
+
+  const toggleFavorite = useCallback((id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  }, []);
+
+  const isFavorite = useCallback((id: number) => favorites.includes(id), [favorites]);
 
   return (
-    <div className='bg-[url(/banner.jpg)] bg-cover bg-center h-[500px] inset-0 w-auto relative'>
-      <div className=' top-[200px] absolute md:left-[20%] lg:left-[20%] left-[5%] text-center w-[90%] md:w-[70%] lg:w-[55%]  bg-black/80 z-[99] transition-opacity duration-30 py-[30px] px-[15px] rounded-[8px]'>
-        <div className='flex flex-col md:flex-row gap-2'>
-          <div className='relative w-full md:w-auto'>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  className='w-full md:w-[200px] justify-between bg-white text-gray-600 border-none h-full'
+    <div
+      className="relative w-full rounded-xl h-[400px] mb-[30px]"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <BannerFilter activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      <div className="relative aspect-[16/9] w-full overflow-hidden h-[400px]">
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className="absolute inset-0">
+            <div className="relative h-full w-full">
+              <motion.div 
+                key={currentIndex}
+                className="absolute inset-0 bg-cover bg-center will-change-transform"
+                style={{ 
+                  backgroundImage: `url(${property.image})`,
+                  transform: 'translateZ(0)'
+                }}
+                initial="initial"
+                animate="animate"
+                variants={imageVariants}
+              />
+              <div className="absolute inset-0 bg-black/30"></div>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1, transition: { delay: 0.3 } }}
+                onClick={(e) => toggleFavorite(property.id, e)}
+                className={cn(
+                  'absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-colors',
+                  isFavorite(property.id) ? 'bg-red-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'
+                )}
+              >
+                <Heart className={cn('h-5 w-5 transition-all', isFavorite(property.id) && 'fill-current')} />
+              </motion.button>
+
+              <div className="absolute bottom-0 top-[80px] left-0 right-0 py-6 px-6 md:px-[80px] text-white">
+                <motion.div
+                  key={`verified-${currentIndex}`}
+                  variants={titleVariants}
+                  custom={0}
+                  initial="initial"
+                  animate="animate"
+                  className="mb-4"
                 >
-                  <div className='flex items-center gap-2'>
-                    <IoLocationOutline className='w-4 h-4' />
-                    <span className='truncate'>{selectedCity || 'Hồ Chí Minh'}</span>
-                  </div>
-                  <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className='w-[90vw] md:w-[746px] p-0' align='start'>
-                <div className='grid'>
-                  <div className='p-4'>
-                    <h4 className='font-medium mb-2 text-sm text-gray-500'>Top tỉnh thành nổi bật</h4>
-                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2'>
-                      {featuredCities.map((city) => (
-                        <div
-                          key={city.name}
-                          className='relative h-[70px] rounded-lg overflow-hidden cursor-pointer group'
-                          onClick={() => {
-                            setSelectedCity(city.name);
-                            setShow(false);
-                          }}
-                        >
-                          <img
-                            src={city.image || '/placeholder.svg'}
-                            alt={city.name}
-                            className='w-full h-full object-cover'
-                          />
-                          <div className='absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all'>
-                            <span className='absolute bottom-2 left-2 text-white font-medium text-sm'>{city.name}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className='border-t'>
-                    <div className='p-4'>
-                      <h4 className='font-medium mb-1 text-sm text-gray-500'>Tất cả tỉnh thành</h4>
-                      <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6'>
-                        {allCities.map((city) => (
-                          <div
-                            key={city}
-                            className='py-[3px] px-3 hover:bg-gray-100 cursor-pointer rounded text-[13px] text-black'
-                            onClick={() => {
-                              setSelectedCity(city);
-                              setShow(false);
-                            }}
-                          >
-                            {city}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className='flex relative w-full bg-white rounded-[5px]'>
-            <Input
-              className='block w-full p-[15px] border-none'
-              placeholder='Nhập tối đa 5 địa điểm, dự án.'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button className='absolute right-[10px] top-[8px] bg-[#EF4444] hover:bg-[#FF837A]' onClick={handleSearch}>
-              <Link to={'/search'} className='hidden md:inline'>
-                Tìm kiếm
-              </Link>
-              <IoIosSearch className='w-4 h-4 md:hidden' />
-            </Button>
-          </div>
-        </div>
-
-        <div className='flex flex-col sm:flex-row gap-2 mt-2'>
-          <Popover open={showPropertyTypes} onOpenChange={setShowPropertyTypes}>
-            <PopoverTrigger asChild>
-              <Button
-                variant='outline'
-                className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
-              >
-                <span className='text-sm truncate'>Loại hình dự án</span>
-                <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
-              <div className='p-4'>
-                <div className='flex items-center justify-between mb-4'>
-                  <h4 className='font-medium text-base'>Loại nhà đất</h4>
-                  <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowPropertyTypes(false)}>
-                    <X className='h-4 w-4' />
-                  </Button>
-                </div>
-                <div className='space-y-3'>
-                  {propertyTypes.map((type) => (
-                    <div key={type.id} className='flex items-center space-x-2'>
-                      <Checkbox
-                        id={type.id}
-                        checked={selectedPropertyTypes.includes(type.id)}
-                        onCheckedChange={() => handlePropertyTypeChange(type.id)}
-                      />
-                      <label
-                        htmlFor={type.id}
-                        className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                      >
-                        {type.icon && <span className='mr-2'>{type.icon}</span>}
-                        {type.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                <div className='flex gap-2 mt-4 border-t pt-4'>
-                  <Button
-                    variant='outline'
-                    className='flex-1'
-                    onClick={() => {
-                      setSelectedPropertyTypes([]);
-                      setShowPropertyTypes(false);
-                    }}
-                  >
-                    Đặt lại
-                  </Button>
-                  <Button
-                    className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]'
-                    onClick={() => setShowPropertyTypes(false)}
-                  >
-                    Áp dụng
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Popover open={showPriceFilter} onOpenChange={setShowPriceFilter}>
-            <PopoverTrigger asChild>
-              <Button
-                variant='outline'
-                className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
-              >
-                <span className='text-sm truncate'>Mức giá</span>
-                <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
-              <div className='p-4'>
-                <div className='flex items-center justify-between mb-4'>
-                  <h4 className='font-medium text-base'>Mức giá</h4>
-                  <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowPriceFilter(false)}>
-                    <X className='h-4 w-4' />
-                  </Button>
-                </div>
-
-                <div className='mb-6'>
-                  <div className='flex justify-between mb-2'>
-                    <span className='text-sm font-medium'>Giá thấp nhất</span>
-                    <span className='text-sm font-medium'>Giá cao nhất</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Input
-                      type='text'
-                      placeholder='Từ'
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
-                      className='flex-1'
-                    />
-                    <span>→</span>
-                    <Input
-                      type='text'
-                      placeholder='Đến'
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
-                      className='flex-1'
-                    />
-                  </div>
-                  <div className='mt-4'>
-                    <Slider
-                      defaultValue={[0, 2000]}
-                      max={2000}
-                      step={100}
-                      value={[Number.parseInt(minPrice || '0'), Number.parseInt(maxPrice || '2000')]}
-                      onValueChange={(value) => {
-                        setMinPrice(value[0].toString());
-                        setMaxPrice(value[1].toString());
-                        setSelectedPriceOption('');
+                  <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
+                    Đã xác thực
+                  </span>
+                </motion.div>
+                
+                <motion.h2 
+                  key={`title-${currentIndex}`}
+                  variants={titleVariants}
+                  custom={1}
+                  initial="initial"
+                  animate="animate"
+                  className="mb-2 text-2xl font-bold tracking-tight md:text-4xl"
+                >
+                  {property.title.split('').map((char, index) => (
+                    <motion.span
+                      key={index}
+                      custom={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ 
+                        opacity: 1, 
+                        y: 0,
+                        transition: { 
+                          delay: index * 0.02,
+                          duration: 0.3
+                        }
                       }}
-                      className='[&_.bg-\[\#EF4444\]]:bg-[#00B4D8]'
-                    />
-                  </div>
-                </div>
-
-                <RadioGroup value={selectedPriceOption} onValueChange={handlePriceOptionChange} className='space-y-2'>
-                  {priceOptions.map((option) => (
-                    <div key={option.value} className='flex items-center space-x-2'>
-                      <RadioGroupItem
-                        value={option.value}
-                        id={option.value}
-                        className='text-[#00B4D8] border-[#00B4D8]'
-                      />
-                      <label htmlFor={option.value} className='text-sm'>
-                        {option.label}
-                      </label>
-                    </div>
+                      className="inline-block"
+                    >
+                      {char === ' ' ? '\u00A0' : char}
+                    </motion.span>
                   ))}
-                </RadioGroup>
-
-                <div className='flex gap-2 mt-4 border-t pt-4'>
-                  <Button
-                    variant='outline'
-                    className='flex-1'
-                    onClick={() => {
-                      setMinPrice('');
-                      setMaxPrice('');
-                      setSelectedPriceOption('all');
-                    }}
-                  >
-                    Đặt lại
+                </motion.h2>
+                
+                <motion.div
+                  key={`location-${currentIndex}`}
+                  variants={titleVariants}
+                  custom={2}
+                  initial="initial"
+                  animate="animate"
+                  className="mb-3 flex items-center"
+                >
+                  <MapPin className="mr-1 h-4 w-4" />
+                  <p className="text-sm font-medium md:text-base">{property.location}</p>
+                </motion.div>
+                
+                <motion.div
+                  key={`amenities-${currentIndex}`}
+                  variants={titleVariants}
+                  custom={3}
+                  initial="initial"
+                  animate="animate"
+                  className="mb-4 flex flex-wrap gap-3"
+                >
+                  <div className="flex items-center rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">
+                    <Bed className="mr-1 h-4 w-4" />
+                    <span className="text-sm">{property.bedrooms} Giường</span>
+                  </div>
+                  <div className="flex items-center rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">
+                    <Bath className="mr-1 h-4 w-4" />
+                    <span className="text-sm">{property.bathrooms} Nhà tắm</span>
+                  </div>
+                  <div className="flex items-center rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">
+                    <Square className="mr-1 h-4 w-4" />
+                    <span className="text-sm">{property.area}</span>
+                  </div>
+                </motion.div>
+                
+                <motion.div
+                  key={`price-button-${currentIndex}`}
+                  variants={titleVariants}
+                  custom={4}
+                  initial="initial"
+                  animate="animate"
+                  className="flex items-center justify-between"
+                >
+                  <p className="text-2xl font-bold md:text-3xl">{property.price}</p>
+                  <Button className="relative overflow-hidden bg-white text-black hover:bg-white/90 mt-4 md:mt-0">
+                    <span className="relative z-10">Xem chi tiết</span>
+                    <motion.span
+                      className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: '100%' }}
+                      transition={{ duration: 0.5 }}
+                    />
                   </Button>
-                  <Button className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]' onClick={() => setShowPriceFilter(false)}>
-                    Áp dụng
-                  </Button>
-                </div>
+                </motion.div>
               </div>
-            </PopoverContent>
-          </Popover>
+            </div>
+          </div>
+        )}
 
-          <Popover open={showAreaFilter} onOpenChange={setShowAreaFilter}>
-            <PopoverTrigger asChild>
-              <Button
-                variant='outline'
-                className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border-none'
-              >
-                <span className='text-sm truncate'>Diện tích</span>
-                <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-[90vw] sm:w-[300px] p-0' align='start'>
-              <div className='p-4'>
-                <div className='flex items-center justify-between mb-4'>
-                  <h4 className='font-medium text-base'>Diện tích</h4>
-                  <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowAreaFilter(false)}>
-                    <X className='h-4 w-4' />
-                  </Button>
-                </div>
-
-                <div className='mb-6'>
-                  <div className='flex justify-between mb-2'>
-                    <span className='text-sm font-medium'>Diện tích nhỏ nhất</span>
-                    <span className='text-sm font-medium'>Diện tích lớn nhất</span>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Input
-                      type='text'
-                      placeholder='Từ'
-                      value={minArea}
-                      onChange={(e) => setMinArea(e.target.value)}
-                      className='flex-1'
-                    />
-                    <span>→</span>
-                    <Input
-                      type='text'
-                      placeholder='Đến'
-                      value={maxArea}
-                      onChange={(e) => setMaxArea(e.target.value)}
-                      className='flex-1'
-                    />
-                  </div>
-                  <div className='mt-4'>
-                    <Slider
-                      defaultValue={[0, 100]}
-                      max={100}
-                      step={5}
-                      value={[Number.parseInt(minArea || '0'), Number.parseInt(maxArea || '100')]}
-                      onValueChange={(value) => {
-                        setMinArea(value[0].toString());
-                        setMaxArea(value[1].toString());
-                        setSelectedAreaOption('');
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <RadioGroup value={selectedAreaOption} onValueChange={handleAreaOptionChange} className='space-y-2'>
-                  {areaOptions.map((option) => (
-                    <div key={option.value} className='flex items-center space-x-2'>
-                      <RadioGroupItem
-                        value={option.value}
-                        id={option.value}
-                        className='text-[#00B4D8] border-[#00B4D8]'
-                      />
-                      <label htmlFor={option.value} className='text-sm'>
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </RadioGroup>
-
-                <div className='flex gap-2 mt-4 border-t pt-4'>
-                  <Button
-                    variant='outline'
-                    className='flex-1'
-                    onClick={() => {
-                      setMinArea('');
-                      setMaxArea('');
-                      setSelectedAreaOption('all');
-                    }}
-                  >
-                    Đặt lại
-                  </Button>
-                  <Button className='flex-1 bg-[#EF4444] hover:bg-[#FF837A]' onClick={() => setShowAreaFilter(false)}>
-                    Áp dụng
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+        {/* Navigation buttons */}
+        <div className="absolute left-4 right-4 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={prevSlide}
+            className="h-10 w-10 rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
+            disabled={isLoading}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={nextSlide}
+            className="h-10 w-10 rounded-full bg-white/10 text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
+            disabled={isLoading}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>

@@ -1,11 +1,6 @@
-'use client';
-
 import { useState } from 'react';
-
 import { Button } from '@/components/ui/button';
-
 import { cn } from '@/lib/utils';
-
 import { ChevronDown, Search, X } from 'lucide-react';
 import { useDebounce } from 'use-debounce';
 import { vietnameseProvinces } from '@/constant/const-sell-detail';
@@ -138,5 +133,3 @@ export default function SearchBar({ allProvinces, onSearch, showMap, setShowMap 
     </div>
   );
 }
-
-// Declare allCities here to avoid TypeScript errors

@@ -8,5 +8,4 @@ export const useGetListPosts = (limit: number, page: number) => {
     placeholderData: (previousData) => previousData,
     
   });
-   
 }
