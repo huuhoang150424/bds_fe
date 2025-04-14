@@ -7,15 +7,16 @@ import RealEstateChat from '@/page/user/chat/real-estate-chat';
 
 const MainLayout: React.FC = () => {
   return (
-    <div className="">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <AuthModal />
       <RealEstateChat />
-      <main className="">
+      <main className="flex-grow">
         <Outlet />
       </main>
       <Footer />
     </div>
   )
 }
+
 export default MainLayout;

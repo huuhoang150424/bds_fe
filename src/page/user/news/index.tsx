@@ -8,23 +8,20 @@ import { Button } from '@/components/ui/button';
 
 
 
-
-
-
 function News() {
-  const [searchTerm, setSearchTerm] = useState(""); // State cho từ khóa tìm kiếm
+  const [searchTerm, setSearchTerm] = useState(""); 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value); // Cập nhật searchTerm khi người dùng nhập vào ô tìm kiếm
+    setSearchTerm(e.target.value); 
   };
   const [search, setSearch] = useState(false);
   return (
-    <div className='max-w-6xl h-full mx-auto pt-[100px]  '>
+    <div className='max-w-6xl h-full mx-auto  mt-[30px] '>
       <div className='search flex bg-gray-100 rounded-l-[10px]'>
       <Input
           placeholder='TÌm kiếm bài viết'
           className='px-[15px] py-[5px] rounded-l-[10px]'
           value={searchTerm}
-          onChange={handleSearchChange} // Lắng nghe sự kiện thay đổi và cập nhật searchTerm
+          onChange={handleSearchChange} 
         />
         <Button className='bg-[#E03C31] hover:bg-[#FF837A]' onClick={() => setSearch(!search)}>Tìm kiếm</Button>
       </div>

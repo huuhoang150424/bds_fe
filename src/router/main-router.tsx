@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import {MainLayout } from '@/components/layout';
 import Home from "@/page/user/home";
-import SellDetail from "@/page/user/sellDetails";
+import SellDetail from "@/page/user/filterPost";
 import { AuthModalProvider } from "@/context/auth-modal";
 import News from "@/page/user/news/index";
 import NotFoundScreen from "@/page/user/NotFoundScreen";

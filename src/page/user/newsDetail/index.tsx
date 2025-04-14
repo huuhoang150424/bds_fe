@@ -1,9 +1,6 @@
-'use client';
 
 import { useState, type ChangeEvent } from 'react';
 import { CustomImage } from '@/components/common';
-
-// import Link from "next/link"
 import { Clock, Home, ChevronRight, Facebook, Linkedin, Twitter, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,7 +32,7 @@ function NewsArticle() {
   });
 
   return (
-    <div className='flex flex-col max-w-6xl bg-white pt-[80px] mx-auto'>
+    <div className='flex flex-col max-w-6xl bg-white mx-auto'>
       {/* Header Navigation */}
       {/* <header className='sticky top-0 z-10 border-b bg-white'>
         <div className='container mx-auto px-4 py-2 flex items-center justify-between'>

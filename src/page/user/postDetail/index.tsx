@@ -55,7 +55,7 @@ function PostDetail() {
 
   console.log(data);
   return (
-    <div className='max-w-6xl h-full mx-auto pt-[80px] px-4 md:px-6 lg:px-8'>
+    <div className='max-w-6xl h-full mx-auto px-4 md:px-6 lg:px-8'>
       {isLoading ? (
         <Loading className='mx-auto mt-[250px] mb-[250px] ' />
       ) : (
