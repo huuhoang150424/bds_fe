@@ -71,10 +71,10 @@ export default function FilterSidebar() {
     <div className='space-y-5 border border-gray-200 rounded-[8px] px-4 py-6'>
       {/* Price Range */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Price Range</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Khoảng giá</h3>
         <div className='relative pt-5 pb-8'>
-          <div className='absolute -top-1 left-0 bg-gray-900 text-white text-xs px-2 py-1 rounded-full'>
-            ${priceRange[0]}
+          <div className='absolute -top-1 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full'>
+            {priceRange[0]} k
           </div>
           <Slider
             defaultValue={priceRange}
@@ -85,54 +85,15 @@ export default function FilterSidebar() {
             className='my-4'
           />
           <div className='flex items-center justify-between text-sm text-gray-800 font-normal mt-2'>
-            <span>${1000}</span>
-            <span>${5000}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Times */}
-      <div className='space-y-4'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Times</h3>
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='space-y-1'>
-            <Label className='text-xs text-gray-800 font-normal'>PERIOD</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='outline' className='w-full justify-between text-gray-800 font-normal'>
-                  {period} <ChevronDown className='h-4 w-4 opacity-50' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className='w-[200px]'>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setPeriod('1')}>1</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPeriod('2')}>2</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPeriod('3')}>3</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPeriod('4')}>4</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setPeriod('5')}>5</DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className='space-y-1'>
-            <Label className='text-xs text-gray-800 font-normal'>DAY</Label>
-            <Tabs defaultValue='all' className='w-full'>
-              <TabsList className='w-full h-10'>
-                <TabsTrigger value='all' className='flex-1 text-gray-800 font-normal'>
-                  All
-                </TabsTrigger>
-                <TabsTrigger value='weekday' className='flex-1 text-gray-800 font-normal'>
-                  Weekday
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <span>{1000} k</span>
+            <span>{5000} k</span>
           </div>
         </div>
       </div>
 
       {/* Start Date */}
       <div className='space-y-1'>
-        <Label className='text-xs text-gray-800 font-normal'>START DATE</Label>
+        <Label className='text-xs text-gray-800 font-normal'>Ngày bắt đầu</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='w-full justify-between text-gray-800 font-normal'>
@@ -151,10 +112,10 @@ export default function FilterSidebar() {
 
       {/* End Date */}
       <div className='space-y-1'>
-        <Label className='text-xs text-gray-800 font-normal'>END DATE</Label>
+        <Label className='text-xs text-gray-600 font-normal'>Ngày kết thúc</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='w-full justify-between text-gray-800 font-normal'>
+            <Button variant='outline' className='w-full justify-between text-gray-600 font-normal'>
               {endDate} <ChevronDown className='h-4 w-4 opacity-50' />
             </Button>
           </DropdownMenuTrigger>
@@ -168,18 +129,9 @@ export default function FilterSidebar() {
         </DropdownMenu>
       </div>
 
-      {/* Favorite */}
-      <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Favorite</h3>
-        <div className='flex items-center justify-between'>
-          <Label htmlFor='favorite' className='text-gray-800 font-normal'>Chỉ hiển thị yêu thích</Label>
-          <Switch id='favorite' checked={isFavorite} onCheckedChange={setIsFavorite} />
-        </div>
-      </div>
-
       {/* Review Score */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Review Score</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Đánh giá sao</h3>
         <div className='space-y-2'>
           <div className='flex items-center space-x-2'>
             <Checkbox id='review-5' checked={reviewScores.includes(5)} onCheckedChange={() => toggleReviewScore(5)} />
@@ -234,7 +186,7 @@ export default function FilterSidebar() {
 
       {/* Square Meters */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Diện tích (m²)</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Diện tích (m²)</h3>
         <div className='pt-2 pb-4'>
           <Slider
             defaultValue={squareMeters}
@@ -253,7 +205,7 @@ export default function FilterSidebar() {
 
       {/* Floor */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Tầng</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Tầng</h3>
         <div className='flex flex-wrap gap-2'>
           {floorOptions.map((option:any) => (
             <Button
@@ -261,7 +213,7 @@ export default function FilterSidebar() {
               variant={floor.includes(option) ? 'default' : 'outline'}
               size='sm'
               onClick={() => toggleSelection(option, floor, setFloor)}
-              className='h-8 rounded-full text-gray-800 font-normal'
+              className='h-8 rounded-full text-gray-600 font-normal'
             >
               {option}
             </Button>
@@ -271,7 +223,7 @@ export default function FilterSidebar() {
 
       {/* Bedrooms */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Phòng ngủ</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Phòng ngủ</h3>
         <div className='flex flex-wrap gap-2'>
           {bedroomOptions.map((option:any) => (
             <Button
@@ -279,7 +231,7 @@ export default function FilterSidebar() {
               variant={bedrooms.includes(option) ? 'default' : 'outline'}
               size='sm'
               onClick={() => toggleSelection(option, bedrooms, setBedrooms)}
-              className='h-8 rounded-full text-gray-800 font-normal'
+              className='h-8 rounded-full text-gray-600 font-normal'
             >
               {option}
             </Button>
@@ -289,7 +241,7 @@ export default function FilterSidebar() {
 
       {/* Bathrooms */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Phòng tắm</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Phòng tắm</h3>
         <div className='flex flex-wrap gap-2'>
           {bathroomOptions.map((option:any) => (
             <Button
@@ -307,13 +259,13 @@ export default function FilterSidebar() {
 
       {/* Furniture */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Nội thất</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Nội thất</h3>
         <div className='flex gap-2'>
           <Button
             variant={isFurnished === true ? 'default' : 'outline'}
             size='sm'
             onClick={() => setIsFurnished(isFurnished === true ? null : true)}
-            className='rounded-full text-gray-800 font-normal'
+            className='rounded-full text-gray-600 font-normal'
           >
             Có nội thất
           </Button>
@@ -321,7 +273,7 @@ export default function FilterSidebar() {
             variant={isFurnished === false ? 'default' : 'outline'}
             size='sm'
             onClick={() => setIsFurnished(isFurnished === false ? null : false)}
-            className='rounded-full text-gray-800 font-normal'
+            className='rounded-full text-gray-600 font-normal'
           >
             Không nội thất
           </Button>
@@ -330,7 +282,7 @@ export default function FilterSidebar() {
 
       {/* Direction */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Hướng</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Hướng</h3>
         <div className='grid grid-cols-2 gap-2'>
           {directionOptions.map((option) => (
             <Button
@@ -338,7 +290,7 @@ export default function FilterSidebar() {
               variant={directions.includes(option) ? 'default' : 'outline'}
               size='sm'
               onClick={() => toggleSelection(option, directions, setDirections)}
-              className='rounded-full text-gray-800 font-normal'
+              className='rounded-full text-gray-600 font-normal'
             >
               {option}
             </Button>
@@ -348,7 +300,7 @@ export default function FilterSidebar() {
 
       {/* Status */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Trạng thái</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Trạng thái</h3>
         <div className='space-y-2'>
           {statusOptions.map((option) => (
             <div key={option} className='flex items-center space-x-2'>
@@ -357,7 +309,7 @@ export default function FilterSidebar() {
                 checked={status.includes(option)}
                 onCheckedChange={() => toggleSelection(option, status, setStatus)}
               />
-              <Label htmlFor={`status-${option}`} className='text-gray-800 font-normal'>{option}</Label>
+              <Label htmlFor={`status-${option}`} className='text-gray-600 font-normal'>{option}</Label>
             </div>
           ))}
         </div>
@@ -365,7 +317,7 @@ export default function FilterSidebar() {
 
       {/* Tags */}
       <div className='space-y-2'>
-        <h3 className='font-bold text-sm uppercase text-gray-800'>Tags</h3>
+        <h3 className='font-bold text-sm uppercase text-gray-600'>Tags</h3>
         <div className='space-y-2'>
           {tagOptions.map((tag) => (
             <div key={tag} className='flex items-center space-x-2'>

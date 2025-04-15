@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import PropertyCard from './property-card';
-import { useGetListPosts } from '../hooks/use-get-list-post';
 import { useState } from 'react';
 import { Pagination } from '@/components/user/pagination';
 import { Loading } from '@/components/common';
@@ -13,14 +12,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown, Heart } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { convertDate } from '@/lib/convert-date';
 
-export default function PropertyListings({ showMap }: { showMap: boolean }) {
-  const [page, setPage] = useState(1);
-  const { data, isLoading } = useGetListPosts(5, page);
-  const handleChangePage = () => {};
+export default function PropertyListings({
+  showMap,
+  data,
+  isLoading,
+  onPageChange,
+  currentPage,
+}: {
+  showMap: boolean;
+  data: any;
+  isLoading: boolean;
+  onPageChange: (page: number) => void;
+  currentPage: number;
+}) {
+  const [page, setPage] = useState(currentPage);
 
+  const handleChangePage = (newPage: number) => {
+    onPageChange(newPage);
+    setPage(newPage);
+    window.scrollTo(0, 0);
+  };
   return (
     <div className=' w-full mb-[50px] '>
       <div className=' mb-[30px]'></div>
@@ -36,17 +51,17 @@ export default function PropertyListings({ showMap }: { showMap: boolean }) {
             <Loading className='mx-auto my-[300px] ' />
           ) : (
             <div className=''>
-                <div className='bg-red-50 w-[50%] p-3 rounded-lg mb-4 flex items-center gap-2'>
-                  <img
-                    src='https://i.pinimg.com/originals/fc/3e/4f/fc3e4f219110231f1942b213c3c2eea2.gif'
-                    className='w-[30px] h-[30px] '
-                  />
-                  <span className='text-[14px] font-medium'>Có 1.356.416 lượt xem khu vực này trong 7 ngày vừa qua.</span>
-                </div>
-                <h1 className='text-xl font-[500]  text-gray-800 mb-2'>
-                  Mua Bán Nhà Đất Hồ Chí Minh Giá Rẻ Mới Nhất T4/2025
-                </h1>
-                <p className='text-gray-600 mb-6'>Hiện có 60.605 bất động sản.</p>
+              <div className='bg-red-50 w-[50%] p-3 rounded-lg mb-4 flex items-center gap-2'>
+                <img
+                  src='https://i.pinimg.com/originals/fc/3e/4f/fc3e4f219110231f1942b213c3c2eea2.gif'
+                  className='w-[30px] h-[30px] '
+                />
+                <span className='text-[14px] font-medium'>Có {data?.data?.total} kết quả trả về.</span>
+              </div>
+              <h1 className='text-[18px] font-[500]  text-gray-800 mb-2'>
+                Mua Bán Nhà Đất Hồ Chí Minh Giá Rẻ Mới Nhất {convertDate(new Date().toDateString())}
+              </h1>
+              <p className='text-gray-600  mb-6'>Hiện có 60.605 bất động sản.</p>
               <div className='flex flex-wrap items-center justify-between gap-4 mb-4'>
                 <Tabs defaultValue='cheapest' className='w-auto'>
                   <TabsList className='h-10'>
@@ -76,14 +91,27 @@ export default function PropertyListings({ showMap }: { showMap: boolean }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="flex flex-col gap-5">
-                {data?.posts?.map((post: any) => (
-                  <Link key={post?.id} to={`/post/${post?.slug}`}>
-                    <PropertyCard {...post} />
-                  </Link>
-                ))}
-              </div>
-              <Pagination currentPage={1} totalPages={100} onPageChange={handleChangePage} />
+              {data?.data?.posts?.length === 0 ? (
+                <div className='w-full flex flex-col items-center justify-center pt-[50px] pb-[200px] '>
+                  <h1 className='text-[17px] text-gray-700 font-[500]'>Không có kết quả tìm kiếm </h1>
+                  <img src='https://i.gifer.com/embedded/download/4jJm.gif' alt='' className='w-[300px] h-[300px] ' />
+                </div>
+              ) : (
+                <div className=''>
+                  <div className='flex flex-col gap-5'>
+                    {data?.data?.posts?.map((post: any) => (
+                      <Link key={post?.id} to={`/post/${post?.slug}`}>
+                        <PropertyCard {...post} />
+                      </Link>
+                    ))}
+                  </div>
+                  <Pagination
+                    currentPage={page}
+                    totalPages={data?.data?.totalPages || 1}
+                    onPageChange={handleChangePage}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

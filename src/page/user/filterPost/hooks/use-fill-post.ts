@@ -1,11 +1,15 @@
-// hooks/usePosts.ts
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fillPost } from '../service/fill-post';
 
 interface FilterParams {
   keyword?: string[];
   bathroom?: number;
   bedroom?: number;
+  tagIds?: string;
+  minSquareMeters?: number;
+  maxSquareMeters?:number;
+  listingTypeIds?: string[];
+  propertyTypeIds?: string[];
   minPrice?: number;
   maxPrice?: number;
   minArea?: number;
@@ -16,9 +20,8 @@ interface FilterParams {
 
 export const useGetPostByFilter = (filters: FilterParams) => {
   return useQuery({
-    queryKey: ['posts', filters],
+    queryKey: ['filterPosts', filters],
     queryFn: () => fillPost(filters),
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData
   });
 };

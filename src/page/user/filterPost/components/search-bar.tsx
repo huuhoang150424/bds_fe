@@ -5,14 +5,11 @@ import { ChevronDown, Search, X, Map, Trash2 } from 'lucide-react';
 import { vietnameseProvinces } from '@/constant/const-sell-detail';
 
 interface SearchBarProps {
-  onSearch: (selected: string[]) => void;
-  onFilterSearch?: (filters: any) => void;
   showMap: boolean;
   setShowMap: (show: boolean) => void;
 }
 
 export default function SearchBar({
-  onSearch,
   showMap, 
   setShowMap 
 }: SearchBarProps) {
@@ -55,7 +52,7 @@ export default function SearchBar({
   };
   
   const handleSearch = () => {
-    onSearch(selectedProvinces); 
+    
   };
 
   return (

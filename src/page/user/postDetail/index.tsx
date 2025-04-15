@@ -53,7 +53,6 @@ function PostDetail() {
     changed_at: new Date(item?.changed_at).toLocaleDateString('vi-VN'),
   }));
 
-  console.log(data);
   return (
     <div className='max-w-6xl h-full mx-auto px-4 md:px-6 lg:px-8'>
       {isLoading ? (

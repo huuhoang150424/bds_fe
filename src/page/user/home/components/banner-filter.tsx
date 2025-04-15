@@ -37,15 +37,50 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
   const propertyTypes = propertyTypesByTab[activeTab as keyof typeof propertyTypesByTab];
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (selectedCity) params.append('keyword', selectedCity);
-    if (searchQuery) params.append('keyword', searchQuery);
-    if (minPrice) params.append('minPrice', minPrice);
-    if (maxPrice) params.append('maxPrice', maxPrice);
-    if (minArea) params.append('minSquareMeters', minArea);
-    if (maxArea) params.append('maxSquareMeters', maxArea);
-    if (selectedPropertyTypes.length > 0) params.append('propertyTypeIds', selectedPropertyTypes.join(','));
+    const filterParams:any = {};
 
+    if (selectedCity) {
+      filterParams.keyword = [selectedCity];
+    }
+    if (searchQuery) {
+      filterParams.keyword = filterParams.keyword 
+        ? [...filterParams.keyword, searchQuery] 
+        : [searchQuery];
+    }
+    if (minPrice) {
+      filterParams.minPrice = Number(minPrice);
+    }
+    if (maxPrice) {
+      filterParams.maxPrice = Number(maxPrice);
+    }
+    if (minArea) {
+      filterParams.minSquareMeters = Number(minArea);
+    }
+    if (maxArea) {
+      filterParams.maxSquareMeters = Number(maxArea);
+    }
+    if (selectedPropertyTypes.length > 0) {
+      filterParams.propertyTypeIds = selectedPropertyTypes.join(',');
+    }
+    const params = new URLSearchParams();
+    if (filterParams.keyword?.length) {
+      params.append('keyword', filterParams.keyword.join(','));
+    }
+    if (filterParams.minPrice !== undefined) {
+      params.append('minPrice', filterParams.minPrice.toString());
+    }
+    if (filterParams.maxPrice !== undefined) {
+      params.append('maxPrice', filterParams.maxPrice.toString());
+    }
+    if (filterParams.minSquareMeters !== undefined) {
+      params.append('minSquareMeters', filterParams.minSquareMeters.toString());
+    }
+    if (filterParams.maxSquareMeters !== undefined) {
+      params.append('maxSquareMeters', filterParams.maxSquareMeters.toString());
+    }
+    if (filterParams.propertyTypeIds) {
+      params.append('propertyTypeIds', filterParams.propertyTypeIds);
+    }
     navigate(`/filter?${params.toString()}`);
   };
 
@@ -59,24 +94,32 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
     });
   };
 
+  const handleSelectAllPropertyTypes = () => {
+    if (selectedPropertyTypes.length === propertyTypes.length) {
+      setSelectedPropertyTypes([]);
+    } else {
+      setSelectedPropertyTypes(propertyTypes.map(type => type.id));
+    }
+  };
+
   const handlePriceOptionChange = (value: string) => {
     setSelectedPriceOption(value);
     switch (value) {
-      case '0-500':
-        setMinPrice('');
-        setMaxPrice('500');
-        break;
-      case '500-800':
-        setMinPrice('500');
-        setMaxPrice('800');
-        break;
-      case '800-1000':
-        setMinPrice('800');
-        setMaxPrice('1000');
-        break;
       case '1000-2000':
-        setMinPrice('1000');
-        setMaxPrice('2000');
+        setMinPrice('1000000000');
+        setMaxPrice('2000000000');
+        break;
+      case '2000-4000':
+        setMinPrice('2000000000');
+        setMaxPrice('4000000000');
+        break;
+      case '4000-8000':
+        setMinPrice('4000000000');
+        setMaxPrice('8000000000');
+        break;
+      case '8000+':
+        setMinPrice('8000000000');
+        setMaxPrice('');
         break;
       default:
         setMinPrice('');
@@ -107,6 +150,40 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
         setMinArea('');
         setMaxArea('');
     }
+  };
+
+  const getPropertyTypeLabel = () => {
+    if (selectedPropertyTypes.length === 0) return "Loại hình dự án";
+    if (selectedPropertyTypes.length === propertyTypes.length) return "Tất cả loại nhà đất";
+    if (selectedPropertyTypes.length === 1) {
+      const selectedType = propertyTypes.find(type => type.id === selectedPropertyTypes[0]);
+      return selectedType ? selectedType.label : "Loại hình dự án";
+    }
+    return `${selectedPropertyTypes.length} loại nhà đất`;
+  };
+
+  const getPriceLabel = () => {
+    if (selectedPriceOption === 'all' && !minPrice && !maxPrice) return "Mức giá";
+    if (selectedPriceOption !== 'all') {
+      const selected = priceOptions.find(option => option.value === selectedPriceOption);
+      return selected ? selected.label : "Mức giá";
+    }
+    if (minPrice && maxPrice) return `${minPrice} - ${maxPrice}`;
+    if (minPrice) return `Từ ${minPrice}`;
+    if (maxPrice) return `Đến ${maxPrice}`;
+    return "Mức giá";
+  };
+
+  const getAreaLabel = () => {
+    if (selectedAreaOption === 'all' && !minArea && !maxArea) return "Diện tích";
+    if (selectedAreaOption !== 'all') {
+      const selected = areaOptions.find(option => option.value === selectedAreaOption);
+      return selected ? selected.label : "Diện tích";
+    }
+    if (minArea && maxArea) return `${minArea} - ${maxArea} m²`;
+    if (minArea) return `Từ ${minArea} m²`;
+    if (maxArea) return `Đến ${maxArea} m²`;
+    return "Diện tích";
   };
 
   return (
@@ -173,7 +250,7 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
               variant='outline'
               className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border border-gray-200'
             >
-              <span className='text-sm truncate'>Loại hình dự án</span>
+              <span className='text-sm truncate'>{getPropertyTypeLabel()}</span>
               <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
             </Button>
           </PopoverTrigger>
@@ -184,6 +261,19 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                 <Button variant='ghost' size='icon' className='h-6 w-6' onClick={() => setShowPropertyTypes(false)}>
                   <X className='h-4 w-4' />
                 </Button>
+              </div>
+              <div className='flex items-center space-x-2 mb-3 border-b pb-2'>
+                <Checkbox
+                  id="select-all"
+                  checked={selectedPropertyTypes.length === propertyTypes.length}
+                  onCheckedChange={handleSelectAllPropertyTypes}
+                />
+                <label
+                  htmlFor="select-all"
+                  className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                >
+                  Tất cả loại nhà đất
+                </label>
               </div>
               <div className='space-y-3'>
                 {propertyTypes.map((type) => (
@@ -227,7 +317,7 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
               variant='outline'
               className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border border-gray-200'
             >
-              <span className='text-sm truncate'>Mức giá</span>
+              <span className='text-sm truncate'>{getPriceLabel()}</span>
               <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
             </Button>
           </PopoverTrigger>
@@ -249,7 +339,10 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     type='text'
                     placeholder='Từ'
                     value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
+                    onChange={(e) => {
+                      setMinPrice(e.target.value);
+                      setSelectedPriceOption('all'); 
+                    }}
                     className='flex-1 px-[8px] py-[6px] border border-gray-200 outline-none'
                   />
                   <span>→</span>
@@ -257,7 +350,10 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     type='text'
                     placeholder='Đến'
                     value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
+                    onChange={(e) => {
+                      setMaxPrice(e.target.value);
+                      setSelectedPriceOption('all'); 
+                    }}
                     className='flex-1 px-[8px] py-[6px] border border-gray-200 outline-none'
                   />
                 </div>
@@ -270,7 +366,7 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     onValueChange={(value) => {
                       setMinPrice(value[0].toString());
                       setMaxPrice(value[1].toString());
-                      setSelectedPriceOption('');
+                      setSelectedPriceOption('all');
                     }}
                     className='[&_.bg-[#EF4444]]:bg-[#00B4D8]'
                   />
@@ -315,7 +411,7 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
               variant='outline'
               className='w-full sm:w-[33%] justify-between bg-white text-gray-600 border border-gray-200'
             >
-              <span className='text-sm truncate'>Diện tích</span>
+              <span className='text-sm truncate'>{getAreaLabel()}</span>
               <MdKeyboardArrowDown className='h-4 w-4 flex-shrink-0' />
             </Button>
           </PopoverTrigger>
@@ -337,7 +433,10 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     type='text'
                     placeholder='Từ'
                     value={minArea}
-                    onChange={(e) => setMinArea(e.target.value)}
+                    onChange={(e) => {
+                      setMinArea(e.target.value);
+                      setSelectedAreaOption('all'); 
+                    }}
                     className='flex-1 px-[8px] py-[6px] border border-gray-200 outline-none'
                   />
                   <span>→</span>
@@ -345,7 +444,10 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     type='text'
                     placeholder='Đến'
                     value={maxArea}
-                    onChange={(e) => setMaxArea(e.target.value)}
+                    onChange={(e) => {
+                      setMaxArea(e.target.value);
+                      setSelectedAreaOption('all'); 
+                    }}
                     className='flex-1 px-[8px] py-[6px] border border-gray-200 outline-none'
                   />
                 </div>
@@ -358,7 +460,7 @@ export default function BannerFilter({ activeTab, setActiveTab }: BannerSearchPr
                     onValueChange={(value) => {
                       setMinArea(value[0].toString());
                       setMaxArea(value[1].toString());
-                      setSelectedAreaOption('');
+                      setSelectedAreaOption('all');
                     }}
                   />
                 </div>
