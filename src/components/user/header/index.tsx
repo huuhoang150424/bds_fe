@@ -23,49 +23,13 @@ import Wishlist from './components/wishlist';
 import CreatePostButton from './components/create-post';
 import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
 import Notification from './components/notification';
-const menuItemsSell = [
-  'Bán căn hộ chung cư',
-  'Bán chung cư mini, căn hộ dịch vụ',
-  'Bán nhà riêng',
-  'Bán nhà biệt thự, liền kề',
-  'Bán nhà mặt phố',
-  'Bán shophouse, nhà phố thương mại',
-  'Bán đất nền dự án',
-  'Bán đất',
-  'Bán trang trại, khu nghỉ dưỡng',
-  'Bán condotel',
-  'Bán kho, nhà xưởng',
-  'Bán loại bất động sản khác',
-];
-const menuItemsRent = [
-  'Cho thuê chung cư mini, căn hộ dịch vụ',
-  'Cho thuê nhà riêng',
-  'Cho thuê nhà biệt thự, liền kề',
-  'Cho thuê nhà mặt phố',
-  'Cho thuê shophouse, nhà phố thương mại',
-  'Cho thuê nhà trọ, phòng trọ',
-  'Cho thuê văn phòng',
-  'Cho thuê, sang nhượng cửa hàng, ki ốt',
-  'Cho thuê kho, nhà xưởng',
-  'Cho thuê loại bất động sản khác',
-];
-const menuItemsProject = [
-  'Căn hộ chung cư',
-  'Cao ốc văn phòng',
-  'Trung tâm thương mại',
-  'Khu đô thị mới',
-  'Khu phức hợp',
-  'Nhà ở xã hội',
-  'Khu nghỉ dưỡng, sinh thái',
-  'Khu công nghiệp',
-  'Biệt thự liền kề',
-  'Shophouse',
-  'Nhà mặt phố',
-  'Dự án khác',
-];
-const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
+
+import { menuItemsContact, menuItemsRent, menuItemsSell } from '@/constant/const-home';
+import { toSlug } from '@/lib/slug';
+
 
 function Header() {
+  const navigate = useNavigate();
   const { openModal } = useAuthModal();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectUser);
@@ -75,7 +39,21 @@ function Header() {
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
 
-  const navigate = useNavigate();
+  const handleMenuItemClick = (listingType?: string, propertyType?: string) => {
+    const params = new URLSearchParams();
+    params.append('page', '1');
+    params.append('limit', '10');
+
+    if (propertyType) {
+      const propertyTypeId = toSlug(propertyType);
+      params.append('propertyTypeIds', propertyTypeId);
+    } else if (listingType) {
+      const listingTypeId = listingType === 'Nhà đất bán' ? 'Bán' : 'Cho thuê';
+      params.append('listingTypeIds', listingTypeId);
+    }
+    navigate(`/filter?${params.toString()}`);
+  };
+
 
   const toggleMenu = (menu: string) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
@@ -112,6 +90,10 @@ function Header() {
       setLoading(false);
     }
   };
+
+
+
+
   return (
     <header
       className={` bg-[#fff] w-full flex items-center justify-between ${heightHeader ? 'py-[10px]' : 'py-[20px]'}  px-[50px] shadow-md sticky top-0 z-[100] transition-all duration-300 ease-in-out `}
@@ -130,13 +112,16 @@ function Header() {
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
             <li className='relative group mr-[30px] text-[16px]'>
-              <span className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'>
+              <span 
+              className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
+              onClick={() => handleMenuItemClick('Bán')}
+              >
                 Nhà đất bán
               </span>
               <ul className='absolute left-0 mt-2 px-[4px] py-[6px]  w-[200px] bg-white shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsSell.map((item) => {
                   return (
-                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
+                    <li onClick={() => handleMenuItemClick('Bán', item)} key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
                       <span>{item}</span>
                     </li>
                   );
@@ -144,13 +129,16 @@ function Header() {
               </ul>
             </li>
             <li className='relative mr-[30px] group text-[16px]'>
-              <span className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'>
+              <span 
+              className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
+              onClick={() => handleMenuItemClick('Cho thuê')}
+              >
                 Nhà đất cho thuê
               </span>
               <ul className='absolute left-0 mt-2 px-[4px] py-[6px]  w-[200px] bg-white shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                {menuItemsSell.map((item) => {
+                {menuItemsRent.map((item) => {
                   return (
-                    <li key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
+                    <li onClick={() => handleMenuItemClick('Cho thuê', item)} key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
                       <span>{item}</span>
                     </li>
                   );
@@ -336,30 +324,6 @@ function Header() {
                 {openMenus['rent'] && (
                   <ul className='pl-6'>
                     {menuItemsRent.map((item, index) => (
-                      <li key={index} className='py-2 hover:bg-gray-100 cursor-pointer'>
-                        {item}
-                        {index === 1 && (
-                          <span className='ml-2 text-xs bg-red-500 text-white px-1 py-0.5 rounded'>Mới</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <li className=' flex items-center justify-between w-full py-[15px]   '>
-                  <a href='#' className='text-[16px] hover:text-orange-500' onClick={() => setIsShow(!isShow)}>
-                    Dự án
-                  </a>
-                  <button onClick={() => toggleMenu('project')}>
-                    {openMenus['project'] ? (
-                      <MdKeyboardArrowUp className='text-gray-600 text-[24px]' />
-                    ) : (
-                      <MdKeyboardArrowDown className='text-gray-600 text-[24px]' />
-                    )}
-                  </button>
-                </li>
-                {openMenus['project'] && (
-                  <ul className='pl-6'>
-                    {menuItemsProject.map((item, index) => (
                       <li key={index} className='py-2 hover:bg-gray-100 cursor-pointer'>
                         {item}
                         {index === 1 && (

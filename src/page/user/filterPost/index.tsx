@@ -11,7 +11,6 @@ function SellDetail() {
   const [limit, setLimit] = useState(10);
   const [searchParams] = useSearchParams();
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
-  const [selectedCity, setSelectedCity] = useState('');
   const [showMap, setShowMap] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchingFill, setIsSearchingFill] = useState(false);
@@ -27,6 +26,11 @@ function SellDetail() {
   const [direction, setDirection] = useState<string>('');
   const [propertyTypeIds, setPropertyTypeIds] = useState<string[]>([]);
   const [listingTypeIds, setListingTypeIds] = useState<string[]>([]);
+  const [status, setStatus] = useState<string[]>([]);
+  const [isProfessional, setIsProfessional] = useState(false);
+  const [ratings, setRatings] = useState<number[]>([]);
+  const [isFurnished, setIsFurnished] = useState<boolean | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
 
   const filterParams = {
     keyword: selectedProvinces.length > 0 ? selectedProvinces : undefined,
@@ -37,75 +41,144 @@ function SellDetail() {
     bedrooms: bedrooms > 0 ? bedrooms : undefined,
     bathrooms: bathrooms > 0 ? bathrooms : undefined,
     floor: floors > 0 ? floors : undefined,
-    direction: direction || undefined,
+    directions: direction || undefined,
     propertyTypeIds: propertyTypeIds.length > 0 ? propertyTypeIds : undefined,
     listingTypeIds: listingTypeIds.length > 0 ? listingTypeIds : undefined,
+    status: status.length > 0 ? status : undefined,
+    isProfessional: isProfessional || undefined,
+    ratings: ratings.length > 0 ? ratings : undefined,
+    isFurniture: isFurnished !== null ? isFurnished : undefined,
+    tags: tags.length > 0 ? tags : undefined,
     page: page,
     limit: limit
   };
 
   const { data: posts, isLoading, error } = useGetPostByFilter(filterParams);
 
+
+  const resetAllFilters = () => {
+    setSelectedProvinces([]);
+    setMinPrice('');
+    setMaxPrice('');
+    setPriceRange([0, 20]);
+    setMinArea('');
+    setMaxArea('');
+    setAreaRange([0, 500]);
+    setBedrooms(0);
+    setBathrooms(0);
+    setFloors(0);
+    setDirection('');
+    setPropertyTypeIds([]);
+    setListingTypeIds([]);
+    setStatus([]);
+    setIsProfessional(false);
+    setRatings([]);
+    setIsFurnished(null);
+    setTags([]);
+  };
+
   useEffect(() => {
-    const city = searchParams.get('city');
+    resetAllFilters();
+
     const keyword = searchParams.get('keyword');
     const minPriceParam = searchParams.get('minPrice');
     const maxPriceParam = searchParams.get('maxPrice');
     const minSquareMeters = searchParams.get('minSquareMeters');
     const maxSquareMeters = searchParams.get('maxSquareMeters');
     const propertyTypeIdsParam = searchParams.get('propertyTypeIds');
-    const propertyTypeIdArray = propertyTypeIdsParam?.split(',') || [];
     const bedroomsParam = searchParams.get('bedrooms');
     const bathroomsParam = searchParams.get('bathrooms');
     const floorParam = searchParams.get('floor');
-    const directionParam = searchParams.get('direction');
+    const directionParam = searchParams.get('directions');
     const listingTypeIdsParam = searchParams.get('listingTypeIds');
-    const listingTypeIdArray = listingTypeIdsParam?.split(',') || [];
+    const statusParam = searchParams.getAll('status');
+    const isProfessionalParam = searchParams.get('isProfessional');
+    const ratingsParam = searchParams.getAll('ratings');
+    const tagsParam = searchParams.getAll('tags');
+    const isFurnitureParam = searchParams.get('isFurniture');
 
-    if (
-      city ||
-      keyword ||
-      minPriceParam ||
-      maxPriceParam ||
-      minSquareMeters ||
-      maxSquareMeters ||
-      propertyTypeIdArray.length > 0 ||
-      bedroomsParam ||
-      bathroomsParam ||
-      floorParam ||
-      directionParam ||
-      listingTypeIdArray.length > 0
-    ) {
-      setSelectedCity(city || '');
-      setSelectedProvinces(city ? [city] : keyword ? keyword.split(',') : []);
+    if (keyword) {
+      setSelectedProvinces([keyword]);
+    }
     
-      setMinPrice(minPriceParam || '');
-      setMaxPrice(maxPriceParam || '');
+    if (minPriceParam) {
+      setMinPrice(minPriceParam);
+    }
+    
+    if (maxPriceParam) {
+      setMaxPrice(maxPriceParam);
+    }
+    
+    if (minPriceParam || maxPriceParam) {
       setPriceRange([
         minPriceParam ? Number(minPriceParam) / 1000000 : 0,
         maxPriceParam ? Number(maxPriceParam) / 1000000 : 20,
       ]);
-      
-      setMinArea(minSquareMeters || '');
-      setMaxArea(maxSquareMeters || '');
+    }
+    
+    if (minSquareMeters) {
+      setMinArea(minSquareMeters);
+    }
+    
+    if (maxSquareMeters) {
+      setMaxArea(maxSquareMeters);
+    }
+    
+    if (minSquareMeters || maxSquareMeters) {
       setAreaRange([
         minSquareMeters ? Number(minSquareMeters) : 0, 
         maxSquareMeters ? Number(maxSquareMeters) : 500
       ]);
-      
-      setBedrooms(bedroomsParam ? Number(bedroomsParam) : 0);
-      setBathrooms(bathroomsParam ? Number(bathroomsParam) : 0);
-      setFloors(floorParam ? Number(floorParam) : 0);
-      
-      setDirection(directionParam || '');
-      
-      setPropertyTypeIds(propertyTypeIdArray);
-      setListingTypeIds(listingTypeIdArray);
-      
-      setIsSearchingFill(true);
-      setIsSearching(false);
     }
+    
+    if (bedroomsParam) {
+      setBedrooms(Number(bedroomsParam));
+    }
+    
+    if (bathroomsParam) {
+      setBathrooms(Number(bathroomsParam));
+    }
+    
+    if (floorParam) {
+      setFloors(Number(floorParam));
+    }
+    
+    if (directionParam) {
+      setDirection(directionParam);
+    }
+    
+    if (propertyTypeIdsParam) {
+      setPropertyTypeIds(propertyTypeIdsParam.split(','));
+    }
+    
+    if (listingTypeIdsParam) {
+      setListingTypeIds(listingTypeIdsParam.split(','));
+    }
+    
+    if (statusParam.length > 0) {
+      setStatus(statusParam);
+    }
+    
+    if (isProfessionalParam) {
+      setIsProfessional(isProfessionalParam === 'true');
+    }
+    
+    if (ratingsParam.length > 0) {
+      setRatings(ratingsParam.map(Number).filter((n) => !isNaN(n)));
+    }
+    
+    if (tagsParam.length > 0) {
+      setTags(tagsParam);
+    }
+    
+    if (isFurnitureParam) {
+      setIsFurnished(isFurnitureParam === 'true');
+    }
+
+    setIsSearchingFill(true);
+    setIsSearching(false);
   }, [searchParams]);
+
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, MapPin, Bed, Bath, Square, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
 import BannerFilter from './banner-filter';
 
 interface BannerSearchProps {

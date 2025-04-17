@@ -1,3 +1,33 @@
+export const menuItemsSell = [
+  'Căn hộ',
+  'Biệt thự',
+  'Bán nhà riêng',
+  'Bán nhà biệt thự, liền kề',
+  'Bán nhà mặt phố',
+  'Bán shophouse, nhà phố thương mại',
+  'Bán đất nền dự án',
+  'Bán đất',
+  'Bán trang trại, khu nghỉ dưỡng',
+  'Bán condotel',
+  'Bán kho, nhà xưởng',
+  'Bán loại bất động sản khác',
+];
+export const menuItemsRent = [
+  'Cho thuê chung cư mini, căn hộ dịch vụ',
+  'Cho thuê nhà riêng',
+  'Cho thuê nhà biệt thự, liền kề',
+  'Cho thuê nhà mặt phố',
+  'Cho thuê shophouse, nhà phố thương mại',
+  'Cho thuê nhà trọ, phòng trọ',
+  'Cho thuê văn phòng',
+  'Cho thuê, sang nhượng cửa hàng, ki ốt',
+  'Cho thuê kho, nhà xưởng',
+  'Cho thuê loại bất động sản khác',
+];
+
+export const menuItemsContact = ['Nhà môi giới', 'Doanh nghiệp'];
+
+
 export interface NewsItem {
   title: string;
   time: string;
@@ -247,165 +277,7 @@ export interface Property {
   pricePerMonth?: string;
   isFavorite?: boolean;
 }
-export const recommendedProperties: Property[] = [
-  {
-    id: '1',
-    title: 'Chung cư cao cấp Gemory Định giá 4,5 tỷ rẻ nhất thị trường khi mua',
-    price: '4.5 tỷ',
-    area: '62 m²',
-    location: 'Nam Từ Liêm, Hà Nội',
-    images: [
-      'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg',
-      '/images/property1-2.jpg',
-      '/images/property1-3.jpg',
-    ],
-    isFavorite: false,
-  },
-  {
-    id: '2',
-    title: 'Cho thuê căn hộ studio - 1 PN - 2 PN tại Ecolife Capitol với giá r',
-    price: '11 triệu/tháng',
-    area: '75 m²',
-    location: 'Nam Từ Liêm, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property2-2.jpg'],
-    pricePerMonth: '11 triệu',
-    isFavorite: true,
-  },
-  {
-    id: '3',
-    title: 'Bán nhà 4 tầng phân lô vip trạch, ngõ thông kinh doanh phố',
-    price: '39 tỷ',
-    area: '115 m²',
-    location: 'Đống Đa, Hà Nội',
-    images: [
-      'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg',
-      '/images/property3-2.jpg',
-      '/images/property3-3.jpg',
-    ],
-    isFavorite: false,
-  },
-  {
-    id: '4',
-    title: 'Nhà 7 tỷ có nhà đẹp TDL ĐT45m2 57 ngõ thông rộng',
-    price: 'Giá thỏa thuận',
-    area: '45 m²',
-    location: 'Đống Đa, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '5',
-    title: 'Biệt thự ven hồ Tây - View đẹp - Nội thất sang trọng',
-    price: '75 tỷ',
-    area: '250 m²',
-    location: 'Tây Hồ, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property5-2.jpg'],
-    isFavorite: true,
-  },
-  {
-    id: '6',
-    title: 'Căn hộ cao cấp Vinhomes Ocean Park 3PN giá tốt nhất',
-    price: '6.8 tỷ',
-    area: '90 m²',
-    location: 'Gia Lâm, Hà Nội',
-    images: [
-      'https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg',
-      '/images/property6-2.jpg',
-      '/images/property6-3.jpg',
-    ],
-    isFavorite: false,
-  },
-  {
-    id: '7',
-    title: 'Bán nhà riêng tại Cầu Giấy - Nhà đẹp, ngõ ô tô vào tận cửa',
-    price: '9.2 tỷ',
-    area: '80 m²',
-    location: 'Cầu Giấy, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'],
-    isFavorite: true,
-  },
-  {
-    id: '8',
-    title: 'Nhà mặt phố Trung Hòa - Kinh doanh sầm uất - Giá cực tốt',
-    price: '56 tỷ',
-    area: '120 m²',
-    location: 'Cầu Giấy, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property8-2.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '9',
-    title: 'Shophouse The Manor Central Park - Vị trí đắc địa',
-    price: '21 tỷ',
-    area: '100 m²',
-    location: 'Hoàng Mai, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property9-2.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '10',
-    title: 'Căn hộ studio tại Times City - Giá hấp dẫn',
-    price: '3.5 tỷ',
-    area: '50 m²',
-    location: 'Hai Bà Trưng, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'],
-    isFavorite: true,
-  },
-  {
-    id: '11',
-    title: 'Nhà phố thương mại tại KĐT Ciputra - Tiện ích đầy đủ',
-    price: '28 tỷ',
-    area: '150 m²',
-    location: 'Tây Hồ, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property11-2.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '12',
-    title: 'Bán biệt thự liền kề 4 tầng tại Vinhomes Smart City',
-    price: '15 tỷ',
-    area: '200 m²',
-    location: 'Nam Từ Liêm, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property12-2.jpg'],
-    isFavorite: true,
-  },
-  {
-    id: '13',
-    title: 'Căn hộ 2PN tại Sunshine City - Nội thất hiện đại',
-    price: '5.2 tỷ',
-    area: '75 m²',
-    location: 'Bắc Từ Liêm, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '14',
-    title: 'Nhà riêng tại Long Biên - Gần cầu Chương Dương',
-    price: '6.5 tỷ',
-    area: '85 m²',
-    location: 'Long Biên, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property14-2.jpg'],
-    isFavorite: false,
-  },
-  {
-    id: '15',
-    title: 'Bán đất nền dự án VinCity Ocean Park - Đầu tư sinh lời',
-    price: '12 tỷ',
-    area: '300 m²',
-    location: 'Gia Lâm, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg'],
-    isFavorite: true,
-  },
-  {
-    id: '16',
-    title: 'Bán nhà mặt phố cổ Hàng Ngang - Khu kinh doanh sầm uất',
-    price: '100 tỷ',
-    area: '180 m²',
-    location: 'Hoàn Kiếm, Hà Nội',
-    images: ['https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/04/anh-ha-noi.jpg', '/images/property16-2.jpg'],
-    isFavorite: false,
-  },
-];
+
 export interface CityInfo {
   name: string;
   count: number;

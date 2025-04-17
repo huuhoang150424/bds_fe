@@ -11,7 +11,7 @@ import { IoLocationOutline } from 'react-icons/io5';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import { X } from 'lucide-react';
 import { RandomizedTextEffect } from '@/components/user/text-randomized';
-import { allCities, areaOptions, featuredCities, priceOptions, propertyTypesByTab } from '@/constant/const-home';
+import { allCities, areaOptions, priceOptions, propertyTypesByTab } from '@/constant/const-home';
 
 interface BannerSearchProps {
   activeTab: string;
