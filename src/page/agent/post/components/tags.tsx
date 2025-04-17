@@ -1,12 +1,10 @@
-"use client";
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface TagSelectorProps {
-  value: string[]; // Changed to string[] to match the Zod schema
+  value: string[]; 
   onChange: (value: string[]) => void;
 }
 

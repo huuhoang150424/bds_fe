@@ -23,9 +23,6 @@ interface AddPostParams {
 export const addPost = async (data:any) => {
   try {
 
-    data.forEach((value, key) => {
-      console.log(key + ':', value);
-    });
     
     const response = await handleApi("/post/createPost", data, "POST");
 

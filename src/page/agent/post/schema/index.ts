@@ -19,3 +19,7 @@ export const formSchema = z.object({
   floor: z.number().min(0, "Số tầng phải lớn hơn hoặc bằng 0"),
   listingType: z.string().min(1, "Loại tin đăng không được để trống"),
 });
+
+
+
+export type FormUploadPost=z.infer<typeof formSchema>;

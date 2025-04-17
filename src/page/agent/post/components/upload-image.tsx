@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Upload, X, ImageIcon, Trash2 } from "lucide-react";
@@ -14,7 +12,7 @@ interface ImageFile {
 }
 
 interface MultiImageUploadProps {
-  onImagesSelect?: (files: File[]) => void; // Updated to return File[]
+  onImagesSelect?: (files: File[]) => void; 
   className?: string;
   maxSizeMB?: number;
   acceptedTypes?: string[];
@@ -130,15 +128,13 @@ export function MultiImageUpload({
       fileInputRef.current.value = "";
     }
     if (onImagesSelect) {
-      onImagesSelect([]); // Return empty File[]
+      onImagesSelect([]); 
     }
   };
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
-
-  // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
       selectedImages.forEach((img) => URL.revokeObjectURL(img.preview));
