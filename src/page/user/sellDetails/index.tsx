@@ -125,7 +125,7 @@ function SellDetail() {
                 areaRange={areaRange}
               />
             ) : (
-              <PropertyListings realEstateListings={realEstateListings} totalListings={getSumByCity()} />
+              <PropertyListings  />
             )}
 
             <FilterSidebar

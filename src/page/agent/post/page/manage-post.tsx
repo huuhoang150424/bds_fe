@@ -9,8 +9,8 @@ export default function ManagePost ()
 {
   const [ sizePage, setSizePage ] = useState( 6 );
   return (
-    <div className=" p-[30px] max-w-[1800px]  mx-auto ">
-      <h1 className="mb-[15px] text-[20px] font-[700] text-textColor dark:text-white">
+    <div className=" p-6 space-y-6  min-h-screen max-w-8xl ">
+      <h1 className="mb-[15px] text-2xl font-[500] text-textColor dark:text-white">
         Danh sách bài đăng
       </h1>
       <div className="flex items-center mb-[15px] justify-between">

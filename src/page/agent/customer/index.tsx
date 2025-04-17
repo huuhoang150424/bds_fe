@@ -118,10 +118,10 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className='flex flex-col p-6 space-y-6  min-h-screen max-w-8xl'>
       <header className='sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6'>
         <div className='flex-1'>
-          <h1 className='text-lg font-semibold'>Quản Lý Khách Hàng</h1>
+          <h1 className='text-2xl font-[500]'>Quản Lý Khách Hàng</h1>
         </div>
       </header>
       <main className='flex-1 p-4 sm:p-6'>
