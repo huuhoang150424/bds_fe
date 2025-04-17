@@ -1,102 +1,115 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Cat, Dog, Fish, Rabbit, Turtle } from 'lucide-react';
-import { MultiSelect } from '@/components/core/multi-selector';
+import { useState } from "react";
+import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-const provincesList = [
-    { value: 'hanoi', label: 'Hà Nội' },
-    { value: 'hochiminh', label: 'TP. Hồ Chí Minh' },
-    { value: 'haiphong', label: 'Hải Phòng' },
-    { value: 'danang', label: 'Đà Nẵng' },
-    { value: 'cantho', label: 'Cần Thơ' },
-    { value: 'angiang', label: 'An Giang' },
-    { value: 'bacgiang', label: 'Bắc Giang' },
-    { value: 'backan', label: 'Bắc Kạn' },
-    { value: 'baclieu', label: 'Bạc Liêu' },
-    { value: 'bacninh', label: 'Bắc Ninh' },
-    { value: 'baria-vungtau', label: 'Bà Rịa - Vũng Tàu' },
-    { value: 'bentre', label: 'Bến Tre' },
-    { value: 'binhdinh', label: 'Bình Định' },
-    { value: 'binhduong', label: 'Bình Dương' },
-    { value: 'binhphuoc', label: 'Bình Phước' },
-    { value: 'binhthuan', label: 'Bình Thuận' },
-    { value: 'camau', label: 'Cà Mau' },
-    { value: 'caobang', label: 'Cao Bằng' },
-    { value: 'daklak', label: 'Đắk Lắk' },
-    { value: 'daknong', label: 'Đắk Nông' },
-    { value: 'dienbien', label: 'Điện Biên' },
-    { value: 'dongnai', label: 'Đồng Nai' },
-    { value: 'dongthap', label: 'Đồng Tháp' },
-    { value: 'gialai', label: 'Gia Lai' },
-    { value: 'hagiang', label: 'Hà Giang' },
-    { value: 'hanam', label: 'Hà Nam' },
-    { value: 'hatinh', label: 'Hà Tĩnh' },
-    { value: 'haiduong', label: 'Hải Dương' },
-    { value: 'haugiang', label: 'Hậu Giang' },
-    { value: 'hoabinh', label: 'Hòa Bình' },
-    { value: 'hungyen', label: 'Hưng Yên' },
-    { value: 'khanhhoa', label: 'Khánh Hòa' },
-    { value: 'kiengiang', label: 'Kiên Giang' },
-    { value: 'kontum', label: 'Kon Tum' },
-    { value: 'laichau', label: 'Lai Châu' },
-    { value: 'lamdong', label: 'Lâm Đồng' },
-    { value: 'langson', label: 'Lạng Sơn' },
-    { value: 'laocai', label: 'Lào Cai' },
-    { value: 'longan', label: 'Long An' },
-    { value: 'namdinh', label: 'Nam Định' },
-    { value: 'nghean', label: 'Nghệ An' },
-    { value: 'ninhbinh', label: 'Ninh Bình' },
-    { value: 'ninhthuan', label: 'Ninh Thuận' },
-    { value: 'phutho', label: 'Phú Thọ' },
-    { value: 'phuyen', label: 'Phú Yên' },
-    { value: 'quangbinh', label: 'Quảng Bình' },
-    { value: 'quangnam', label: 'Quảng Nam' },
-    { value: 'quangngai', label: 'Quảng Ngãi' },
-    { value: 'quangninh', label: 'Quảng Ninh' },
-    { value: 'quangtri', label: 'Quảng Trị' },
-    { value: 'soctrang', label: 'Sóc Trăng' },
-    { value: 'sonla', label: 'Sơn La' },
-    { value: 'tayninh', label: 'Tây Ninh' },
-    { value: 'thaibinh', label: 'Thái Bình' },
-    { value: 'thainguyen', label: 'Thái Nguyên' },
-    { value: 'thanhhoa', label: 'Thanh Hóa' },
-    { value: 'thuathienhue', label: 'Thừa Thiên Huế' },
-    { value: 'tiengiang', label: 'Tiền Giang' },
-    { value: 'travinh', label: 'Trà Vinh' },
-    { value: 'tuyenquang', label: 'Tuyên Quang' },
-    { value: 'vinhlong', label: 'Vĩnh Long' },
-    { value: 'vinhphuc', label: 'Vĩnh Phúc' },
-    { value: 'yenbai', label: 'Yên Bái' },
+interface TagSelectorProps {
+  value: string[]; // Changed to string[] to match the Zod schema
+  onChange: (value: string[]) => void;
+}
+
+export default function TagSelector({ value, onChange }: TagSelectorProps) {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const allTags = [
+    "hot",
+    "new",
+    "sale",
+    "featured",
+    "exclusive",
+    "popular",
+    "trending",
+    "recommended",
+    "bestseller",
+    "limited",
+    "discount",
+    "clearance",
+    "on-sale",
+    "limited-time",
+    "exclusive-offer",
+    "best-value",
+    "top-picks",
+    "must-have",
+    "limited-edition",
   ];
 
-function Tags() {
-  const [selectedProvinces, setSelectedProvinces] = useState<string[]>([
-    'hochiminh',
-    'danang',
-  ]);
+  const toggleTag = (tagName: string) => {
+    if (value.includes(tagName)) {
+      onChange(value.filter((t) => t !== tagName));
+    } else {
+      onChange([...value, tagName]);
+    }
+  };
+
+  const removeTag = (tagName: string) => {
+    onChange(value.filter((t) => t !== tagName));
+  };
 
   return (
-    <div className='pt-8 pb-16 w-[400px]'>
-      <MultiSelect
-        options={provincesList}
-        onValueChange={setSelectedProvinces}
-        defaultValue={selectedProvinces}
-        placeholder='Chọn tỉnh/thành phố'
-        popoverClass='w-96'
-        maxCount={3}
-      />
-      <div className='mt-4'>
-        <h2 className='text-xl font-semibold'>Chọn các tỉnh liên quan:</h2>
-        <ul className='list-disc list-inside'>
-          {selectedProvinces.map((province) => {
-            const selected = provincesList.find((p) => p.value === province);
-            return <li key={province}>{selected?.label}</li>;
-          })}
-        </ul>
+    <div className="max-w-md mx-auto p-4 space-y-6">
+      <div>
+        <h3 className="text-sm font-medium mb-1">Tags</h3>
+        <p className="text-sm text-muted-foreground">Những tag cho các bài đăng liên quan</p>
+      </div>
+
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {value.map((tag) => (
+            <Badge
+              key={tag}
+              variant="outline"
+              className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full flex items-center gap-1"
+            >
+              {tag}
+              <button
+                onClick={() => removeTag(tag)}
+                className="ml-1 hover:bg-gray-200 p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      <div className="relative">
+        <div
+          className="border rounded-md p-2 cursor-pointer flex items-center"
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
+          <span className="text-sm text-gray-500">Chọn các tag</span>
+        </div>
+
+        {showDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-1 border rounded-md bg-white shadow-md z-10 p-4">
+            <h4 className="font-medium mb-2">Chọn các tag liên quan</h4>
+            <ul className="space-y-2">
+              {allTags.map((tag) => (
+                <li key={tag} className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <button
+                    onClick={() => toggleTag(tag)}
+                    className={`text-left hover:text-gray-700 ${
+                      value.includes(tag) ? "font-semibold text-primary" : ""
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              className="w-full mt-4"
+              onClick={() => setShowDropdown(false)}
+            >
+              Xác nhận
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-export default Tags;

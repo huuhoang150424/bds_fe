@@ -61,18 +61,18 @@ function PostDetail() {
         <div className='grid grid-cols-12 gap-6'>
           <div className='col-span-12 lg:col-span-9'>
             <div className='title mt-[40px]'>
-              <span className='text-2xl font-[500]'>{data.title}</span>
+              <span className='text-2xl font-[500]'>{data?.title}</span>
             </div>
             <div className='mt-[8px] flex items-center gap-[5px]'>
               <MapPin className='text-gray-500' size={15} />
-              <span className='text-sm font-normal text-gray-500'>{data.address}</span>
-              <StarRating commentsSectionId='comments' postId={data.id} />
+              <span className='text-sm font-normal text-gray-500'>{data?.address}</span>
+              <StarRating commentsSectionId='comments' postId={data?.id} />
             </div>
             <div className='image relative mt-[30px]'>
               <div className='w-full'>
                 <Carousel options={OPTIONS} className='relative' isAutoPlay={false}>
                   <SliderContainer className='gap-2'>
-                    {data.images.map((src: { image_url: string }, index: number) => (
+                    {data?.images.map((src: { image_url: string }, index: number) => (
                       <SliderItem
                         key={index}
                         src={src.image_url}
@@ -104,17 +104,17 @@ function PostDetail() {
                     <ThumsSlider />
                   </div>
                 </Carousel>
-                {isOpen && data.images.length > 0 && (
+                {isOpen && data?.images?.length > 0 && (
                   <Suspense fallback={<Loading className='mx-auto my-[100px] ' />}>
                     <Lightbox
-                      mainSrc={data.images[currentIndex].image_url}
-                      nextSrc={data.images[(currentIndex + 1) % data.images.length].image_url}
-                      prevSrc={data.images[(currentIndex + data.images.length - 1) % data.images.length].image_url}
+                      mainSrc={data?.images[currentIndex]?.image_url}
+                      nextSrc={data?.images[(currentIndex + 1) % data.images.length]?.image_url}
+                      prevSrc={data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url}
                       onCloseRequest={() => setIsOpen(false)}
                       onMovePrevRequest={() =>
-                        setCurrentIndex((currentIndex + data.images.length - 1) % data.images.length)
+                        setCurrentIndex((currentIndex + data?.images?.length - 1) % data?.images?.length)
                       }
-                      onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data.images.length)}
+                      onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data?.images?.length)}
                     />
                   </Suspense>
                 )}
@@ -132,7 +132,7 @@ function PostDetail() {
                   {' '}
                   ~
                   {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                    data.price / data.squareMeters,
+                    data?.price / data?.squareMeters,
                   )}{' '}
                   /m²
                 </span>
@@ -270,7 +270,7 @@ function PostDetail() {
               <div className='my-[20px]'>
                 <span className='text-2xl font-[500] '>Xem trên bản đồ</span>
               </div>
-              <div className='w-[800px] h-[300px] z-0'>
+              <div className='w-[800px] h-[300px] z-0 mb-[30px]'>
                 <Suspense fallback={<Loading className='mx-auto my-[100px] ' />}>
                   <MapComponent address={data?.address} />
                 </Suspense>

@@ -7,7 +7,7 @@ import { PostByMonth } from '../components/statistical-post-by-month';
 function Statistical ()
 {
   return (
-    <div className='max-w-[1800px] p-[30px] mx-auto '>
+    <div className='p-6 space-y-6  min-h-screen max-w-8xl '>
       <div className='grid grid-cols-1 md:grid-cols-12 gap-8'>
         <div className='col-span-1 md:col-span-8'>
           <DashboardCharts />

@@ -5,7 +5,7 @@ import VipCard from './components/vip-card';
 
 function Vip() {
   return (
-    <div className='max-w-[1800px] mx-auto p-[30px]' >
+    <div className='p-6 space-y-6  min-h-screen max-w-8xl' >
       <VipCard />
       <div>
         <Faqs />
