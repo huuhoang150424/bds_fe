@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ListingType, AddressData } from '../listing-wizard';
-import { Loading } from '@/components/common';
+import { Loading, LoadingSpinner } from '@/components/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { formSchema, type FormUploadPost } from '../../schema';
@@ -14,10 +14,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import Ckeditor from '../CKEditor';
 import { X, Upload, Plus, GripVertical, ZoomIn, Edit } from 'lucide-react';
 import ImageLightbox from './image-lightbox';
+import TagInput from '../tag-input';
+import { Switch } from '@/components/ui/switch';
 interface ListingDetailsStepProps {
   listingType: ListingType;
-  addressData: AddressData;
+  addressData: string;
   onBack: () => void;
+  selectListingTypeId: string;
 }
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,42 +44,71 @@ const itemVariants = {
     },
   },
 };
-interface ImageFile {
+export interface ImageFile {
   id: string;
   file: File;
   preview: string;
   isPrimary: boolean;
 }
-export default function ListingDetailsStep({ listingType, addressData, onBack }: ListingDetailsStepProps) {
+const propertyTypes = ['Căn hộ chung cư', 'Nhà riêng', 'Nhà mặt phố', 'Biệt thự', 'Đất nền'];
+
+export default function ListingDetailsStep({
+  listingType,
+  addressData,
+  onBack,
+  selectListingTypeId,
+}: ListingDetailsStepProps) {
   const [images, setImages] = useState<ImageFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
+  const [resetTagsTrigger, setResetTagsTrigger] = useState(0);
 
-  const { mutate: addPost, isPending } = useAddPost();
+  const defaultValues = {
+    title: '',
+    description: '',
+    price: 0,
+    squareMeters: 0,
+    bedroom: 0,
+    bathroom: 0,
+    address: addressData,
+    propertyType: '',
+    direction: '',
+    status: '',
+    isFurniture: false,
+    tags: [],
+    images: [],
+    floor: 0,
+    listingType: selectListingTypeId,
+  };
 
   const form = useForm<FormUploadPost>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      price: 0,
-      squareMeters: 0,
-      bedroom: 0,
-      bathroom: 0,
-      address: '',
-      propertyType: '',
-      direction: '',
-      status: '',
-      isFurniture: false,
-      tags: [],
-      images: [],
-      floor: 0,
-      listingType: '4b386eb5-03c2-44ae-b585-39a2871feb5f',
-    },
+    defaultValues,
   });
+  useEffect(() => {
+    form.setValue('images', images, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [images, form]);
+
+  const resetForm = useCallback(() => {
+    form.reset(defaultValues);
+    images.forEach((img) => URL.revokeObjectURL(img.preview));
+    setImages([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (replaceFileInputRef.current) replaceFileInputRef.current.value = '';
+    setLightboxOpen(false);
+    setIsDragging(false);
+    setResetTagsTrigger((prev) => prev + 1);
+  }, [form, images, addressData, selectListingTypeId]);
+
+  const { mutate: addPost, isPending: isPendingCreatePost } = useAddPost(resetForm);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -87,7 +119,13 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
         isPrimary: images.length === 0 && newFiles.indexOf(file) === 0,
       }));
 
-      setImages((prev) => [...prev, ...newImages]);
+      const updatedImages = [...images, ...newImages];
+      setImages(updatedImages);
+      form.setValue('images', updatedImages, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -105,13 +143,19 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
     if (e.target.files && e.target.files.length > 0 && replaceFileInputRef.current?.dataset.replaceId) {
       const imageId = replaceFileInputRef.current.dataset.replaceId;
       const file = e.target.files[0];
-
       const imageToReplace = images.find((img) => img.id === imageId);
       if (imageToReplace) {
         URL.revokeObjectURL(imageToReplace.preview);
-        setImages((prev) =>
-          prev.map((img) => (img.id === imageId ? { ...img, file, preview: URL.createObjectURL(file) } : img)),
+        const updatedImages = images.map((img) =>
+          img.id === imageId ? { ...img, file, preview: URL.createObjectURL(file) } : img,
         );
+
+        setImages(updatedImages);
+        form.setValue('images', updatedImages, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
       }
       if (replaceFileInputRef.current) {
         replaceFileInputRef.current.value = '';
@@ -132,15 +176,25 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
     }
 
     setImages(updatedImages);
+    form.setValue('images', updatedImages, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const handleSetPrimary = (id: string) => {
-    setImages(
-      images.map((img) => ({
-        ...img,
-        isPrimary: img.id === id,
-      })),
-    );
+    const updatedImages = images.map((img) => ({
+      ...img,
+      isPrimary: img.id === id,
+    }));
+
+    setImages(updatedImages);
+    form.setValue('images', updatedImages, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -164,8 +218,13 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
         preview: URL.createObjectURL(file),
         isPrimary: images.length === 0 && newFiles.indexOf(file) === 0,
       }));
-
-      setImages((prev) => [...prev, ...newImages]);
+      const updatedImages = [...images, ...newImages];
+      setImages(updatedImages);
+      form.setValue('images', updatedImages, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     }
   };
 
@@ -174,24 +233,33 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
     setLightboxOpen(true);
   };
 
-  const [formData, setFormData] = useState({
-    title: '',
-    propertyType: '',
-    area: '',
-    price: '',
-    description: '',
-  });
+  const onSubmit = (values: FormUploadPost) => {
+    console.log(values);
+    const formData: any = new FormData();
+    formData.append('title', values.title);
+    formData.append('description', values.description);
+    formData.append('price', values.price);
+    formData.append('squareMeters', values.squareMeters);
+    formData.append('bedroom', values.bedroom);
+    formData.append('bathroom', values.bathroom);
+    formData.append('address', values.address);
+    formData.append('propertyType', values.propertyType);
+    formData.append('direction', values.direction);
+    formData.append('status', values.status);
+    formData.append('isFurniture', values.isFurniture);
+    formData.append('floor', values.floor);
+    formData.append('listingType', values.listingType);
 
-  const propertyTypes = ['Căn hộ chung cư', 'Nhà riêng', 'Nhà mặt phố', 'Biệt thự', 'Đất nền'];
-
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    if (values.tags && values.tags.length > 0) {
+      values.tags.forEach((tag) => formData.append('tags', tag));
+    }
+    if (values.images && values.images.length > 0) {
+      values.images.forEach((img) => {
+        formData.append('images', img.file);
+      });
+    }
+    addPost(formData);
   };
-
-  const onSubmit = (values: FormUploadPost) => {};
 
   const isLoading = false;
   return (
@@ -238,7 +306,7 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                       <FormItem className='flex-1'>
                         <FormLabel>
                           <Label htmlFor='price' className='mb-1 block font-medium'>
-                            {listingType === 'sell' ? 'Giá bán (VNĐ)' : 'Giá thuê (VNĐ/tháng)'}
+                            {listingType === 'Bán' ? 'Giá bán (VNĐ)' : 'Giá thuê (VNĐ/tháng)'}
                           </Label>
                         </FormLabel>
                         <FormControl>
@@ -247,6 +315,9 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                             type='number'
                             placeholder='Nhập giá'
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || 0);
+                            }}
                             className='outline-none px-[18px] py-[8px] rounded-[8px] '
                           />
                         </FormControl>
@@ -260,21 +331,24 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                 <div className='flex items-center gap-[30px] w-full '>
                   <FormField
                     control={form.control}
-                    name='title'
+                    name='squareMeters'
                     render={({ field }) => (
                       <FormItem className='flex-1'>
                         <FormLabel>
-                          <Label htmlFor='title' className='mb-1 block font-medium'>
+                          <Label htmlFor='squareMeters' className='mb-1 block font-medium'>
                             Diện tích (m²)
                           </Label>
                         </FormLabel>
                         <FormControl>
                           <Input
                             type='number'
-                            id='title'
+                            id='squareMeters'
                             placeholder='Nhập diện tích'
                             className=' outline-none px-[18px] py-[8px] rounded-[8px] '
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || 0);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -297,6 +371,9 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                             type='number'
                             placeholder='Nhập số phòng ngủ'
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || 0);
+                            }}
                             className='outline-none px-[18px] py-[8px] rounded-[8px] '
                           />
                         </FormControl>
@@ -325,6 +402,9 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                             placeholder='Nhập số phòng tắm'
                             className=' outline-none px-[18px] py-[8px] rounded-[8px] '
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || 0);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -347,6 +427,9 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                             type='number'
                             placeholder='Nhập số tầng'
                             {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || 0);
+                            }}
                             className='outline-none px-[18px] py-[8px] rounded-[8px] '
                           />
                         </FormControl>
@@ -410,21 +493,61 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                 </div>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Label htmlFor='propertyType' className='mb-3 block font-medium'>
-                  Danh mục bất động sản
-                </Label>
-                <Select value={formData.propertyType} onValueChange={(value) => handleChange('propertyType', value)}>
-                  <SelectTrigger id='propertyType' className='w-full'>
-                    <SelectValue placeholder='Chọn loại bất động sản' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertyTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormField
+                  control={form.control}
+                  name='isFurniture'
+                  render={({ field }) => (
+                    <FormItem className='flex-1 flex items-center gap-2'>
+                      <FormLabel className='text-[16px] font-[500] text-gray-800 mt-[6px] mr-[10px] '>Nội thất</FormLabel>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} className='mt-1' />
+                      </FormControl>
+                      <span>{field.value ? 'Có nội thất' : 'Không nội thất'}</span>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <FormField
+                  control={form.control}
+                  name='propertyType'
+                  render={({ field }) => (
+                    <FormItem className='flex-1 '>
+                      <FormLabel>Danh mục bất động sản</FormLabel>
+                      <FormControl>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger id='propertyType' className='w-full'>
+                            <SelectValue placeholder='Chọn loại bất động sản' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {propertyTypes.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <FormField
+                  control={form.control}
+                  name='tags'
+                  render={({ field }) => (
+                    <FormItem className='flex-1 '>
+                      <FormLabel>Hash tags bài đăng</FormLabel>
+                      <FormControl>
+                        <TagInput onSelect={field.onChange} resetTags={resetTagsTrigger} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </motion.div>
               <motion.div variants={itemVariants} className='space-y-2'>
                 <Label className='mb-3 block font-medium'>
@@ -475,7 +598,6 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
                   </div>
                 </div>
 
-                {/* Image Preview Section */}
                 {images.length > 0 && (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className='mt-4 space-y-3'>
                     <div className='flex items-center justify-between'>
@@ -592,16 +714,35 @@ export default function ListingDetailsStep({ listingType, addressData, onBack }:
             <Button variant='outline' type='button' onClick={onBack}>
               Quay lại
             </Button>
-            <Button
-              type='submit'
-              //whileHover={{ scale: 1.05 }}
-              //whileTap={{ scale: 0.95 }}
-              className='relative overflow-hidden'
-            >
-              <motion.span initial={{ x: -5, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                Đăng tin
-              </motion.span>
-            </Button>
+            <div className='flex gap-[15px] '>
+              {isPendingCreatePost ? (
+                <LoadingSpinner className='' />
+              ) : (
+                <Button
+                  type='submit'
+                  className='relative overflow-hidden bg-red-500 hover:bg-red-600 transition-all duration-all ease-in-out'
+                >
+                  <motion.span
+                    initial={{ x: -5, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    Đăng tin
+                  </motion.span>
+                </Button>
+              )}
+
+              <Button
+                //type='submit'
+                //whileHover={{ scale: 1.05 }}
+                //whileTap={{ scale: 0.95 }}
+                className='relative overflow-hidden bg-sky-500  hover:bg-sky-600 transition-all duration-all ease-in-out'
+              >
+                <motion.span initial={{ x: -5, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                  Tạo bản nháp
+                </motion.span>
+              </Button>
+            </div>
           </motion.div>
           <ImageLightbox
             images={images}

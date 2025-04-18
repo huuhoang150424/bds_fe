@@ -4,8 +4,9 @@ import { Tag, Home, Info, HelpCircle, Building, Landmark, MapPin } from "lucide-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useGetListType } from '../../hooks/use-get-list-type';
 interface ListingTypeStepProps {
-  onSelect: (type: ListingType) => void;
+  onSelect: any;
 }
 const propertyCategories = [
   {
@@ -34,6 +35,7 @@ const propertyCategories = [
   },
 ]
 export default function ListingTypeStep({ onSelect }: ListingTypeStepProps) {
+  const {data}=useGetListType();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -68,26 +70,23 @@ export default function ListingTypeStep({ onSelect }: ListingTypeStepProps) {
         Nhu cầu
       </motion.h2>
       <motion.div variants={containerVariants} initial='hidden' animate='visible' className='grid gap-4 md:grid-cols-2'>
-        <motion.button
-          variants={itemVariants}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onSelect('sell')}
-          className='flex items-center gap-3 rounded-md border border-gray-200 p-4 text-left transition-colors hover:border-red-500 hover:bg-red-50'
-        >
-          <Tag className='h-5 w-5 text-red-600' />
-          <span className='text-[16px] font-[500] text-gray-800'>Bán</span>
-        </motion.button>
-        <motion.button
-          variants={itemVariants}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onSelect('rent')}
-          className='flex items-center gap-3 rounded-md border border-gray-200 p-4 text-left transition-colors hover:border-red-500 hover:bg-red-50'
-        >
-          <Home className='h-5 w-5 text-red-600' />
-          <span className='text-[16px] font-[500] text-gray-800'>Cho thuê</span>
-        </motion.button>
+        {
+          data?.map((listingType:any)=>{
+            return (
+              <motion.button
+              key={listingType?.id}
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onSelect(listingType?.listingType, listingType?.id)}
+              className='flex items-center gap-3 rounded-md border border-gray-200 p-4 text-left transition-colors hover:border-red-500 hover:bg-red-50'
+            >
+              <Tag className='h-5 w-5 text-red-600' />
+              <span className='text-[16px] font-[500] text-gray-800'>{listingType?.listingType}</span>
+            </motion.button>
+            )
+          })
+        }
       </motion.div>
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="mt-8 border-t pt-6">
         <motion.h3 variants={itemVariants} className="mb-4 flex items-center gap-2 text-lg font-medium">

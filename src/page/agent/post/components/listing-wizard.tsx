@@ -6,7 +6,7 @@ import AddressStep from './steps/address-step';
 import ListingDetailsStep from './steps/listing-details-step';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type ListingType = 'sell' | 'rent' | null;
+export type ListingType = 'Bán' | 'Cho thuê' | null;
 export type AddressData = {
   province: string;
   district: string;
@@ -20,28 +20,22 @@ export default function ListingWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [listingType, setListingType] = useState<ListingType>(null);
-  const [addressData, setAddressData] = useState<AddressData>({
-    province: '',
-    district: '',
-    ward: '',
-    street: '',
-    project: '',
-    fullAddress: '',
-  });
+  const [listingTypeId, setListingTypeId] = useState<string>("");
+  const [addressData, setAddressData] = useState<string>('');
 
   const steps = [
     { id: 1, name: 'Thông tin BDS', icon: <Tag className='h-4 w-4' /> },
     { id: 2, name: 'Địa chỉ', icon: <MapPin className='h-4 w-4' /> },
     { id: 3, name: 'Chi tiết', icon: <FileText className='h-4 w-4' /> },
   ];
-
-  const handleTypeSelect = (type: ListingType) => {
+  const handleTypeSelect = (type: ListingType,id:string) => {
     setListingType(type);
+    setListingTypeId(id);
     setDirection(1);
     setCurrentStep(2);
   };
 
-  const handleAddressSubmit = (data: AddressData) => {
+  const handleAddressSubmit = (data:string) => {
     setAddressData(data);
     setDirection(1);
     setCurrentStep(3);
@@ -55,25 +49,6 @@ export default function ListingWizard() {
     }
   };
 
-  const handlePreview = () => {
-    alert('Xem trước tin đăng');
-  };
-
-  const handleExit = () => {
-    if (confirm('Bạn có chắc muốn thoát? Dữ liệu sẽ không được lưu.')) {
-      setDirection(-1);
-      setCurrentStep(1);
-      setListingType(null);
-      setAddressData({
-        province: '',
-        district: '',
-        ward: '',
-        street: '',
-        project: '',
-        fullAddress: '',
-      });
-    }
-  };
 
   const contentVariants = {
     enter: (direction: number) => ({
@@ -154,7 +129,12 @@ export default function ListingWizard() {
             {currentStep === 1 && <ListingTypeStep onSelect={handleTypeSelect} />}
             {currentStep === 2 && <AddressStep onSubmit={handleAddressSubmit} onBack={handleBack} />}
             {currentStep === 3 && (
-              <ListingDetailsStep listingType={listingType} addressData={addressData} onBack={handleBack} />
+              <ListingDetailsStep 
+                listingType={listingType} 
+                addressData={addressData} 
+                onBack={handleBack} 
+                selectListingTypeId={listingTypeId} 
+              />
             )}
           </motion.div>
         </AnimatePresence>
