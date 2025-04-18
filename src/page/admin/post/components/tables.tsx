@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { columns, Post } from "./colums";
 import TablePaginate from "./table-paginate";
+import { useGetAllPost } from "../hooks/use-get-all-post";
 
 const data: Post[] = [
   {
@@ -195,6 +196,8 @@ const data: Post[] = [
 ];
 
 export default function DataTableDemo() {
+  const {data: post, isLoading, isError} = useGetAllPost(1, 10);
+  console.log("post", post);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});

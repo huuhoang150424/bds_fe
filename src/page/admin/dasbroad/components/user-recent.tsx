@@ -1,34 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useGetTopUser } from '../hooks/use-get-top-use';
 
-const users = [
-  { id: 1, avatar: "https://i.pravatar.cc/40?img=1", name: "Nguyễn Văn A", email: "vana@example.com", order_count: 25 },
-  { id: 2, avatar: "https://i.pravatar.cc/40?img=2", name: "Trần Thị B", email: "thib@example.com", order_count: 18 },
-  { id: 3, avatar: "https://i.pravatar.cc/40?img=3", name: "Lê Minh C", email: "minhc@example.com", order_count: 15 },
-  { id: 4, avatar: "https://i.pravatar.cc/40?img=4", name: "Phạm Văn D", email: "vand@example.com", order_count: 30 },
-  { id: 5, avatar: "https://i.pravatar.cc/40?img=5", name: "Hoàng Thị E", email: "thie@example.com", order_count: 12 },
-  { id: 6, avatar: "https://i.pravatar.cc/40?img=6", name: "Ngô Văn F", email: "vanf@example.com", order_count: 22 },
-  { id: 7, avatar: "https://i.pravatar.cc/40?img=7", name: "Vũ Thị G", email: "thig@example.com", order_count: 19 },
-  { id: 8, avatar: "https://i.pravatar.cc/40?img=8", name: "Đặng Minh H", email: "minhh@example.com", order_count: 16 },
-  { id: 9, avatar: "https://i.pravatar.cc/40?img=9", name: "Trịnh Văn I", email: "vani@example.com", order_count: 27 },
-  { id: 10, avatar: "https://i.pravatar.cc/40?img=10", name: "Bùi Thị J", email: "thij@example.com", order_count: 14 }
-];
+
 
 const RecentSales: React.FC = () => {
+  const {data, isLoading, isError} = useGetTopUser();
+  console.log("data top user", data);
+  console.log("data top user .data", data?.data);
+
+  
   return (
     <ScrollArea className="h-[380px] mt-[-10px]">
-      {users.map((user) => (
+      {data?.map((user : any) => (
         <div key={user.id} className="flex mt-[15px] items-center px-[20px]">
           <img
             className="object-cover border border-gray-200 w-[40px] h-[40px] rounded-full"
             src={user.avatar}
-            alt={user.name}
+            alt={user.fullname}
           />
           <div className="ml-4 space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-sm font-medium leading-none">{user.fullname}</p>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
-          <div className="ml-auto font-medium">{user.order_count} bài</div>
+          <div className="ml-auto font-medium">{user.postCount} bài</div>
         </div>
       ))}
     </ScrollArea>
