@@ -150,7 +150,7 @@ function PostDetail() {
               <div className='icon flex items-center justify-center gap-4'>
                 <Share />
                 <AuthGuard actionType='warning'>
-                  <Warning />
+                  <Warning postId={postId} />
                 </AuthGuard>
                 <AuthGuard actionType='like'>
                   <WishlistButton postId={postId} />

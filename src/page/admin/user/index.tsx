@@ -23,48 +23,23 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { useGetAllUser } from './hooks/use-get-all-user';
 
 export default function UserManagement() {
   useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState('');
   const [isLocked, setIsLocked] = useState(false); // State to track lock status
 
-  // Mock user data
-  const users = [
-    {
-      id: 'u1',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      status: 'active',
-      registrationDate: '2023-01-15',
-    },
-    { id: 'u2', name: 'Trần Thị B', email: 'tranthib@example.com', status: 'active', registrationDate: '2023-01-20' },
-    { id: 'u3', name: 'Lê Văn C', email: 'levanc@example.com', status: 'locked', registrationDate: '2023-01-25' },
-    { id: 'u4', name: 'Phạm Thị D', email: 'phamthid@example.com', status: 'active', registrationDate: '2023-02-01' },
-    { id: 'u5', name: 'Hoàng Văn E', email: 'hoangvane@example.com', status: 'active', registrationDate: '2023-02-05' },
-    { id: 'u6', name: 'Ngô Thị F', email: 'ngothif@example.com', status: 'locked', registrationDate: '2023-02-10' },
-    { id: 'u7', name: 'Đỗ Văn G', email: 'dovang@example.com', status: 'active', registrationDate: '2023-02-15' },
-    { id: 'u8', name: 'Vũ Thị H', email: 'vuthih@example.com', status: 'active', registrationDate: '2023-02-20' },
-    { id: 'u9', name: 'Bùi Văn I', email: 'buivani@example.com', status: 'active', registrationDate: '2023-02-25' },
-    { id: 'u10', name: 'Lý Thị K', email: 'lythik@example.com', status: 'locked', registrationDate: '2023-03-01' },
-  ];
-
-  // Filter users based on search term
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
   // Format date to display in DD-MM-YYYY format
   const formatDate = (dateString: string | number | Date) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN');
   };
+  const { data, isLoading, isError } = useGetAllUser(1, 10);
+  console.log('data', data?.data);
 
   return (
-    <div className='  mx-auto py-6 px-4'>
+    <div className='  py-6 px-4'>
       <div className='flex flex-col space-y-4'>
         <div className='flex justify-between items-center'>
           <div>
@@ -98,30 +73,40 @@ export default function UserManagement() {
                   </div>
                 </TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Địa chỉ</TableHead>
+                <TableHead>Giới tính</TableHead>
+                <TableHead>Ngày sinh</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Ngày đăng ký</TableHead>
+                <TableHead>Điểm</TableHead>
                 <TableHead className='text-right'>Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((user) => (
+              {data?.data.map((user: any) => (
                 <TableRow key={user.id}>
                   <TableCell className='font-medium'>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.fullname}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.address}</TableCell>
+                  <TableCell>
+                    {user.gender === "Male" ? "Nam" : user.gender === "Female" ? "Nữ" : "Khác"}
+                  </TableCell>
+                  <TableCell>{new Date(user.dateOfBirth).toLocaleDateString('vi-VN')}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={user.status === 'active' ? 'default' : 'destructive'}
+                      variant={!user.isLock ? 'default' : 'destructive'}
                       className={
-                        user.status === 'active'
+                        !user.isLock 
                           ? 'bg-green-100 text-green-800 hover:bg-green-100'
                           : 'bg-red-100 text-red-800 hover:bg-red-100'
                       }
                     >
-                      {user.status === 'active' ? 'Hoạt động' : 'Đã khóa'}
+                      {!user.isLock  ? 'Đang hoạt động' : 'không hoạt động'}
                     </Badge>
                   </TableCell>
-                  <TableCell>{formatDate(user.registrationDate)}</TableCell>
+                  <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  <TableCell>{(user.score)}</TableCell>
                   <TableCell className='text-right'>
                     <div className='flex justify-end gap-2'>
                       <Dialog>
@@ -139,9 +124,9 @@ export default function UserManagement() {
                             <div>
                               <h3 className='font-medium'>{user.name}</h3>
                               <p className='text-sm text-muted-foreground'>Email: {user.email}</p>
-                              <p className='text-sm text-muted-foreground'>Ngày đăng ký: {user.registrationDate}</p>
+                              <p className='text-sm text-muted-foreground'>Ngày đăng ký: {formatDate(user.createdAt)}</p>
                               <p className='text-sm text-muted-foreground'>
-                                Trạng thái: {user.status === 'active' ? 'Đang hoạt động' : 'Đã khóa'}
+                                Trạng thái: {user.active === true ? 'Đang hoạt động' : 'không hoạt động'}
                               </p>
                             </div>
                             <div className='border rounded-md p-4'>
@@ -155,7 +140,7 @@ export default function UserManagement() {
                           </div>
                           <DialogFooter>
                             <Button variant='outline'>Đóng</Button>
-                            {isLocked ? (
+                            {user.isLock ? (
                               <Button className='gap-1'>
                                 <Unlock className='h-4 w-4' /> Mở khóa tài khoản
                               </Button>
@@ -167,20 +152,19 @@ export default function UserManagement() {
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                      {user.status === 'active' ? (
+                      {user.isLock === true ? (
                         <div>
                           <Button variant='outline' size='sm' className='px-2'>
-                        <Unlock className='h-4 w-4' />
-                      </Button>
+                            <Unlock className='h-4 w-4' />
+                          </Button>
                         </div>
-                      ): (
+                      ) : (
                         <div>
                           <Button variant='outline' size='sm' className='px-2'>
                             <Lock className='h-4 w-4' />
                           </Button>
                         </div>
                       )}
-                      
                     </div>
                   </TableCell>
                 </TableRow>
