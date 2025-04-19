@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,51 +15,126 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Check, Upload, User, MapPin, Phone, Mail, Briefcase } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { Check, Upload, User, MapPin, Phone, Mail, Briefcase, X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@/redux/authReducer';
 import { formSchemaRegisterAgent, type FormRegisterAgent } from '../../schema/register-agent';
+import { Label } from '@/components/ui/label';
+import { useToast } from "@/hooks/use-toast";
+import { useRegisterBroker } from '../../hooks/use-register-broker';
+import { AppDispatch } from '@/redux/store';
+
 
 export default function AgentRegistrationModal() {
-  const user=useSelector(selectUser);
+  const dispatch=useDispatch<AppDispatch>();
+  const user = useSelector(selectUser);
   const [step, setStep] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedExpertise, setSelectedExpertise] = useState<string[]>([]);
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const { toast } = useToast();
+  const { mutate, isPending } = useRegisterBroker();
 
   const form = useForm<FormRegisterAgent>({
     resolver: zodResolver(formSchemaRegisterAgent),
     defaultValues: {
-      fullName: user?.fullname,
-      email:  user?.email,
-      phone:  user?.phone,
+      fullName: user?.fullname || '',
+      phone: user?.phone || '',
       address: '',
-      bio: '',
+      selfIntroduction: '',
+      expertise: [],
     },
   });
 
+  useEffect(() => {
+    form.setValue('expertise', selectedExpertise);
+  }, [selectedExpertise, form]);
+
+  const expertiseOptions = [
+    { value: 'residential', label: 'Nhà ở' },
+    { value: 'commercial', label: 'Thương mại' },
+    { value: 'land', label: 'Đất' },
+    { value: 'industrial', label: 'Công nghiệp' },
+    { value: 'all', label: 'Tất cả các loại' },
+  ];
+
+  const addExpertise = (value: string) => {
+    if (!selectedExpertise.includes(value)) {
+      setSelectedExpertise([...selectedExpertise, value]);
+    }
+  };
+
+  const removeExpertise = (value: string) => {
+    setSelectedExpertise(selectedExpertise.filter(item => item !== value));
+  };
+
+  const clearAllExpertise = () => {
+    setSelectedExpertise([]);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Lỗi",
+          description: "Kích thước tệp tối đa là 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Lỗi",
+          description: "Chỉ chấp nhận tệp PDF, JPG hoặc PNG",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setCertificateFile(file);
+    }
+  };
+
   function onSubmit(values: FormRegisterAgent) {
-    setIsSubmitting(true);
-
-
-
-    setTimeout(() => {
-      console.log(values);
-      setIsSubmitting(false);
-      setIsSuccess(true);
-
-      setTimeout(() => {
-        setIsSuccess(false);
-        setIsOpen(false);
-        setStep(1);
-        form.reset();
-      }, 2000);
-    }, 1500);
+    const formData = new FormData();
+    formData.append('fullName', values.fullName || '');
+    formData.append('phone', values.phone || '');
+    formData.append('address', values.address || '');
+    formData.append('selfIntroduction', values.selfIntroduction || '');
+    formData.append('experience', values.experience || '');
+    if (values.expertise && values.expertise.length > 0) {
+      values.expertise.forEach((item: string) => formData.append('expertise', item));
+    }
+    if (certificateFile) {
+      formData.append('image', certificateFile);
+    }
+    
+    mutate(formData, {
+      onSuccess: () => {
+        setIsSubmitting(false);
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSuccess(false);
+          setIsOpen(false);
+          setStep(1);
+          form.reset();
+          setSelectedExpertise([]);
+          setCertificateFile(null);
+        }, 2000); 
+      },
+      onError: () => {
+        setIsSubmitting(false); 
+      },
+    });
   }
 
   const nextStep = () => {
-    const fieldsToValidate = step === 1 ? ['fullName', 'email', 'phone'] : ['address', 'experience', 'specialization'];
+    const fieldsToValidate = step === 1 ? ['fullName', 'phone'] : ['address', 'experience', 'expertise'];
 
     form.trigger(fieldsToValidate as any).then((isValid) => {
       if (isValid) setStep(step + 1);
@@ -68,6 +143,11 @@ export default function AgentRegistrationModal() {
 
   const prevStep = () => {
     setStep(step - 1);
+  };
+
+  const getExpertiseLabel = (value: string) => {
+    const option = expertiseOptions.find(opt => opt.value === value);
+    return option ? option.label : value;
   };
 
   return (
@@ -81,7 +161,7 @@ export default function AgentRegistrationModal() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[550px] p-0 overflow-hidden max-h-[95vh] '>
+      <DialogContent className='sm:max-w-[550px] p-0 overflow-hidden max-h-[95vh]'>
         <div className="px-4 py-2 overflow-y-auto max-h-[calc(95vh-30px)]">
           <AnimatePresence mode='wait'>
             {isSuccess ? (
@@ -125,7 +205,7 @@ export default function AgentRegistrationModal() {
                       </div>
                     </div>
                   </div>
-                  <DialogTitle className='text-xl font-[600] text-gray-700  text-center'>Đăng ký trở thành Môi giới</DialogTitle>
+                  <DialogTitle className='text-xl font-[600] text-gray-700 text-center'>Đăng ký trở thành Môi giới</DialogTitle>
                   <DialogDescription className='text-center pt-1'>
                     {step === 1 && 'Nhập thông tin cá nhân của bạn'}
                     {step === 2 && 'Thông tin địa chỉ và chuyên môn'}
@@ -153,30 +233,21 @@ export default function AgentRegistrationModal() {
                                   <FormLabel>Họ và tên</FormLabel>
                                   <FormControl>
                                     <div className='relative'>
-                                      <User className='absolute left-2 top-[9px] text-gray-400  ' size={20}/>
-                                      <Input placeholder='Nguyễn Văn A' className='pl-10 outline-none px-[34px] py-[8px] ' {...field} />
+                                      <User className='absolute left-2 top-[9px] text-gray-400' size={20}/>
+                                      <Input placeholder='Nguyễn Văn A' className='pl-10 outline-none px-[34px] py-[8px]' {...field} />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <FormField
-                              control={form.control}
-                              name='email'
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Email</FormLabel>
-                                  <FormControl>
-                                    <div className='relative'>
-                                      <Mail className='absolute left-2 top-[9px] text-gray-400  ' size={20}/>
-                                      <Input placeholder='example@gmail.com' className='pl-10 outline-none px-[34px] py-[8px]' {...field} />
-                                    </div>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                            <div className="flex flex-col gap-[10px]">
+                              <Label>Email</Label>
+                              <div className='relative'>
+                                <Mail className='absolute left-2 top-[9px] text-gray-400' size={20}/>
+                                <Input value={user?.email} disabled={true} placeholder='example@gmail.com' className='pl-10 outline-none px-[34px] py-[8px]'/>
+                              </div>
+                            </div>
                             <FormField
                               control={form.control}
                               name='phone'
@@ -185,7 +256,7 @@ export default function AgentRegistrationModal() {
                                   <FormLabel>Số điện thoại</FormLabel>
                                   <FormControl>
                                     <div className='relative'>
-                                      <Phone className='absolute left-2 top-[9px] text-gray-400  ' size={20}/>
+                                      <Phone className='absolute left-2 top-[9px] text-gray-400' size={20}/>
                                       <Input placeholder='0912345678' className='pl-10 outline-none px-[34px] py-[8px]' {...field} />
                                     </div>
                                   </FormControl>
@@ -212,7 +283,7 @@ export default function AgentRegistrationModal() {
                                   <FormLabel>Địa chỉ</FormLabel>
                                   <FormControl>
                                     <div className='relative'>
-                                      <MapPin className='absolute left-2 top-[9px] text-gray-400  ' size={20}/>
+                                      <MapPin className='absolute left-2 top-[9px] text-gray-400' size={20}/>
                                       <Input placeholder='123 Đường ABC, Quận XYZ, TP.HCM' className='pl-10 outline-none px-[34px] py-[8px]' {...field} />
                                     </div>
                                   </FormControl>
@@ -245,24 +316,61 @@ export default function AgentRegistrationModal() {
                             />
                             <FormField
                               control={form.control}
-                              name='specialization'
+                              name='expertise'
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>Chuyên môn</FormLabel>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                      <SelectTrigger className='w-full'>
-                                        <SelectValue placeholder='Chọn lĩnh vực chuyên môn' />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent className='z-[999999999]'>
-                                      <SelectItem value='residential'>Nhà ở</SelectItem>
-                                      <SelectItem value='commercial'>Thương mại</SelectItem>
-                                      <SelectItem value='land'>Đất</SelectItem>
-                                      <SelectItem value='industrial'>Công nghiệp</SelectItem>
-                                      <SelectItem value='all'>Tất cả các loại</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <div className="space-y-2">
+                                    <Select 
+                                      onValueChange={(value) => addExpertise(value)}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger className='w-full'>
+                                          <SelectValue placeholder='Chọn lĩnh vực chuyên môn' />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent className='z-[999999999]'>
+                                        {expertiseOptions.map(option => (
+                                          <SelectItem 
+                                            key={option.value} 
+                                            value={option.value}
+                                            disabled={selectedExpertise.includes(option.value)}
+                                          >
+                                            {option.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    
+                                    {selectedExpertise.length > 0 && (
+                                      <div className="mt-2">
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                          {selectedExpertise.map(item => (
+                                            <div 
+                                              key={item} 
+                                              className="flex items-center bg-orange-100 text-orange-700 rounded-md px-2 py-1"
+                                            >
+                                              <span className="text-sm">{getExpertiseLabel(item)}</span>
+                                              <button 
+                                                type="button" 
+                                                onClick={() => removeExpertise(item)}
+                                                className="ml-1 text-orange-700 hover:text-orange-900"
+                                              >
+                                                <X size={14} />
+                                              </button>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        <button 
+                                          type="button"
+                                          onClick={clearAllExpertise}
+                                          className="text-xs text-gray-500 hover:text-gray-700"
+                                        >
+                                          Xóa tất cả
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -280,7 +388,7 @@ export default function AgentRegistrationModal() {
                           >
                             <FormField
                               control={form.control}
-                              name='bio'
+                              name='selfIntroduction'
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>Giới thiệu bản thân</FormLabel>
@@ -296,30 +404,45 @@ export default function AgentRegistrationModal() {
                               )}
                             />
                             <div className='border border-dashed border-gray-300 rounded-lg p-4'>
-                              <div className='flex flex-col items-center justify-center py-4'>
-                                <Upload className='h-10 w-10 text-gray-400 mb-2' />
-                                <p className='text-sm font-medium mb-1'>Tải lên ảnh đại diện</p>
-                                <p className='text-xs text-gray-500 mb-2'>SVG, PNG, JPG hoặc GIF (tối đa 2MB)</p>
-                                <Button variant='outline' size='sm' type='button'>
-                                  Chọn ảnh
-                                </Button>
-                              </div>
-                            </div>
-                            <div className='border border-dashed border-gray-300 rounded-lg p-4'>
                               <div className='flex flex-col items-center justify-center py-2'>
                                 <Briefcase className='h-8 w-8 text-gray-400 mb-2' />
                                 <p className='text-sm font-medium mb-1'>Tải lên chứng chỉ hành nghề (nếu có)</p>
-                                <p className='text-xs text-gray-500 mb-2'>PDF, JPG (tối đa 5MB)</p>
-                                <Button variant='outline' size='sm' type='button'>
-                                  Chọn tệp
-                                </Button>
+                                <p className='text-xs text-gray-500 mb-2'>PDF, JPG, PNG (tối đa 5MB)</p>
+                                <label htmlFor="certificate-upload" className="cursor-pointer">
+                                  <div className="flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                                    <Upload size={16} />
+                                    {certificateFile ? 'Đổi tệp khác' : 'Chọn tệp'}
+                                  </div>
+                                  <input
+                                    id="certificate-upload"
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                  />
+                                </label>
+                                {certificateFile && (
+                                  <div className="mt-2 flex items-center text-sm text-green-600">
+                                    <Check size={16} className="mr-1" />
+                                    <span className="text-ellipsis overflow-hidden max-w-[200px]">
+                                      {certificateFile.name}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setCertificateFile(null)}
+                                      className="ml-2 text-gray-500 hover:text-gray-700"
+                                    >
+                                      <X size={16} />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </div>
-                    <div className='px-6 py-4 bg-gray-100 flex justify-between rounded-[6px] '>
+                    <div className='px-6 py-4 bg-gray-100 flex justify-between rounded-[6px]'>
                       {step > 1 ? (
                         <Button type='button' variant='outline' onClick={prevStep}>
                           Quay lại
@@ -330,16 +453,16 @@ export default function AgentRegistrationModal() {
                         </Button>
                       )}
                       {step < 3 ? (
-                        <Button type='button' onClick={nextStep} className='bg-red-500 hover:bg-red-600 '>
+                        <Button type='button' onClick={nextStep} className='bg-red-500 hover:bg-red-600'>
                           Tiếp tục
                         </Button>
                       ) : (
                         <Button
                           type='submit'
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isPending}
                           className='bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
                         >
-                          {isSubmitting ? (
+                          {(isSubmitting || isPending) ? (
                             <>
                               <svg
                                 className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'

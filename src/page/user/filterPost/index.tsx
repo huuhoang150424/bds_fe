@@ -5,8 +5,10 @@ import SearchBar from './components/search-bar';
 import Map from '@/page/user/filterPost/components/Map';
 import PropertyListings from './components/property-listing';
 import { useGetPostByFilter } from './hooks/use-fill-post';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function SellDetail() {
+  useScrollToTopOnMount();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchParams] = useSearchParams();

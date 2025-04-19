@@ -31,8 +31,10 @@ const PostCommentSection = lazy(() => import('./components/comment/post-comment-
 
 import 'react-image-lightbox/style.css';
 import { StarRating } from './components/star-rating';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function PostDetail() {
+  useScrollToTopOnMount();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);

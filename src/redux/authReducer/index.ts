@@ -67,8 +67,12 @@ const authSlice = createSlice({
       if (state.user) {
         state.user.phone=action.payload.phone;
       }
+    },
+    updateRole: (state,action)=>{
+      if (state.user) {
+        state.user.roles=action.payload.roles;
+      }
     }
-    
   },
   extraReducers: (builder) => {
     builder
@@ -93,7 +97,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore} = authSlice.actions;
+export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore,updateRole} = authSlice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;

@@ -6,12 +6,12 @@ import { PenLine, MapPin, User, CreditCard, Award } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectUser } from '@/redux/authReducer';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function UserProfile() {
+  useScrollToTopOnMount();
   const user = useSelector(selectUser);
-  // const isAuthenticated = useSelector(selectIsAuthenticated);
   console.log(user)
-  // User data from the provided JSON
   const userData = {
     id: 'b10ba6ed-adf3-4519-aace-8208c72c4afa',
     createdAt: '2025-04-09T18:39:50.000Z',
@@ -33,15 +33,9 @@ export default function UserProfile() {
     score: 0,
   };
 
-  // Format date of birth
-  // const formattedDOB = user?.dateOfBirth ? format(new Date(user.dateOfBirth), 'dd/MM/yyyy') : 'Not provided';
-  // const formattedCreatedAt = format(new Date(user?.createdAt), 'dd/MM/yyyy');
-
   return (
     <div className='max-w-8xl  p-6 space-y-6  min-h-screen'>
       <h1 className='text-2xl font-[500] '>Hồ sơ người dùng</h1>
-
-      {/* Profile Header */}
       <Card className='border rounded-[10px] border-gray-200'>
         <CardContent className='p-6'>
           <div className='flex flex-col md:flex-row items-start md:items-center gap-6'>

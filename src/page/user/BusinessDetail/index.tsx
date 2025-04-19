@@ -1,3 +1,4 @@
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import Banner from './components/Banner';
 import CompanyInfo from './components/company-info';
 import ContactInfo from './components/contact-info';
@@ -5,6 +6,7 @@ import ProjectList from './components/project-list';
 import Relate from './components/relate';
 
 function BusinessDetail() {
+  useScrollToTopOnMount();
   return (
     <div className='min-h-screen bg-gradient-to-b from-gray-50 to-white'>
       <div className='pt-[80px]'>

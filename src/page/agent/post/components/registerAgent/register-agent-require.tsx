@@ -2,9 +2,10 @@ import AgentRegistrationModal from './agent-registration-modal';
 import { BadgeCheck, Home, TrendingUp, Users, Briefcase, Award } from 'lucide-react';
 import FeatureCard from './feature-card';
 import AnimatedBackground from './animated-background';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function RegisterAgentRequire() {
-
+  useScrollToTopOnMount();
 
   
   return (

@@ -22,8 +22,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function UserManagement() {
+  useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState('');
   const [isLocked, setIsLocked] = useState(false); // State to track lock status
 

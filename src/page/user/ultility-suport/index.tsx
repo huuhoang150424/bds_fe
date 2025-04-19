@@ -8,8 +8,9 @@ import { CustomImage } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
-
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 export default function UltilitySuport() {
+  useScrollToTopOnMount();
   const [isActiveTab, setIsActiveTab] = useState('');
   const [isChoose, setIsChoose] = useState(false);
   const [birthYear, setBirthYear] = useState<string>('');

@@ -1,38 +1,20 @@
-'use client';
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Phone, Search, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Phone, Search } from 'lucide-react';
 import { CustomImage } from '@/components/common';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Dialog,
-  DialogContent,
-
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Label } from 'recharts';
 import formSendEmail from '@/page/user/Brokers/schema';
 import { z } from 'zod';
 import { agents, recommendedProperties } from '@/constant/const-brokers';
-import { Item } from '@radix-ui/react-dropdown-menu';
-import { CardContent } from '@/components/ui/card';
 import Infor from './components/infor';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 
 export default function RealEstateAgentDirectory() {
+  useScrollToTopOnMount();
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
   // Calculate the current page's data
@@ -92,37 +74,6 @@ export default function RealEstateAgentDirectory() {
         </div>
 
         <div className='md:col-span-1'>
-          {/* <div className='border rounded-md p-4 mb-4'>
-            <h3 className='font-bold text-center mb-4'>Tìm kiếm theo khu vực</h3>
-            <div className='space-y-2'>
-              <div className='border-b pb-2'>
-                <h4 className='font-bold text-sm mb-1'>Khu vực Hà Nội (2371)</h4>
-                <ul className='text-sm space-y-1'>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận Ba Đình (145)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận Hoàn Kiếm (128)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận Tây Hồ (189)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận Cầu Giấy (235)</li>
-                </ul>
-              </div>
-              <div className='border-b pb-2'>
-                <h4 className='font-bold text-sm mb-1'>Khu vực TP HCM (3105)</h4>
-                <ul className='text-sm space-y-1'>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận 1 (201)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận 2 (189)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận 3 (156)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Quận 7 (245)</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className='font-bold text-sm mb-1'>Khu vực khác (1024)</h4>
-                <ul className='text-sm space-y-1'>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Đà Nẵng (187)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Nha Trang (145)</li>
-                  <li className='text-red-600 hover:underline cursor-pointer'>Hải Phòng (98)</li>
-                </ul>
-              </div>
-            </div>
-          </div> */}
 
           <div className='border rounded-md p-4'>
             <h3 className='font-bold text-center mb-4'>Dự án nổi bật</h3>

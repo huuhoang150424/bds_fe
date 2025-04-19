@@ -7,9 +7,11 @@ import { RecentListings } from '../components/recent-listing';
 import { Prominent } from '../components/prominent-news';
 
 import VIPRequired from '../../vip/components/have-vip';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function Overview ()
 {
+    useScrollToTopOnMount();
   const isHaveVip = true;
 
   return (

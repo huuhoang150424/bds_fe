@@ -1,5 +1,3 @@
-'use client';
-
 import type React from 'react';
 
 import { useState } from 'react';
@@ -16,9 +14,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { MapPin, User, CreditCard, Award, CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function UserProfileEditable() {
-  // User data from the provided JSON
+  useScrollToTopOnMount();
   const [userData, setUserData] = useState({
     id: 'b10ba6ed-adf3-4519-aace-8208c72c4afa',
     createdAt: '2025-04-09T18:39:50.000Z',

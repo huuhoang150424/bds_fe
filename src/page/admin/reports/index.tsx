@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -13,8 +12,10 @@ import {
 } from "@/components/ui/pagination"
 import { ArrowUpDown, Download, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import useScrollToTopOnMount from "@/hooks/use-scroll-top"
 
 export default function ReportManagement() {
+  useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState("")
 
   // Mock report data

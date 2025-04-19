@@ -26,8 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function Business() {
+  useScrollToTopOnMount();
   return (
     <div className='max-w-6xl mx-auto pt-[80px]'>
       {/* Header */}

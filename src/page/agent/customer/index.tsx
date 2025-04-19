@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -30,7 +28,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { customers } from '@/constant/const-agent-customer-infor';
-// Dữ liệu mẫu khách hàng - thêm nhiều khách hàng hơn để kiểm tra phân trang
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -50,14 +48,10 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function CustomersPage() {
-  // Thêm state để quản lý phân trang
+  useScrollToTopOnMount();
   const [currentPage, setCurrentPage] = useState(1);
   const customersPerPage = 10;
-
-  // Tính toán tổng số trang
   const totalPages = Math.ceil(customers.length / customersPerPage);
-
-  // Lấy danh sách khách hàng cho trang hiện tại
   const getCurrentPageCustomers = () => {
     const startIndex = (currentPage - 1) * customersPerPage;
     const endIndex = startIndex + customersPerPage;

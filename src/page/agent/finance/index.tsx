@@ -1,4 +1,3 @@
-"use client"
 
 import { useState } from "react"
 import { ArrowDownIcon, ArrowUpIcon, SearchIcon } from "lucide-react"
@@ -13,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import useScrollToTopOnMount from "@/hooks/use-scroll-top"
 
 // Mock data for transactions
 const allTransactions = [
@@ -119,6 +119,7 @@ interface RecentTransactionsProps {
 }
 
 export function Finance({ showAll = false }: RecentTransactionsProps) {
+  useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState("")
   const [transactionType, setTransactionType] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
