@@ -66,7 +66,7 @@ export default function ListingWizard() {
   };
 
   return (
-    <div className='mx-auto px-[30px] mb-[30px] '>
+    <div className='mx-auto px-[30px] mb-[30px] mt-[15px] '>
       <div className='flex items-center mb-4 '>
         {currentStep > 1 && (
           <Button variant='ghost' size='icon' onClick={handleBack} className='mr-2'>
