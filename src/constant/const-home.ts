@@ -37,32 +37,7 @@ export interface NewsItem {
 interface NewsData {
   [key: string]: NewsItem[];
 }
-export const featuredCities = [
-  {
-    name: 'Hà Nội',
-    image: '/images/hanoi.jpg',
-  },
-  {
-    name: 'Hồ Chí Minh',
-    image: '/images/hochiminh.jpg',
-  },
-  {
-    name: 'Đà Nẵng',
-    image: '/images/danang.jpg',
-  },
-  {
-    name: 'Bình Dương',
-    image: '/images/binhduong.jpg',
-  },
-  {
-    name: 'Đồng Nai',
-    image: '/images/dongnai.jpg',
-  },
-  {
-    name: 'Khánh Hòa',
-    image: '/images/khanhhoa.jpg',
-  },
-];
+
 export const allCities = [
   'An Giang',
   'Bà Rịa Vũng Tàu',
@@ -267,16 +242,7 @@ export const propertyTypesByTab = {
     },
   ],
 };
-export interface Property {
-  id: string;
-  title: string;
-  price: string;
-  area: string;
-  location: string;
-  images: string[];
-  pricePerMonth?: string;
-  isFavorite?: boolean;
-}
+
 
 export interface CityInfo {
   name: string;

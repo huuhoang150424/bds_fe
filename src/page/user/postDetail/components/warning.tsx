@@ -11,7 +11,7 @@ import { useAddReport } from '../hooks/use-add-report';
 interface WarningProps {
   isAuthenticated?: boolean;
   onAuthRequired?: () => void;
-  postId: string;
+  postId?: string;
 }
 
 function Warning({ isAuthenticated = false, onAuthRequired, postId }: WarningProps) {

@@ -24,13 +24,13 @@ export default function PropertyListings({
   currentPage,
 }: {
   showMap: boolean;
-  data: any;
+  data?: any;
   isLoading: boolean;
   onPageChange: (page: number) => void;
   currentPage: number;
 }) {
   const [page, setPage] = useState(currentPage);
-
+  console.log(data)
   const handleChangePage = (newPage: number) => {
     onPageChange(newPage);
     setPage(newPage);

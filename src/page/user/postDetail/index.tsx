@@ -21,7 +21,6 @@ import Share from './components/share';
 import Warning from './components/warning';
 import WishlistButton from './components/like';
 import InforBrokerPpost from './components/infor-broker-post';
-import { posts } from '../../../constant/constPostDetail';
 
 const Lightbox = lazy(() => import('react-image-lightbox'));
 const Chart = lazy(() => import('./components/line-chart'));
@@ -300,7 +299,7 @@ function PostDetail() {
               </div>
               <div className='flex flex-col gap-2 items-start'>
                 <span className='text-sm text-gray-500'>mã tin</span>
-                <span className='font-[500]'>{posts.id}</span>
+                <span className='font-[500]'></span>
               </div>
             </div>
             <div className='border border-gray-100 my-[10px]'></div>

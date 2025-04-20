@@ -6,22 +6,23 @@ import Map from '@/page/user/filterPost/components/Map';
 import PropertyListings from './components/property-listing';
 import { useGetPostByFilter } from './hooks/use-fill-post';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { useSearchPost } from './hooks/use-seach-post';
+import { Button } from '@/components/ui/button';
 
 function SellDetail() {
   useScrollToTopOnMount();
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const limit = 10;
   const [searchParams] = useSearchParams();
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
+  const [isUsingSearch, setIsUsingSearch] = useState(false);
+  const [searchAddress, setSearchAddress] = useState<string[]>([]);
   const [showMap, setShowMap] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [isSearchingFill, setIsSearchingFill] = useState(false);
   const [minArea, setMinArea] = useState('');
   const [maxArea, setMaxArea] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20]);
-  const [areaRange, setAreaRange] = useState<[number, number]>([0, 500]);
   const [bedrooms, setBedrooms] = useState<number>(0);
   const [bathrooms, setBathrooms] = useState<number>(0);
   const [floors, setFloors] = useState<number>(0);
@@ -34,8 +35,15 @@ function SellDetail() {
   const [isFurnished, setIsFurnished] = useState<boolean | null>(null);
   const [tags, setTags] = useState<string[]>([]);
 
+  // Sử dụng search API chỉ khi isUsingSearch = true và searchAddress có dữ liệu
+  const { 
+    data: searchResults, 
+    isLoading: isSearchLoading 
+  } = useSearchPost(isUsingSearch ? searchAddress : []);
+
   const filterParams = {
-    keyword: selectedProvinces.length > 0 ? selectedProvinces : undefined,
+    // Không sử dụng selectedProvinces cho filter khi đang dùng search
+    keyword: !isUsingSearch && selectedProvinces.length > 0 ? selectedProvinces : undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
     minSquareMeters: minArea ? Number(minArea) : undefined,
@@ -55,17 +63,22 @@ function SellDetail() {
     limit: limit
   };
 
-  const { data: posts, isLoading, error } = useGetPostByFilter(filterParams);
-
+  // Chỉ gọi filter API khi không sử dụng search
+  const { 
+    data: posts, 
+    isLoading: isFilterLoading, 
+    error 
+  } = useGetPostByFilter(
+    filterParams, 
+    { enabled: !isUsingSearch }
+  );
 
   const resetAllFilters = () => {
     setSelectedProvinces([]);
     setMinPrice('');
     setMaxPrice('');
-    setPriceRange([0, 20]);
     setMinArea('');
     setMaxArea('');
-    setAreaRange([0, 500]);
     setBedrooms(0);
     setBathrooms(0);
     setFloors(0);
@@ -111,26 +124,12 @@ function SellDetail() {
       setMaxPrice(maxPriceParam);
     }
     
-    if (minPriceParam || maxPriceParam) {
-      setPriceRange([
-        minPriceParam ? Number(minPriceParam) / 1000000 : 0,
-        maxPriceParam ? Number(maxPriceParam) / 1000000 : 20,
-      ]);
-    }
-    
     if (minSquareMeters) {
       setMinArea(minSquareMeters);
     }
     
     if (maxSquareMeters) {
       setMaxArea(maxSquareMeters);
-    }
-    
-    if (minSquareMeters || maxSquareMeters) {
-      setAreaRange([
-        minSquareMeters ? Number(minSquareMeters) : 0, 
-        maxSquareMeters ? Number(maxSquareMeters) : 500
-      ]);
     }
     
     if (bedroomsParam) {
@@ -176,21 +175,30 @@ function SellDetail() {
     if (isFurnitureParam) {
       setIsFurnished(isFurnitureParam === 'true');
     }
-
-    setIsSearchingFill(true);
     setIsSearching(false);
+    setIsUsingSearch(false);
   }, [searchParams]);
-
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
 
   const handleSearch = (provinces: string[]) => {
-    setSelectedProvinces(provinces);
+    setIsUsingSearch(true);
+    setSearchAddress(provinces);
     setIsSearching(true);
-    setIsSearchingFill(false);
+    setPage(1);
   };
+
+  useEffect(() => {
+    if (searchResults && isSearching) {
+      setIsSearching(false);
+    }
+  }, [searchResults, isSearching]);
+  console.log(posts)
+  const currentData = isUsingSearch ? searchResults : posts;
+  const isLoading = isUsingSearch ? isSearchLoading : isFilterLoading;
+  console.log(searchResults?.posts,currentData,isUsingSearch )
   return (
     <div className=''>
       <div className={cn('flex w-full', showMap ? 'h-[calc(100vh-80px)]' : '')}>
@@ -199,8 +207,24 @@ function SellDetail() {
             <SearchBar
               showMap={showMap}
               setShowMap={setShowMap}
-              //onSearch={handleSearch} 
+              onSearch={handleSearch} 
             />
+            {isUsingSearch && (
+              <div className="mt-2 flex items-center">
+                <span className="text-sm text-gray-500 mr-2">Đang sử dụng tìm kiếm theo địa điểm</span>
+                <Button
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-blue-500 hover:text-blue-700"
+                  onClick={() => {
+                    setIsUsingSearch(false);
+                    setSearchAddress([]);
+                  }}
+                >
+                  Quay lại bộ lọc
+                </Button>
+              </div>
+            )}
           </div>
           <div
             className={cn(
@@ -210,7 +234,7 @@ function SellDetail() {
           >
             <PropertyListings
               showMap={showMap}
-              data={posts}
+              data={currentData}
               isLoading={isLoading}
               onPageChange={handlePageChange}
               currentPage={page}

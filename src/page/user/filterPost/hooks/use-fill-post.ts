@@ -21,7 +21,7 @@ interface FilterParams {
   isFurniture?:boolean
 }
 
-export const useGetPostByFilter = (filters: FilterParams) => {
+export const useGetPostByFilter = (filters: FilterParams,options = {}) => {
   const cleanFilters = Object.fromEntries(
     Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
   );
@@ -37,5 +37,6 @@ export const useGetPostByFilter = (filters: FilterParams) => {
     gcTime: 1000,
     retry: false,
     notifyOnChangeProps: ['data', 'error', 'isLoading', 'isFetching'],
+    ...options
   });
 };

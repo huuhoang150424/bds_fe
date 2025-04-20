@@ -3,9 +3,8 @@ import { SearchPost } from '../service/search-post';
 
 export const useSearchPost = (address: string[]) => {
   return useQuery({
-    queryKey: ['searchPost', address.sort().join(',')],
-
+    queryKey: ['searchByAddress', address.sort().join(',')],
     queryFn: () => SearchPost(address),
-    enabled: !!address.length,
+    enabled: address.length > 0
   });
 };

@@ -23,19 +23,17 @@ export const navItems: NavItem[] = [
   {
     icon: <FaUsers size={24} />,
     name: 'Người dùng',
-   
     subItems: [{ name: 'Danh sách người dùng', path: '/admin/user', pro: false }],
   },
   {
     icon: <FaUsers size={24} />,
     name: 'Reports',
-   
     subItems: [{ name: 'Danh sách báo cáo', path: '/admin/reports', pro: false }],
   },
   {
     icon: <FaUsers size={24} />,
     name: 'Tin tức',
-   
+
     subItems: [{ name: 'Danh sách bài viết', path: '/admin/news', pro: false }],
   },
 ];

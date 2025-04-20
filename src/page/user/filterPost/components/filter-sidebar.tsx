@@ -32,7 +32,6 @@ export default function FilterSidebar() {
   
   useEffect(() => {
     const paramKeys = [...searchParams.keys()];
-    console.log("params", paramKeys);
     const hasOnlyPageAndLimit =
       paramKeys.length <= 2 && paramKeys.every((key) => key === 'page' || key === 'limit');
     const hasNoParams = paramKeys.length === 0;

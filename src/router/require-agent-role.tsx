@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 export default function RequireAgentRole() {
   const user=useSelector(selectUser);
 
-  if (!user || user.roles !== "Agent") {
+  if (!user || user.roles === "User") {
     return <RegisterAgentRequire />;
   }
 

@@ -7,7 +7,7 @@ export const SearchPost = async (addresses: string[]) => {
 
     const url = `/post/searchPost?${params.toString()}`;
     const response = await handleApi(url, null, 'GET');
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error('Error fetching search post:', error);
     throw error;
