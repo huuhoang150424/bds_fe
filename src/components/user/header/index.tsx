@@ -11,9 +11,6 @@ import { logout, selectIsAuthenticated, selectUser } from '@/redux/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoChevronDownOutline } from 'react-icons/io5';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { AiFillDashboard } from 'react-icons/ai';
-import { FaLock, FaSignOutAlt, FaClipboardList, FaUsers, FaWallet, FaGift, FaMoneyBillWave } from 'react-icons/fa';
-import { MdDashboard, MdManageAccounts } from 'react-icons/md';
 import { AppDispatch } from '@/redux/store';
 import { handleApi } from '@/service';
 import { toast } from '@/hooks/use-toast';
@@ -23,9 +20,12 @@ import Wishlist from './components/wishlist';
 import CreatePostButton from './components/create-post';
 import AuthGuard from '@/page/auth/page/auth-guard-enhanced';
 import Notification from './components/notification';
-
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { menuItemsContact, menuItemsRent, menuItemsSell } from '@/constant/const-home';
 import { toSlug } from '@/lib/slug';
+import { BarChart3, FileText, Package, Briefcase, Wallet, Settings, LogOut, ChevronRight,} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 
 function Header() {
@@ -38,6 +38,7 @@ function Header() {
   const [loading, setLoading] = useState(false);
   const [heightHeader, setHeightHeader] = useState(false);
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+  const [hoverItem, setHoverItem] = useState<string | null>(null);
 
   const handleMenuItemClick = (listingType?: string, propertyType?: string) => {
     const params = new URLSearchParams();
@@ -53,7 +54,6 @@ function Header() {
     }
     navigate(`/filter?${params.toString()}`);
   };
-
 
   const toggleMenu = (menu: string) => {
     setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
@@ -72,7 +72,6 @@ function Header() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -90,8 +89,55 @@ function Header() {
       setLoading(false);
     }
   };
-
-
+  const menuItems = [
+    {
+      id: 'tong-quan',
+      label: 'Tổng quan',
+      icon: <BarChart3 className='w-5 h-5' />,
+      onClick: () => navigate('/agent/overview'),
+    },
+    {
+      id: 'quan-ly-tin-dang',
+      label: 'Quản lý tin đăng',
+      icon: <FileText className='w-5 h-5' />,
+      onClick: () => console.log(' Quản lý tin đăng'),
+    },
+    {
+      id: 'goi-hoi-vien',
+      label: 'Gói hội viên',
+      icon: <Package className='w-5 h-5' />,
+      discount: '-39%',
+      onClick: () => console.log(' Gói hội viên'),
+    },
+    {
+      id: 'moi-gioi-chuyen-nghiep',
+      label: 'Môi giới chuyên nghiệp',
+      icon: <Briefcase className='w-5 h-5' />,
+      onClick: () => console.log(' Môi giới chuyên nghiệp'),
+    },
+    {
+      id: 'nap-tien',
+      label: 'Nạp tiền',
+      icon: <Wallet className='w-5 h-5' />,
+      onClick: () => console.log(' Nạp tiền'),
+    },
+    {
+      id: 'quan-tri',
+      label: 'Quản trị',
+      icon: <Settings className='w-5 h-5' />,
+      onClick: () => console.log(' Quản trị'),
+      adminOnly: true,
+    },
+    {
+      id: 'dang-xuat',
+      label: 'Đăng xuất',
+      icon: <LogOut className='w-5 h-5' />,
+      onClick: handleLogout,
+    },
+  ];
+  const filteredMenuItems = menuItems.filter(
+    (item) => !item.adminOnly || (item.adminOnly && user?.roles === 'Admin')
+  );
 
 
   return (
@@ -112,16 +158,20 @@ function Header() {
         <div className=' hidden lg:block relative'>
           <ul className='flex justify-center relative'>
             <li className='relative group mr-[30px] text-[16px]'>
-              <span 
-              className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
-              onClick={() => handleMenuItemClick('Bán')}
+              <span
+                className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
+                onClick={() => handleMenuItemClick('Bán')}
               >
                 Nhà đất bán
               </span>
               <ul className='absolute left-0 mt-2 px-[4px] py-[6px]  w-[200px] bg-white shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsSell.map((item) => {
                   return (
-                    <li onClick={() => handleMenuItemClick('Bán', item)} key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
+                    <li
+                      onClick={() => handleMenuItemClick('Bán', item)}
+                      key={item}
+                      className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '
+                    >
                       <span>{item}</span>
                     </li>
                   );
@@ -129,16 +179,20 @@ function Header() {
               </ul>
             </li>
             <li className='relative mr-[30px] group text-[16px]'>
-              <span 
-              className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
-              onClick={() => handleMenuItemClick('Cho thuê')}
+              <span
+                className='hover:text-[#F97316] cursor-pointer font-[500] transition-all duration-300 ease-in-out'
+                onClick={() => handleMenuItemClick('Cho thuê')}
               >
                 Nhà đất cho thuê
               </span>
               <ul className='absolute left-0 mt-2 px-[4px] py-[6px]  w-[200px] bg-white shadow-2xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 {menuItemsRent.map((item) => {
                   return (
-                    <li onClick={() => handleMenuItemClick('Cho thuê', item)} key={item} className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '>
+                    <li
+                      onClick={() => handleMenuItemClick('Cho thuê', item)}
+                      key={item}
+                      className='py-[4px] px-[8px]  hover:bg-gray-200 cursor-pointer rounded-[4px]  text-[14px] transition-all duration-300 ease-in-out '
+                    >
                       <span>{item}</span>
                     </li>
                   );
@@ -172,7 +226,7 @@ function Header() {
 
             <HoverCard>
               <HoverCardTrigger>
-                <div className='avt flex items-center gap-[10px] relative'>
+                <div className='avt flex items-center gap-[10px] relative cursor-pointer'>
                   <div>
                     <CustomImage
                       src={user?.avatar}
@@ -185,65 +239,82 @@ function Header() {
                 </div>
               </HoverCardTrigger>
               <HoverCardContent className='p-0  rounded-[10px]'>
-                <div className='w-[300px]  h-[540px]'>
-                  <div className='image relative w-full '>
-                    <img
-                      className='rounded-t-[10px] h-[150px] w-full'
-                      src='https://th.bing.com/th/id/OIP.BzaY5GKh3hFvshHMlpabxAHaEj?rs=1&pid=ImgDetMain'
-                      alt=' nền '
-                    />
-                    <div className='title absolute top-[30px] left-[45px] text-[#fff]'>
-                      <h3 className='text-[24px] font-bold '>Gói hội viên</h3>
-                      <span className='text-[16px] font-[500]'>Tiết kiệm đến 39%</span>
-                      <Button className='bg-[#E03C31] hover:bg-[#FF837A] mt-[5px]'>Tìm hiểu thêm</Button>
+                <Card className=' overflow-hidden border-0 rounded-xl shadow-2xl bg-white/90 backdrop-blur-sm'>
+                  <CardHeader className='p-0'>
+                    <div
+                      className='relative h-32 bg-cover overflow-hidden'
+                      style={{
+                        backgroundImage:
+                          "url('https://images.unsplash.com/photo-1507783548227-544c3b8fc065?q=80&w=1974&auto=format&fit=crop')",
+                      }}
+                    >
+                      <div className='absolute inset-0 bg-gradient-to-b from-amber-500/20 to-amber-900/70 animate-pulse-slow' />
+                      <div className='absolute inset-0 pl-[20px] pb-[15px] flex flex-col justify-end'>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5 }}
+                          className='text-white z-10'
+                        >
+                          <h2 className='text-[16px] font-[500] tracking-tight drop-shadow-md'>Gói hội viên</h2>
+                          <p className='text-[14px] font-[400] text-amber-100 drop-shadow-md'>Tiết kiệm đến 39%</p>
+                          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button className='mt-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 px-[12px] py-[8px] text-[14px] font-[500] rounded-lg shadow-lg transition-all duration-300'>
+                              Tìm hiểu thêm
+                            </Button>
+                          </motion.div>
+                        </motion.div>
+                      </div>
                     </div>
-                    <div className='h-full w-full  py-2 '>
-                      {/* Menu Items */}
-                      <ul className=' text-black cursor-pointer '>
-                        <Link to={'/agent/overview'} className='hover:bg-[#F2F2F2]'>
-                          <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                            <MdDashboard /> <span>Tổng quan</span> <span className='badge'>Mới</span>
-                          </li>
-                        </Link>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaClipboardList /> <span>Quản lý tin đăng</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaGift /> <span>Gói hội viên</span>{' '}
-                          <span className='badge text-[12px] text-[#E03C31]'>-39%</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaUsers /> <span>Quản lý khách hàng</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaWallet /> <span>Quản lý tin tài trợ</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <MdManageAccounts /> <span>Thay đổi thông tin cá nhân</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaLock /> <span>Thay đổi mật khẩu</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaUsers /> <span>Môi giới chuyên nghiệp</span>
-                        </li>
-                        <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaMoneyBillWave /> <span>Nạp tiền</span>
-                        </li>
-                        {user?.roles === 'Admin' ? (
-                          <li className='flex items-center gap-2 pb-[10px] pl-[15px] hover:bg-[#F2F2F2]'>
-                            <Link to={'/admin/dashboard'} className='flex gap-[10px] items-center '>
-                              <AiFillDashboard /> <span>Quản trị</span>
-                            </Link>
-                          </li>
-                        ) : null}
-                        <li onClick={handleLogout} className='flex items-center gap-2  pl-[15px] hover:bg-[#F2F2F2]'>
-                          <FaSignOutAlt /> <span>Đăng xuất</span>
-                        </li>
-                      </ul>
+                  </CardHeader>
+                  <CardContent className='p-0'>
+                    <div className='divide-y divide-amber-100'>
+                      {filteredMenuItems.map((item) => (
+                        <motion.div
+                          key={item.id}
+                          className={cn(
+                            'flex items-center gap-4 px-[12px] py-[8px] cursor-pointer transition-all duration-300 hover:bg-amber-50 border-l-4 border-transparent',
+                            hoverItem === item.id && 'bg-gradient-to-r from-amber-50 to-amber-100 border-l-4 border-amber-500',
+                          )}
+                          onClick={item.onClick}
+                          onMouseEnter={() => setHoverItem(item.id)}
+                          onMouseLeave={() => setHoverItem(null)}
+                          whileHover={{ x: 5 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                          <div
+                            className={cn(
+                              'p-2 rounded-lg transition-colors duration-300',
+                              hoverItem === item.id && 'text-amber-500',
+                            )}
+                          >
+                            {item.icon}
+                          </div>
+                          <div
+                            className={cn(
+                              'flex-1 font-medium transition-colors duration-300',
+                              hoverItem === item.id && 'text-amber-800',
+                            )}
+                          >
+                            {item.label}
+                          </div>
+                          {item.discount ? (
+                            <div className='bg-red-100 text-red-600 font-bold px-2 py-1 rounded-md animate-pulse'>
+                              {item.discount}
+                            </div>
+                          ) : (
+                            <ChevronRight
+                              className={cn(
+                                'w-5 h-5 transition-transform duration-300',
+                                hoverItem === item.id ? 'translate-x-1 opacity-100' : 'opacity-0',
+                              )}
+                            />
+                          )}
+                        </motion.div>
+                      ))}
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </HoverCardContent>
             </HoverCard>
           </div>
