@@ -70,7 +70,7 @@ function PostDetail() {
               <StarRating commentsSectionId='comments' postId={data?.id} />
             </div>
             <div className='image relative mt-[30px]'>
-              <div className='w-full'>
+              <div className='w-full relative'>
                 <Carousel options={OPTIONS} className='relative' isAutoPlay={false}>
                   <SliderContainer className='gap-2'>
                     {data?.images.map((src: { image_url: string }, index: number) => (
@@ -82,6 +82,7 @@ function PostDetail() {
                           setCurrentIndex(index);
                           setIsOpen(true);
                         }}
+                        countImg={data?.images?.length}
                       />
                     ))}
                   </SliderContainer>
@@ -110,7 +111,9 @@ function PostDetail() {
                     <Lightbox
                       mainSrc={data?.images[currentIndex]?.image_url}
                       nextSrc={data?.images[(currentIndex + 1) % data.images.length]?.image_url}
-                      prevSrc={data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url}
+                      prevSrc={
+                        data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url
+                      }
                       onCloseRequest={() => setIsOpen(false)}
                       onMovePrevRequest={() =>
                         setCurrentIndex((currentIndex + data?.images?.length - 1) % data?.images?.length)
@@ -119,6 +122,9 @@ function PostDetail() {
                     />
                   </Suspense>
                 )}
+                <div className='absolute top-[70%] right-2 bg-black/60 text-white text-sm px-2 py-1 rounded-md'>
+                  {data?.images?.length}
+                </div>
               </div>
             </div>
 
@@ -328,7 +334,6 @@ function PostDetail() {
                 <h3 className='font-semibold text-lg'>Bình luận</h3>
                 <AuthGuard actionType='comment'>
                   <PostCommentSection postId={postId} />
-
                 </AuthGuard>
               </div>
             </div>
