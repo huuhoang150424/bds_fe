@@ -1,24 +1,27 @@
+// In your use-add-post.ts
 import { useMutation } from "@tanstack/react-query";
-import { addPost } from "../services/add-post";
-import { useToast } from "@/hooks/use-toast";
+import { addPost as addPostService } from "../services/add-post";
+import { toast } from "@/hooks/use-toast";
 
-export const useAddPost = (resetForm:any) => {
-  const { toast } = useToast();
+export const useAddPost = (resetForm: any) => {
+  
   return useMutation({
-    mutationFn: (data: FormData) => addPost(data),
+    mutationFn: ({ type, data }: { type: string, data: FormData }) => 
+      addPostService(type, data),
     onSuccess: (data) => {
       toast({
         title: "Thành công",
         description: data?.message,
         variant: "success",
       });
+      window.scrollTo(0,0);
       resetForm();
     },
     onError: (error: any) => {
-      console.log(error)
+      console.log(error);
       toast({
         title: "Lỗi",
-        description: ` ${error?.response?.data?.message || "Lỗi không xác định"}`,
+        description: `${error?.response?.data?.message || "Lỗi không xác định"}`,
         variant: "destructive",
       });
     },

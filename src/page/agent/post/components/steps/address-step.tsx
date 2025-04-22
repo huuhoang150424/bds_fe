@@ -191,7 +191,7 @@ export default function AddressStep({ onSubmit, onBack }: AddressStepProps) {
           type='button'
           onClick={handleSubmit}
           disabled={!formData.province || !formData.district || !formData.ward}
-          className='relative overflow-hidden'
+          className='relative overflow-hidden bg-red-500 hover:bg-red-600 transition-all duration-300 ease-in-out  '
         >
           <motion.span initial={{ x: -5, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
             Xác nhận
