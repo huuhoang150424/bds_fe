@@ -32,13 +32,9 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       setIsSuccess(true);
-
-      // Close after showing success
       setTimeout(() => {
         setIsSuccess(false);
         onClose();

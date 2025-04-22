@@ -44,8 +44,6 @@ export default function UserProfileEditable() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       alert('Thông tin đã được cập nhật thành công!');
@@ -55,14 +53,10 @@ export default function UserProfileEditable() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload the file to a server
-      // For now, we'll just create a local URL
       const url = URL.createObjectURL(file);
       setUserData({ ...userData, avatar: url });
     }
   };
-
-  // Format date for display
   const formattedCreatedAt = format(new Date(userData.createdAt), 'dd/MM/yyyy');
 
   return (
