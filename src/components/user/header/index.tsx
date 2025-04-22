@@ -125,7 +125,7 @@ function Header() {
       id: 'quan-tri',
       label: 'Quản trị',
       icon: <Settings className='w-5 h-5' />,
-      onClick: () => console.log(' Quản trị'),
+      onClick: () => navigate('/admin/dashboard'),
       adminOnly: true,
     },
     {
