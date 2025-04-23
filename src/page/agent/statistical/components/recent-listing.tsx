@@ -1,9 +1,7 @@
-'use client';
 
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   DropdownMenu,
@@ -31,7 +29,6 @@ interface recentNews {
 }
 export function RecentListings() {
   const { data, isLoading, isError } = useGetRecentNews();
-  console.log('data news', data?.recentNews);
   return (
     <div className='my-8'>
       <div className='flex items-center justify-between mb-4'>
@@ -60,16 +57,8 @@ export function RecentListings() {
               <TableRow key={recentNews.id}>
                 <TableCell className='font-medium'>{recentNews.title}</TableCell>
                 <TableCell>{recentNews.category}</TableCell>
-                {/* <TableCell>{recentNews.price}</TableCell> */}
                 <TableCell className='max-w-[200px] truncate'>{recentNews.view}</TableCell>
                 <TableCell>
-                  {/* <Badge
-                    variant={
-                      recentNews.status === 'Đang bán' ? 'default' : recentNews.status === 'Đã bán' ? 'secondary' : 'outline'
-                    }
-                  >
-                    {recentNews.status}
-                  </Badge> */}
                   {recentNews.author.fullname}
                 </TableCell>
                 <TableCell>{new Date(recentNews.created_at).toLocaleDateString('vi-VN')}</TableCell>

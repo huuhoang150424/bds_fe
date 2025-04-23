@@ -1,57 +1,35 @@
-import { mockDraftPosts } from '@/constant/const-draft-post';
 import { useState, useEffect } from 'react';
-import { DraftPostsHeader } from './draft-post-header';
-import { DraftPostsList } from './draft-post-list';
-import { DraftPostsTable } from './draft-post-table';
-import { DraftPostsEmpty } from './draft-post-empty';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { PropertyTable } from './property-table';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { useGetMyPosts } from '../hooks/use-get-myposts';
+import { Loading } from '@/components/common';
 
 export function DraftPostsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [posts, setPosts] = useState(mockDraftPosts);
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = viewMode === 'card' ? 6 : 15;
-  const filteredPosts = posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-  const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
-  const indexOfLastPost = currentPage * itemsPerPage;
-  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, viewMode]);
-
-  const handleDelete = (id: number) => {
-    setPosts(posts.filter((post) => post.draft_id !== id));
+  useScrollToTopOnMount();
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useGetMyPosts('PostDraft', page, 10);
+  const handlePageChange = (newPage: number) => {
+    window.scrollTo(0, 0);
+    setPage(newPage);
   };
-
-  const handlePublish = (id: number) => {
-    setPosts(posts.filter((post) => post.draft_id !== id));
-  };
-
   return (
-    <div className=' p-6 space-y-6  min-h-screen max-w-8xl '>
-      <DraftPostsHeader
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-      {filteredPosts.length > 0 ? (
-        <>
-          {viewMode === 'card' ? (
-            <DraftPostsList posts={currentPosts} onDelete={handleDelete} onPublish={handlePublish} />
-          ) : (
-            <DraftPostsTable posts={currentPosts} onDelete={handleDelete} onPublish={handlePublish} />
-          )}
-        </>
-      ) : (
-        <DraftPostsEmpty searchQuery={searchQuery} />
-      )}
+    <div className='max-w-[1280px] mx-auto py-6 overflow-hidden px-[20px]'>
+      <div className='flex items-center justify-between mb-6'>
+        <h1 className='text-xl font-[600] text-gray-700 '>Danh sách bài đăng nháp</h1>
+        <div className='relative w-64'>
+          <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+          <Input placeholder='Tìm kiếm...' className='pl-7 outline-none py-[6px] rounded-[8px] text-[14px] ' />
+        </div>
+      </div>
+      <div className=''>
+        {isLoading ? (
+          <Loading className='mt-[200px] ' />
+        ) : (
+          <PropertyTable data={data} onPageChange={handlePageChange} typeListPost='postDraft' />
+        )}
+      </div>
     </div>
   );
 }

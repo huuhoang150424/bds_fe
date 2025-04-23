@@ -25,7 +25,7 @@ export const data = {
           url: "create-post",
         },
         {
-          title: "Bài đăng nháp",
+          title: "Quản lí bài đăng nháp",
           url: "draft-post",
         },
         {
@@ -41,7 +41,7 @@ export const data = {
       isActive: true,
       items: [
         {
-          title: "Quản lí khách hàng",
+          title: "Quản lí lịch hẹn khách hàng",
           url: "customer-infor",
         },
         {

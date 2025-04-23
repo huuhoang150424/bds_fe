@@ -7,18 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, Trash2, ChevronFirst, ChevronLast } from 'lucide-react';
 import { PropertyModal } from './property-modal';
 import { Badge } from '@/components/ui/badge';
 import { convertDate } from '@/lib/convert-date';
+import { Pagination } from '@/components/user/pagination';
 
-export function formatCurrency(amount: number, currency = 'VND'): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+
 
 export interface PropertyData {
   createdAt: string;
@@ -52,16 +47,21 @@ export interface PropertyData {
   }[];
 }
 
-export function PropertyTable({ properties }: { properties: PropertyData[] }) {
-  const [selectedProperty, setSelectedProperty] = useState<PropertyData | null>(null);
+
+
+
+export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , onPageChange?: (page: number) => void ,typeListPost?:string}) {
+  const [selectedProperty, setSelectedProperty] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
-    dropdownRefs.current = dropdownRefs.current.slice(0, properties.length);
-  }, [properties]);
+    dropdownRefs.current = dropdownRefs.current.slice(0,data?.data?.data);
+  }, [data?.data?.data]);
 
-  const handleView = (property: PropertyData, index: number) => {
+  console.log(data);
+
+  const handleView = (property: any, index: number) => {
     if (dropdownRefs.current[index]) {
       dropdownRefs.current[index]?.blur();
     }
@@ -71,14 +71,16 @@ export function PropertyTable({ properties }: { properties: PropertyData[] }) {
     }, 10);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadgePost = (status: string) => {
     switch (status) {
       case 'Đã bàn giao':
         return <Badge className='text-xs font-normal bg-green-500'>Đã bàn giao</Badge>;
       case 'Đã hết hạng':
         return <Badge className='text-xs font-normal bg-red-500'>Đã hết hạng</Badge>;
-      case 'Đang bán':
-        return <Badge className='text-xs font-normal bg-blue-500'>Đang bán</Badge>;
+      case 'Đang đàm phán':
+        return <Badge className='text-xs font-normal bg-blue-500'>Đang đàm phán</Badge>;
+      case 'DRAFT':
+          return <Badge className='text-xs font-normal bg-pink-500'>Nháp</Badge>;
       case 'Sắp mở bán':
         return <Badge className='text-xs font-normal bg-amber-500'>Sắp mở bán</Badge>;
       default:
@@ -91,96 +93,109 @@ export function PropertyTable({ properties }: { properties: PropertyData[] }) {
       setSelectedProperty(null);
     }, 300);
   };
-
-
-  console.log('selectedProperty' ,selectedProperty)
-
+  console.log(data)
   return (
-    <div className="rounded-md border relative ">
-      <div className="overflow-x-auto custom-scrollbar w-full">
-        <Table className="text-xs w-max min-w-full">
-          <TableHeader className="bg-muted/50">
+    <div className='rounded-md border relative '>
+      <div className='overflow-x-auto custom-scrollbar w-full'>
+        <Table className='text-xs w-max min-w-full'>
+          <TableHeader className='bg-gray-100'>
             <TableRow>
-              <TableHead className="w-[100px] font-medium whitespace-nowrap sticky left-0 z-20 bg-muted/50">
+              <TableHead className='w-[100px] font-medium whitespace-nowrap sticky left-0 z-20 bg-gray-100'>
                 Hình ảnh
               </TableHead>
-              <TableHead className="w-[250px] font-medium whitespace-nowrap">Tiêu đề</TableHead>
-              <TableHead className="w-[150px] font-medium whitespace-nowrap">Giá</TableHead>
-              <TableHead className="w-[250px] font-medium whitespace-nowrap">Địa chỉ</TableHead>
-              <TableHead className="w-[100px] font-medium whitespace-nowrap">Diện tích</TableHead>
-              <TableHead className="w-[100px] font-medium whitespace-nowrap">Phòng ngủ</TableHead>
-              <TableHead className="w-[100px] font-medium whitespace-nowrap">Phòng tắm</TableHead>
-              <TableHead className="w-[100px] font-medium whitespace-nowrap">Hướng</TableHead>
-              <TableHead className="w-[120px] font-medium whitespace-nowrap">Trạng thái</TableHead>
-              <TableHead className="w-[150px] font-medium whitespace-nowrap">Ngày tạo</TableHead>
-              <TableHead className="w-[150px] font-medium whitespace-nowrap">Ngày hết hạn</TableHead>
-              <TableHead className="w-[100px] font-medium text-right whitespace-nowrap sticky right-0 z-20 bg-muted/50">
+              <TableHead className='w-[250px] font-medium whitespace-nowrap'>Tiêu đề</TableHead>
+              <TableHead className='w-[150px] font-medium whitespace-nowrap'>Giá</TableHead>
+              <TableHead className='w-[250px] font-medium whitespace-nowrap'>Địa chỉ</TableHead>
+              <TableHead className='w-[100px] font-medium whitespace-nowrap'>Diện tích</TableHead>
+              <TableHead className='w-[100px] font-medium whitespace-nowrap'>Phòng ngủ</TableHead>
+              <TableHead className='w-[100px] font-medium whitespace-nowrap'>Phòng tắm</TableHead>
+              <TableHead className='w-[100px] font-medium whitespace-nowrap'>Hướng</TableHead>
+              <TableHead className='w-[120px] font-medium whitespace-nowrap'>Trạng thái</TableHead>
+              <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày tạo</TableHead>
+              <TableHead className='w-[150px] font-medium whitespace-nowrap'>Có nội thất</TableHead>
+              <TableHead className='w-[150px] font-medium whitespace-nowrap'>Danh mục</TableHead>
+              {
+                  typeListPost==='Post' && (<TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày hết hạn</TableHead>)
+                }
+              
+              <TableHead className='w-[100px] font-medium text-right whitespace-nowrap sticky right-0 z-20 bg-gray-100'>
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {properties.map((property,index:number) => (
-              <TableRow key={property.title} className="h-16">
-                <TableCell className="p-2 sticky left-0 z-10 bg-white dark:bg-gray-950 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                  <div className="flex items-center space-x-1">
-                    {property.images.slice(0, 3).map((image, index) => (
-                      <div key={index} className="relative w-8 h-8 overflow-hidden rounded-md">
+            {data?.data?.data?.map((property: any, index: number) => (
+              <TableRow key={property?.title} className='h-16'>
+                <TableCell className='p-2 sticky left-0 z-10 bg-white dark:bg-gray-950 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]'>
+                  <div className='flex items-center space-x-1'>
+                    {property?.images?.map((image: any, index: number) => (
+                      <div key={index} className='relative w-8 h-8 overflow-hidden rounded-md'>
                         <img
-                          src={image.imageUrl }
-                          alt={property.title}
-                          
-                          className="object-cover w-full h-full border border-gray-200 "
+                          src={image?.imageUrl}
+                          alt={property?.title}
+                          className='object-cover w-full h-full border border-gray-200 '
                         />
                       </div>
                     ))}
-                    {property.images.length > 3 && (
-                      <span className="text-xs text-muted-foreground">+{property.images.length - 3}</span>
+                    {property?.images.length > 3 && (
+                      <span className='text-xs text-muted-foreground'>+{property?.images?.length - 3}</span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium whitespace-nowrap">{property.title}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {formatCurrency(property.price, property.priceUnit)}
+                <TableCell className='font-medium whitespace-nowrap'>{property?.title}</TableCell>
+                <TableCell className='whitespace-nowrap'>
+                  <span className='mr-[3px]'>
+                    {property?.price?.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    })}
+                  </span>
+                  {property?.priceUnit}
                 </TableCell>
-                <TableCell className="whitespace-nowrap">{property.address}</TableCell>
-                <TableCell className="whitespace-nowrap">{property.squareMeters} m²</TableCell>
-                <TableCell className="whitespace-nowrap">{property.bedroom}</TableCell>
-                <TableCell className="whitespace-nowrap">{property.bathroom}</TableCell>
-                <TableCell className="whitespace-nowrap">{property.direction}</TableCell>
-                <TableCell className="whitespace-nowrap">{getStatusBadge(property.status)}</TableCell>
-                <TableCell className="whitespace-nowrap">{convertDate(property.createdAt)}</TableCell>
-                <TableCell className="whitespace-nowrap">{convertDate(property.expiredDate)}</TableCell>
-                <TableCell className="text-right sticky right-0 z-10 bg-white dark:bg-gray-950 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                <DropdownMenu>
+                <TableCell className='whitespace-nowrap'>{property?.address}</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.squareMeters} m²</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.bedroom}</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.bathroom}</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.direction}</TableCell>
+                <TableCell className='whitespace-nowrap'>{getStatusBadgePost(property?.status)}</TableCell>
+                <TableCell className='whitespace-nowrap'>{convertDate(property?.createdAt)}</TableCell>
+
+                <TableCell className='whitespace-nowrap'>{property?.isFurniture ?'Có':'Không'}</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.propertyType[0]?.name}</TableCell>
+                {
+                  typeListPost==='Post' && (<TableCell className='whitespace-nowrap'>{convertDate(property?.expiredDate)}</TableCell>)
+                }
+                <TableCell className='text-right sticky right-0 z-10 bg-white dark:bg-gray-950 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]'>
+                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        ref={el => { dropdownRefs.current[index] = el; }}
-                        variant="ghost" 
-                        className="h-8 w-8 p-0"
-                        onBlur={() => {
+                      <Button
+                        ref={(el) => {
+                          dropdownRefs.current[index] = el;
                         }}
+                        variant='ghost'
+                        className='h-8 w-8 p-0'
+                        onBlur={() => {}}
                       >
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
+                        <span className='sr-only'>Open menu</span>
+                        <MoreHorizontal className='h-4 w-4' />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end"
+                    <DropdownMenuContent
+                      align='end'
                       onCloseAutoFocus={(e) => {
                         e.preventDefault();
                       }}
                     >
                       <DropdownMenuItem onClick={() => handleView(property, index)}>
-                        <Eye className="mr-2 h-4 w-4" />
+                        <Eye className='mr-2 h-4 w-4' />
                         <span>Xem</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <Pencil className="mr-2 h-4 w-4" />
+                        <Pencil className='mr-2 h-4 w-4' />
                         <span>Sửa</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className='mr-2 h-4 w-4' />
                         <span>Xóa</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -192,14 +207,17 @@ export function PropertyTable({ properties }: { properties: PropertyData[] }) {
         </Table>
       </div>
       {selectedProperty && (
-        <PropertyModal 
-          property={selectedProperty} 
-          isOpen={isModalOpen} 
-          onClose={handleCloseModal} 
-        />
+        <PropertyModal property={selectedProperty} isOpen={isModalOpen} onClose={handleCloseModal} />
       )}
+      <div className='flex items-center justify-between px-4 py-3 border-t w-full '>
+        <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số {data?.data?.totalPages} trang</div>
+        <Pagination
+          currentPage={data?.data?.currentPage}
+          totalPages={data?.data?.totalPages || 1}
+          onPageChange={onPageChange || (()=>{})}
+          className='mt-0'
+        />
+      </div>
     </div>
   );
 }
-
-

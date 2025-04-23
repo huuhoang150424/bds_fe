@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  className?:string
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export function Pagination({ currentPage, totalPages, onPageChange,className }: PaginationProps) {
   if (totalPages <= 1) return null;
   const getPageNumbers = () => {
     const pages = []
@@ -42,7 +44,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 mt-6">
+    <div className={cn(`flex items-center justify-center gap-1 mt-6` , className) }>
       <Button
         variant="outline"
         size="icon"

@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency, type PropertyData } from './property-table';
+import {  type PropertyData } from './property-table';
 
 interface PropertyModalProps {
   property: PropertyData;
@@ -39,7 +39,13 @@ export function PropertyModal({ property, isOpen, onClose }: PropertyModalProps)
                 <CardContent className='p-4 space-y-2'>
                   <div className='flex justify-between'>
                     <span className='text-muted-foreground'>Giá:</span>
-                    <span className='font-medium'>{formatCurrency(property.price, property.priceUnit)}</span>
+                    <span className='font-medium '>
+                    {property?.price?.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    })}
+                  </span>
+                  {property?.priceUnit}
                   </div>
                   <div className='flex justify-between'>
                     <span className='text-muted-foreground'>Diện tích:</span>
@@ -98,25 +104,7 @@ export function PropertyModal({ property, isOpen, onClose }: PropertyModalProps)
                 <Card className='border border-gray-200 rounded-[6px]'>
                   <CardContent className='p-4'>
                     <h3 className='font-medium mb-2'>Mô tả</h3>
-                    <p>{property.description}</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className='col-span-2'>
-                <Card className='border border-gray-200 rounded-[6px]'>
-                  <CardContent className='p-4'>
-                    <h3 className='font-medium mb-2'>Thông tin liên hệ</h3>
-                    <div className='flex items-center space-x-4'>
-                      <div className='relative w-12 h-12 rounded-full overflow-hidden'>
-                        <img src={property.user.avatar} alt={property.user.fullname} className='object-cover' />
-                      </div>
-                      <div>
-                        <p className='font-medium'>{property.user.fullname}</p>
-                        <p className='text-sm text-muted-foreground'>{property.user.email}</p>
-                        <p className='text-sm text-muted-foreground'>{property.user.phone}</p>
-                      </div>
-                    </div>
+                    <div className="" dangerouslySetInnerHTML={{ __html:property.description || '' }} ></div>
                   </CardContent>
                 </Card>
               </div>
@@ -126,8 +114,8 @@ export function PropertyModal({ property, isOpen, onClose }: PropertyModalProps)
           <TabsContent value='images'>
             <div className='grid grid-cols-2 gap-4 py-4'>
               {property.images.map((image, index) => (
-                <div key={index} className='relative aspect-video rounded-md overflow-hidden'>
-                  <img src={image.imageUrl} alt={`${property.title} - Ảnh ${index + 1}`} className='object-cover w-full h-full' />
+                <div key={index} className='relative aspect-video  '>
+                  <img src={image.imageUrl} alt={`${property.title} - Ảnh ${index + 1}`} className='object-cover w-full h-full border border-gray-300 rounded-md' />
                 </div>
               ))}
             </div>
