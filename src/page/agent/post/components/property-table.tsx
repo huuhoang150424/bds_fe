@@ -7,13 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye, Pencil, Trash2, ChevronFirst, ChevronLast } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react';
 import { PropertyModal } from './property-modal';
-import { Badge } from '@/components/ui/badge';
-import { convertDate } from '@/lib/convert-date';
 import { Pagination } from '@/components/user/pagination';
-
-
+import { DeleteModal } from './delete-post';
+import { convertDate } from '@/lib/convert-date';
+import { Badge } from '@/components/ui/badge';
+import { useDeletePost } from '../hooks/use-delete-post';
 
 export interface PropertyData {
   createdAt: string;
@@ -45,21 +45,26 @@ export interface PropertyData {
   images: {
     imageUrl: string;
   }[];
+  propertyType: {
+    name: string;
+  }[];
 }
 
-
-
-
-export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , onPageChange?: (page: number) => void ,typeListPost?:string}) {
+export function PropertyTable({ data, onPageChange, typeListPost }: { 
+  data: any; 
+  onPageChange?: (page: number) => void; 
+  typeListPost?: string 
+}) {
   const [selectedProperty, setSelectedProperty] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<any | null>(null);
   const dropdownRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost(typeListPost);
 
   useEffect(() => {
-    dropdownRefs.current = dropdownRefs.current.slice(0,data?.data?.data);
+    dropdownRefs.current = dropdownRefs.current.slice(0, data?.data?.data?.length || 0);
   }, [data?.data?.data]);
-
-  console.log(data);
 
   const handleView = (property: any, index: number) => {
     if (dropdownRefs.current[index]) {
@@ -71,6 +76,35 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
     }, 10);
   };
 
+  const handleDeleteClick = (property: any, index: number) => {
+    if (dropdownRefs.current[index]) {
+      dropdownRefs.current[index]?.blur();
+    }
+    setTimeout(() => {
+      setPropertyToDelete(property);
+      setIsDeleteModalOpen(true);
+    }, 10);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!propertyToDelete) return;
+    deletePost(propertyToDelete.id, {
+      onSuccess: () => {
+        setIsDeleteModalOpen(false);
+        setTimeout(() => {
+          setPropertyToDelete(null);
+        }, 300);
+      },
+    });
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setTimeout(() => {
+      setPropertyToDelete(null);
+    }, 300);
+  };
+
   const getStatusBadgePost = (status: string) => {
     switch (status) {
       case 'Đã bàn giao':
@@ -80,22 +114,30 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
       case 'Đang đàm phán':
         return <Badge className='text-xs font-normal bg-blue-500'>Đang đàm phán</Badge>;
       case 'DRAFT':
-          return <Badge className='text-xs font-normal bg-pink-500'>Nháp</Badge>;
+        return <Badge className='text-xs font-normal bg-pink-500'>Nháp</Badge>;
       case 'Sắp mở bán':
         return <Badge className='text-xs font-normal bg-amber-500'>Sắp mở bán</Badge>;
       default:
         return <Badge className='text-xs font-normal'>{status}</Badge>;
     }
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTimeout(() => {
       setSelectedProperty(null);
     }, 300);
   };
-  console.log(data)
+
+  const totalItems = data?.data?.totalItems || 0;
+  const itemsPerPage = data?.data?.itemsPerPage || 10;
+  const currentPage = data?.data?.currentPage || 1;
+  const totalPages = data?.data?.totalPages || 1;
+  const startItem = Math.min(totalItems, (currentPage - 1) * itemsPerPage + 1);
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
   return (
-    <div className='rounded-md border relative '>
+    <div className='rounded-md border relative'>
       <div className='overflow-x-auto custom-scrollbar w-full'>
         <Table className='text-xs w-max min-w-full'>
           <TableHeader className='bg-gray-100'>
@@ -114,10 +156,9 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày tạo</TableHead>
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Có nội thất</TableHead>
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Danh mục</TableHead>
-              {
-                  typeListPost==='Post' && (<TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày hết hạn</TableHead>)
-                }
-              
+              {typeListPost === 'Post' && (
+                <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày hết hạn</TableHead>
+              )}
               <TableHead className='w-[100px] font-medium text-right whitespace-nowrap sticky right-0 z-20 bg-gray-100'>
                 Actions
               </TableHead>
@@ -128,16 +169,16 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
               <TableRow key={property?.title} className='h-16'>
                 <TableCell className='p-2 sticky left-0 z-10 bg-white dark:bg-gray-950 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]'>
                   <div className='flex items-center space-x-1'>
-                    {property?.images?.map((image: any, index: number) => (
-                      <div key={index} className='relative w-8 h-8 overflow-hidden rounded-md'>
+                    {property?.images?.slice(0, 3).map((image: any, imgIndex: number) => (
+                      <div key={imgIndex} className='relative w-8 h-8 overflow-hidden rounded-md'>
                         <img
                           src={image?.imageUrl}
                           alt={property?.title}
-                          className='object-cover w-full h-full border border-gray-200 '
+                          className='object-cover w-full h-full border border-gray-200'
                         />
                       </div>
                     ))}
-                    {property?.images.length > 3 && (
+                    {property?.images?.length > 3 && (
                       <span className='text-xs text-muted-foreground'>+{property?.images?.length - 3}</span>
                     )}
                   </div>
@@ -159,12 +200,11 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
                 <TableCell className='whitespace-nowrap'>{property?.direction}</TableCell>
                 <TableCell className='whitespace-nowrap'>{getStatusBadgePost(property?.status)}</TableCell>
                 <TableCell className='whitespace-nowrap'>{convertDate(property?.createdAt)}</TableCell>
-
-                <TableCell className='whitespace-nowrap'>{property?.isFurniture ?'Có':'Không'}</TableCell>
-                <TableCell className='whitespace-nowrap'>{property?.propertyType[0]?.name}</TableCell>
-                {
-                  typeListPost==='Post' && (<TableCell className='whitespace-nowrap'>{convertDate(property?.expiredDate)}</TableCell>)
-                }
+                <TableCell className='whitespace-nowrap'>{property?.isFurniture ? 'Có' : 'Không'}</TableCell>
+                <TableCell className='whitespace-nowrap'>{property?.propertyType?.[0]?.name}</TableCell>
+                {typeListPost === 'Post' && (
+                  <TableCell className='whitespace-nowrap'>{convertDate(property?.expiredDate)}</TableCell>
+                )}
                 <TableCell className='text-right sticky right-0 z-10 bg-white dark:bg-gray-950 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]'>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -194,7 +234,7 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
                         <Pencil className='mr-2 h-4 w-4' />
                         <span>Sửa</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeleteClick(property, index)}>
                         <Trash2 className='mr-2 h-4 w-4' />
                         <span>Xóa</span>
                       </DropdownMenuItem>
@@ -206,17 +246,35 @@ export function PropertyTable({ data,onPageChange ,typeListPost}: { data: any , 
           </TableBody>
         </Table>
       </div>
+
       {selectedProperty && (
         <PropertyModal property={selectedProperty} isOpen={isModalOpen} onClose={handleCloseModal} />
       )}
-      <div className='flex items-center justify-between px-4 py-3 border-t w-full '>
-        <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số {data?.data?.totalPages} trang</div>
-        <Pagination
-          currentPage={data?.data?.currentPage}
-          totalPages={data?.data?.totalPages || 1}
-          onPageChange={onPageChange || (()=>{})}
-          className='mt-0'
+      {propertyToDelete && (
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xác nhận xóa"
+          property={propertyToDelete}
+          isLoading={isDeleting}
         />
+      )}
+
+      <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+        <div className='text-xs text-gray-500'>
+          {totalItems > 0
+            ? `Hiển thị ${startItem} đến ${endItem} trong tổng số ${totalItems} bất động sản`
+            : 'Không có bất động sản nào'}
+        </div>
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange || (() => {})}
+            className='mt-0'
+          />
+        )}
       </div>
     </div>
   );

@@ -14,6 +14,8 @@ import UserProfile from '@/page/agent/manage-account/infor';
 import UserProfileEditable from '@/page/agent/manage-account/update-infor';
 import CreatePost from '@/page/agent/post/page/create-post';
 import RequireAgentRole from './require-agent-role';
+import Guideline from '@/page/agent/post/page/instruct';
+import Sample from '@/page/agent/post/page/sample-instructions';
 
 export default function AgentRouter() {
   return (
@@ -29,6 +31,8 @@ export default function AgentRouter() {
           <Route path='/finance' element={<Finance />} />
           <Route path='/statistical' element={<Statistical />} />
           <Route path='/draft-post' element={<DraftPost />} />
+          <Route path='/guideline' element={<Guideline />} />
+          <Route path='/sample' element={<Sample />} />
         </Route>
         <Route path='/profile' element={<UserProfile />} />
         <Route path='/chat' element={<Chat />} />
