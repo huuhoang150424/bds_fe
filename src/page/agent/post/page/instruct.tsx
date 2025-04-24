@@ -96,20 +96,20 @@ export default function Guideline() {
       </div>
 
       <div className='bg-gradient-to-r from-red-500 to-red-600 rounded-md p-4 text-white'>
-        <h3 className='text-xs font-medium mb-2'>Bạn đã sẵn sàng?</h3>
-        <p className='text-[10px] mb-3 text-white/90'>Hãy bắt đầu tạo bất động sản đầu tiên của bạn ngay bây giờ.</p>
+        <h3 className='text-[14px] font-medium mb-2'>Bạn đã sẵn sàng?</h3>
+        <p className='text-[12px] mb-3 text-white/90'>Hãy bắt đầu tạo bất động sản đầu tiên của bạn ngay bây giờ.</p>
         <Button
           onClick={()=>navigate('/agent/create-post')}
           size='sm'
           variant='outline'
-          className='bg-white/10 hover:bg-white/20 text-white border-white/30 text-[10px]'
+          className='bg-white/10 hover:bg-white/20 text-white border-white/30 text-[12x]'
         >
           <Plus className='w-3 h-3 mr-1' /> Thêm bất động sản
         </Button>
       </div>
 
       <div className='mt-6 text-center'>
-        <p className='text-[10px] text-gray-500'>
+        <p className='text-[12px] text-gray-500'>
           Cần thêm trợ giúp?{' '}
           <Link to='/ho-tro' className='text-red-500 hover:underline'>
             Liên hệ hỗ trợ

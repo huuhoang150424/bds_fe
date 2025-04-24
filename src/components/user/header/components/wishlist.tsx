@@ -30,7 +30,7 @@ function Wishlist() {
             <ScrollArea className='h-[300px] w-full'>
               {data?.map(
                 (item: { post: { images: { imageUrl: string }[]; title: string; id: string, slug:string }; postId: string }) => (
-                  <Link to={`/post/${item.post.slug}`} key={item?.post?.id}>
+                  <Link to={`/post/${item?.post?.slug}`} key={item?.post?.id}>
                     <Card
                       key={item?.post?.id}
                       className='mb-2 border-b-[1px] relative hover:bg-gray-200 pl-[5px] mr-[15px] rounded-[5px]'
@@ -51,7 +51,7 @@ function Wishlist() {
                         <div className='flex flex-col gap-2'>
                           <h3 className='text-[16px] font-[500]'>{item?.post?.title}</h3>
                         </div>
-                        {hoveredId === item.post.id && (
+                        {hoveredId === item?.post?.id && (
                           <button
                             className='absolute right-2 top-1 text-red-500 hover:text-red-700'
                             onClick={() => deleteWishlist(item?.post?.id)}

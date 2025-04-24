@@ -88,7 +88,7 @@ const Header: React.FC = () => {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className='flex items-center gap-2 rounded-full pr-2 pl-1 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'>
+          <button className='flex items-center gap-2 rounded-full pr-2 pl-1 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200'>
             <Avatar className='h-8 w-8 border border-gray-200 dark:border-gray-700'>
               <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={user?.fullname} />
               <AvatarFallback>{user?.fullname.charAt(0)}</AvatarFallback>

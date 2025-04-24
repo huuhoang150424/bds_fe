@@ -15,11 +15,10 @@ export default function ManagePost() {
     window.scrollTo(0, 0);
     setPage(newPage);
   };
-  console.log(data?.data?.data);
   return (
     <div className='max-w-[1280px] '>
       {data?.data?.data?.length === 0 ? (
-        <EmptyState />
+        <EmptyState type='Post' />
       ) : (
         <div className=' mx-auto py-6 overflow-hidden px-[20px] '>
           <div className='flex items-center justify-between mb-6'>

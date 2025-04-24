@@ -7,13 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, Trash2,Upload } from 'lucide-react';
 import { PropertyModal } from './property-modal';
 import { Pagination } from '@/components/user/pagination';
 import { DeleteModal } from './delete-post';
 import { convertDate } from '@/lib/convert-date';
 import { Badge } from '@/components/ui/badge';
 import { useDeletePost } from '../hooks/use-delete-post';
+import { PostEditModalEnhanced } from './edit-post/post-edit-modal-enhanced';
 
 export interface PropertyData {
   createdAt: string;
@@ -50,17 +51,47 @@ export interface PropertyData {
   }[];
 }
 
-export function PropertyTable({ data, onPageChange, typeListPost }: { 
-  data: any; 
-  onPageChange?: (page: number) => void; 
-  typeListPost?: string 
+export function PropertyTable({
+  data,
+  onPageChange,
+  typeListPost,
+}: {
+  data: any;
+  onPageChange?: (page: number) => void;
+  typeListPost?: string;
 }) {
   const [selectedProperty, setSelectedProperty] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<any | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentPost, setCurrentPost] = useState<any>(null);
   const dropdownRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost(typeListPost);
+
+
+  const handleEdit = (post: any, index: number) => {
+    if (dropdownRefs.current[index]) {
+      dropdownRefs.current[index]?.blur();
+    }
+    setTimeout(() => {
+      setCurrentPost(post);
+      setIsEditModalOpen(true);
+    }, 10);
+
+
+  };
+
+  const handleEditModalClose = (open: boolean) => {
+    setIsEditModalOpen(open);
+    if (!open) {
+      setTimeout(() => {
+        setCurrentPost(null);
+      }, 300);
+    }
+  };
+
+  const handlePublishPost = (post: any) => {};
 
   useEffect(() => {
     dropdownRefs.current = dropdownRefs.current.slice(0, data?.data?.data?.length || 0);
@@ -113,6 +144,8 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
         return <Badge className='text-xs font-normal bg-red-500'>Đã hết hạng</Badge>;
       case 'Đang đàm phán':
         return <Badge className='text-xs font-normal bg-blue-500'>Đang đàm phán</Badge>;
+      case 'Còn trống':
+        return <Badge className='text-xs font-normal bg-blue-500'>Còn trống</Badge>;
       case 'DRAFT':
         return <Badge className='text-xs font-normal bg-pink-500'>Nháp</Badge>;
       case 'Sắp mở bán':
@@ -129,13 +162,17 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
     }, 300);
   };
 
+  const handleSave = (updatedPost: any) => {
+    //setPosts(posts.map((post) => (post.id === updatedPost.id ? { ...post, ...updatedPost } : post)))
+  }
+
   const totalItems = data?.data?.totalItems || 0;
   const itemsPerPage = data?.data?.itemsPerPage || 10;
   const currentPage = data?.data?.currentPage || 1;
   const totalPages = data?.data?.totalPages || 1;
   const startItem = Math.min(totalItems, (currentPage - 1) * itemsPerPage + 1);
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
+  console.log(data);
   return (
     <div className='rounded-md border relative'>
       <div className='overflow-x-auto custom-scrollbar w-full'>
@@ -155,6 +192,7 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
               <TableHead className='w-[120px] font-medium whitespace-nowrap'>Trạng thái</TableHead>
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày tạo</TableHead>
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Có nội thất</TableHead>
+              <TableHead className='w-[150px] font-medium whitespace-nowrap'>Tags</TableHead>
               <TableHead className='w-[150px] font-medium whitespace-nowrap'>Danh mục</TableHead>
               {typeListPost === 'Post' && (
                 <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày hết hạn</TableHead>
@@ -201,6 +239,18 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
                 <TableCell className='whitespace-nowrap'>{getStatusBadgePost(property?.status)}</TableCell>
                 <TableCell className='whitespace-nowrap'>{convertDate(property?.createdAt)}</TableCell>
                 <TableCell className='whitespace-nowrap'>{property?.isFurniture ? 'Có' : 'Không'}</TableCell>
+
+                <TableCell className='whitespace-nowrap space-x-[3px] '>
+                  {property?.tagPosts?.map((tag: any, index: number) => (
+                    <Badge
+                      key={index}
+                      variant='outline'
+                      className='bg-red-50 text-red-700 border-red-200 text-[13px]  '
+                    >
+                      {tag?.tag?.tagName}
+                    </Badge>
+                  ))}
+                </TableCell>
                 <TableCell className='whitespace-nowrap'>{property?.propertyType?.[0]?.name}</TableCell>
                 {typeListPost === 'Post' && (
                   <TableCell className='whitespace-nowrap'>{convertDate(property?.expiredDate)}</TableCell>
@@ -230,10 +280,21 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
                         <Eye className='mr-2 h-4 w-4' />
                         <span>Xem</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleEdit(property,index)}
+                        
+                      >
                         <Pencil className='mr-2 h-4 w-4' />
                         <span>Sửa</span>
                       </DropdownMenuItem>
+
+                      {typeListPost === 'PostDraft' ? (
+                        <DropdownMenuItem onClick={() => handlePublishPost(property)}>
+                          <Upload className='mr-2 h-4 w-4' />
+                          <span>Xuất bản</span>
+                        </DropdownMenuItem>
+                      ) : null}
+
                       <DropdownMenuItem onClick={() => handleDeleteClick(property, index)}>
                         <Trash2 className='mr-2 h-4 w-4' />
                         <span>Xóa</span>
@@ -255,11 +316,18 @@ export function PropertyTable({ data, onPageChange, typeListPost }: {
           isOpen={isDeleteModalOpen}
           onClose={handleCancelDelete}
           onConfirm={handleConfirmDelete}
-          title="Xác nhận xóa"
+          title='Xác nhận xóa'
           property={propertyToDelete}
           isLoading={isDeleting}
         />
       )}
+
+      <PostEditModalEnhanced
+        open={isEditModalOpen}
+        onOpenChange={handleEditModalClose}
+        post={currentPost}
+        onSave={handleSave}
+      />
 
       <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
         <div className='text-xs text-gray-500'>

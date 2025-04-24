@@ -5,6 +5,7 @@ import { PropertyTable } from './property-table';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { useGetMyPosts } from '../hooks/use-get-myposts';
 import { Loading } from '@/components/common';
+import EmptyState from './instructPost/empty-state';
 
 export function DraftPostsPage() {
   useScrollToTopOnMount();
@@ -15,21 +16,25 @@ export function DraftPostsPage() {
     setPage(newPage);
   };
   return (
-    <div className='max-w-[1280px] mx-auto py-6 overflow-hidden px-[20px]'>
-      <div className='flex items-center justify-between mb-6'>
-        <h1 className='text-xl font-[600] text-gray-700 '>Danh sách bài đăng nháp</h1>
-        <div className='relative w-64'>
-          <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-          <Input placeholder='Tìm kiếm...' className='pl-7 outline-none py-[6px] rounded-[8px] text-[14px] ' />
+    <div className='max-w-[1280px] '>
+      {data?.data?.data?.length === 0 ? (
+        <EmptyState type='PostDraft'/>
+      ) : ( 
+        <div className=' mx-auto py-6 overflow-hidden px-[20px] '>
+          <div className='flex items-center justify-between mb-6'>
+            <h1 className='text-xl font-[600] text-gray-700 '>Danh sách bất động sản</h1>
+            <div className='relative w-64'>
+              <Search className='absolute left-2 top-3 h-4 w-4 text-muted-foreground' />
+              <Input placeholder='Tìm kiếm...' className='pl-8 outline-none py-[8px] rounded-[8px] ' />
+            </div>
+          </div>
+          {isLoading ? (
+            <Loading className='mt-[200px] ' />
+          ) : (
+            <PropertyTable data={data} onPageChange={handlePageChange} typeListPost='PostDraft' />
+          )}
         </div>
-      </div>
-      <div className=''>
-        {isLoading ? (
-          <Loading className='mt-[200px] ' />
-        ) : (
-          <PropertyTable data={data} onPageChange={handlePageChange} typeListPost='postDraft' />
-        )}
-      </div>
+      )}
     </div>
   );
 }

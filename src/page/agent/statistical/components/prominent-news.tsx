@@ -1,4 +1,3 @@
-"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,27 +66,27 @@ export function PropertyCard({ property }: { property: Property }) {
     <Card className="overflow-hidden rounded-lg  transition-shadow duration-200 border border-gray-200 hover:shadow-xl">
       <div className="relative aspect-video">
         <img
-          src={property.images[0].image_url}
-          alt={property.title}
+          src={property?.images[0]?.image_url}
+          alt={property?.title}
           className="object-cover w-full h-full"
         />
         <Badge className="absolute top-2 right-2 bg-primary text-white">
-          {property.score} điểm
+          {property?.score} điểm
         </Badge>
       </div>
       <CardContent className="p-4">
         <h3 className="font-semibold text-lg mb-1 truncate">
-          {property.title}
+          {property?.title}
         </h3>
         <p className="text-sm text-muted-foreground mb-2 truncate">
-          {property.address}
+          {property?.address}
         </p>
-        <p className="font-bold text-[#E03C31] mb-3">{Math.round(property.price).toLocaleString('vi-VN')}</p>
+        <p className="font-bold text-[#E03C31] mb-3">{Math.round(property?.price).toLocaleString('vi-VN')}</p>
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <span>{property.propertyType[0].name}</span>
+          <span>{property?.propertyType[0]?.name}</span>
           {/* <span>{property.bedrooms} Phòng ngủ</span>
           <span>{property.bathrooms} Phòng tắm</span> */}
-          <span>{property.squareMeters} m²</span>
+          <span>{property?.squareMeters} m²</span>
         </div>
       </CardContent>
     </Card>
