@@ -14,6 +14,7 @@ import Loader from '@/components/common/loading/loader/loading';
 import { loginAuth } from '@/redux/action/auth';
 import { useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
+import LoginGoogle from './login-google';
 
 
 
@@ -135,10 +136,7 @@ function LoginScreen() {
               </div>
             </div>
             <div className='bg-[#fff]  rounded-[10px] mb-[15px] flex justify-center border-[1px]'>
-              <a href='#' className='flex items-center space-x-4 p-[10px]  '>
-                <FcGoogle className='text-2xl' />
-                <p className='text-[14px]'>Đăng nhập bằng Google</p>
-              </a>
+              <LoginGoogle/>
             </div>
             <div className='flex justify-center text-[14px] text-gray-600 '>
               <p className=''>Bạn chưa có tài khoản?</p>
@@ -150,7 +148,6 @@ function LoginScreen() {
           </form>
         </Form>)
       }
- 
     </div>
   );
 }
