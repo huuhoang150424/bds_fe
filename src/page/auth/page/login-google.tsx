@@ -24,7 +24,6 @@ export default function LoginGoogle() {
     try {
       const res: any = await signInWithPopup(auth, provider);
       if (res) {
-        console.log(res.user.photoURL);
         const data = {
           displayName: res.user.displayName,
           email: res.user.email,
