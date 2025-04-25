@@ -41,7 +41,6 @@ export function NewsTable() {
 
   const { data: dataNew, isLoading } = useGetAllNewsAdmin(page, 10);
 
-  console.log(dataNew?.data);
 
   const table = useReactTable({
     data: dataNew?.data?.data,
