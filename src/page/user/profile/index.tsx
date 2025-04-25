@@ -15,8 +15,9 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaCheckCircle } from 'react-icons/fa';
-
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 export default function Profile() {
+  useScrollToTopOnMount();
   const [active, setActive] = useState(false);
   const [typePost, setTypePost] = useState('forSale');
   const [visible, setVisible] = useState(6);

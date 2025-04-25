@@ -21,7 +21,6 @@ import Share from './components/share';
 import Warning from './components/warning';
 import WishlistButton from './components/like';
 import InforBrokerPpost from './components/infor-broker-post';
-import { posts } from '../../../constant/constPostDetail';
 
 const Lightbox = lazy(() => import('react-image-lightbox'));
 const Chart = lazy(() => import('./components/line-chart'));
@@ -31,8 +30,10 @@ const PostCommentSection = lazy(() => import('./components/comment/post-comment-
 
 import 'react-image-lightbox/style.css';
 import { StarRating } from './components/star-rating';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function PostDetail() {
+  useScrollToTopOnMount();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -53,9 +54,8 @@ function PostDetail() {
     changed_at: new Date(item?.changed_at).toLocaleDateString('vi-VN'),
   }));
 
-  console.log(data);
   return (
-    <div className='max-w-6xl h-full mx-auto pt-[80px] px-4 md:px-6 lg:px-8'>
+    <div className='max-w-6xl h-full mx-auto px-4 md:px-6 lg:px-8'>
       {isLoading ? (
         <Loading className='mx-auto mt-[250px] mb-[250px] ' />
       ) : (
@@ -70,7 +70,7 @@ function PostDetail() {
               <StarRating commentsSectionId='comments' postId={data?.id} />
             </div>
             <div className='image relative mt-[30px]'>
-              <div className='w-full'>
+              <div className='w-full relative'>
                 <Carousel options={OPTIONS} className='relative' isAutoPlay={false}>
                   <SliderContainer className='gap-2'>
                     {data?.images.map((src: { image_url: string }, index: number) => (
@@ -82,6 +82,7 @@ function PostDetail() {
                           setCurrentIndex(index);
                           setIsOpen(true);
                         }}
+                        countImg={data?.images?.length}
                       />
                     ))}
                   </SliderContainer>
@@ -110,7 +111,9 @@ function PostDetail() {
                     <Lightbox
                       mainSrc={data?.images[currentIndex]?.image_url}
                       nextSrc={data?.images[(currentIndex + 1) % data.images.length]?.image_url}
-                      prevSrc={data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url}
+                      prevSrc={
+                        data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url
+                      }
                       onCloseRequest={() => setIsOpen(false)}
                       onMovePrevRequest={() =>
                         setCurrentIndex((currentIndex + data?.images?.length - 1) % data?.images?.length)
@@ -119,6 +122,9 @@ function PostDetail() {
                     />
                   </Suspense>
                 )}
+                <div className='absolute top-[70%] right-2 bg-black/60 text-white text-sm px-2 py-1 rounded-md'>
+                  {data?.images?.length}
+                </div>
               </div>
             </div>
 
@@ -299,7 +305,7 @@ function PostDetail() {
               </div>
               <div className='flex flex-col gap-2 items-start'>
                 <span className='text-sm text-gray-500'>mã tin</span>
-                <span className='font-[500]'>{posts.id}</span>
+                <span className='font-[500]'></span>
               </div>
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
@@ -328,7 +334,6 @@ function PostDetail() {
                 <h3 className='font-semibold text-lg'>Bình luận</h3>
                 <AuthGuard actionType='comment'>
                   <PostCommentSection postId={postId} />
-
                 </AuthGuard>
               </div>
             </div>

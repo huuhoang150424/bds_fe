@@ -1,5 +1,3 @@
-'use client';
-
 import type React from 'react';
 
 import { useState } from 'react';
@@ -16,9 +14,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { MapPin, User, CreditCard, Award, CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function UserProfileEditable() {
-  // User data from the provided JSON
+  useScrollToTopOnMount();
   const [userData, setUserData] = useState({
     id: 'b10ba6ed-adf3-4519-aace-8208c72c4afa',
     createdAt: '2025-04-09T18:39:50.000Z',
@@ -45,8 +44,6 @@ export default function UserProfileEditable() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       alert('Thông tin đã được cập nhật thành công!');
@@ -56,14 +53,10 @@ export default function UserProfileEditable() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload the file to a server
-      // For now, we'll just create a local URL
       const url = URL.createObjectURL(file);
       setUserData({ ...userData, avatar: url });
     }
   };
-
-  // Format date for display
   const formattedCreatedAt = format(new Date(userData.createdAt), 'dd/MM/yyyy');
 
   return (

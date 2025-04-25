@@ -87,6 +87,7 @@
     "redux-persist": "^6.0.0",
     "sass": "^1.85.1",
     "shadcn": "^2.3.0",
+    "slugify": "^1.6.6",
     "socket.io-client": "^4.8.1",
     "sonner": "^2.0.1",
     "swiper": "^11.2.5",

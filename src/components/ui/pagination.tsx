@@ -57,7 +57,7 @@ const PaginationLink = ({
         variant: 'outline',
         size
       }),
-      `${isActive ? 'border-none text-white bg-primaryColor hover:bg-primaryColor hover:opacity-85 transition-all duration-300 ease-in-out  ' : ' shadow-none' } `,
+      `${isActive ? 'border-none text-white bg-red-500 hover:bg-primaryColor hover:opacity-85 transition-all duration-300 ease-in-out  ' : ' shadow-none' } `,
       className
     )}
     {...props}

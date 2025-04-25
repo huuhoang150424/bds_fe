@@ -5,7 +5,7 @@ import type { AppDispatch } from '@/redux/store';
 import { toast } from '@/hooks/use-toast';
 import BannerSearch from './components/banner-search';
 import { Loading } from '@/components/common';
-
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 const NewsSection = lazy(() => import('./components/news-sections'));
 const PropertyListings = lazy(() => import('./components/property-listing'));
 const BusinessCarousel = lazy(() => import('./components/business-carousel'));
@@ -61,6 +61,7 @@ const LazySection = ({
 };
 
 function Home() {
+  useScrollToTopOnMount();
   const message = useSelector(selectMessage);
   const success = useSelector(selectSuccess);
   const dispatch = useDispatch<AppDispatch>();

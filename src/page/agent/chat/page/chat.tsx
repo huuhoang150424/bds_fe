@@ -10,8 +10,13 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/authReducer';
 import { useSendMessage } from '../hooks/use-send-message';
 import { getTimeAgo } from '@/lib/get-time-ago';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+
+
+
 
 export default function Chat() {
+  useScrollToTopOnMount();
   const user = useSelector(selectUser);
   const [message, setMessage] = useState('');
   const [activeReceiverId, setActiveReceiverId] = useState('');

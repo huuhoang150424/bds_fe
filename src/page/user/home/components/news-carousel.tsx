@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
-import { useState } from "react"
-import { getAllNews } from "../service/get-allnews";
 import { Loading } from "@/components/common";
 import { useGetAllNews } from "../hook/use-getall-news";
 import { Link } from "react-router-dom";

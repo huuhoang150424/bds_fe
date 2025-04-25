@@ -4,8 +4,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { useState } from "react";
 import DataTableDemo from "./components/tables";
+import useScrollToTopOnMount from "@/hooks/use-scroll-top";
 
 export default function Post() {
+  useScrollToTopOnMount();
   const [sizePage, setSizePage] = useState(6);
   return (
     <div className=" ">

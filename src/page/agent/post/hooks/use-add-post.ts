@@ -1,29 +1,30 @@
-import { useMutation } from "@tanstack/react-query";
-import { addPost } from "../services/add-post";
-import { useToast } from "@/hooks/use-toast"; // Assuming you use a toast library
-import { useQueryClient } from "@tanstack/react-query"; // For query invalidation
+// In your use-add-post.ts
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addPost as addPostService } from "../services/add-post";
+import { toast } from "@/hooks/use-toast";
 
-export const useAddPost = () => {
-  const { toast } = useToast();
+export const useAddPost = (resetForm: any) => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (data: FormData) => addPost(data), // Explicitly type the input as FormData
+    mutationFn: ({ type, data }: { type: string, data: FormData }) => 
+      addPostService(type, data),
     onSuccess: (data) => {
-      console.log("Bài đăng đã được tạo thành công:", data);
       toast({
         title: "Thành công",
-        description: "Bài đăng đã được tạo thành công!",
-        variant: "default",
+        description: data?.message,
+        variant: "success",
       });
-      // Invalidate relevant queries (e.g., list of posts) to refresh data
-      queryClient.invalidateQueries({ queryKey: ["posts"] }); // Adjust queryKey as needed
+      queryClient.invalidateQueries({
+        queryKey: ['myPosts'],
+      });
+      window.scrollTo(0,0);
+      resetForm();
     },
-    onError: (error: Error) => {
-      console.error("Lỗi khi tạo bài đăng:", error);
+    onError: (error: any) => {
+      console.log(error);
       toast({
         title: "Lỗi",
-        description: `Có lỗi khi tạo bài đăng: ${error.message || "Lỗi không xác định"}`,
+        description: `${error?.response?.data?.message || "Lỗi không xác định"}`,
         variant: "destructive",
       });
     },

@@ -1,4 +1,3 @@
-'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -22,9 +21,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { useGetAllUser } from './hooks/use-get-all-user';
 
 export default function UserManagement() {
+  useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState('');
   const [isLocked, setIsLocked] = useState(false); // State to track lock status
 
