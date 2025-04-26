@@ -3,7 +3,7 @@ import { AdminLayout } from "@/components/layout";
 import DashBroad from "@/page/admin/dasbroad";
 import Post from '@/page/admin/post';
 import UserManagement from '@/page/admin/user';
-import ReportManagement from '@/page/admin/reports';
+import ReportManagement from '@/page/admin/reports/page/report';
 import NewsManagement from '@/page/admin/news/page/list-news';
 import CreateNews from '@/page/admin/news/page/creat-news';
 import ListPricing from '@/page/admin/pricing/page/list-pricing';
