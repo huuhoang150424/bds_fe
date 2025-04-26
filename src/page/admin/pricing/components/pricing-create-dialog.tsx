@@ -42,12 +42,10 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
     expiredDay: 30,
   });
 
-  // Tính giá đã chiết khấu
   const calculateDiscountedPrice = (price: number, discountPercent: number) => {
     return price - (price * discountPercent) / 100;
   };
 
-  // Định dạng tiền tệ
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',

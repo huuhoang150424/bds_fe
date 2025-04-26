@@ -27,10 +27,10 @@ const Header: React.FC = () =>{
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 flex justify-between w-full px-[25px] py-[12px] bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b ">
+    <header className="sticky top-0 flex justify-between w-full px-[25px] py-[12px] bg-white border-gray-200 z-[999] border-l dark:border-gray-800 dark:bg-gray-900 lg:border-b ">
       <Button
         variant={ 'outline' }
-        className=" px-[12px] py-[19px] text-gray-500 border-gray-200 rounded-lg z-99999 dark:bg-gray-900 dark:border-gray-800 lg:flex dark:text-gray-400 "
+        className=" px-[12px] py-[19px] text-gray-500 border-gray-200 rounded-lg  z-[9999999] dark:bg-gray-900 dark:border-gray-800 lg:flex dark:text-gray-400 "
         onClick={ handleToggle }
       >
         <AiOutlineUnorderedList size={ 28 } />
