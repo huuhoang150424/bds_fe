@@ -10,7 +10,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ChevronDown, Filter } from 'lucide-react';
+import { ChevronDown, Filter, Trash2, Edit } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -23,88 +24,46 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { columns, Gender, Roles, type User } from './colums';
+import { ListingTypeCreateDialog } from './listing-type-create-dialog';
+import { ListingTypes, type ListingType, columns } from './column';
 import { Pagination } from '@/components/user/pagination';
 
-export const userData: User[] = [
+export const listingTypeData: ListingType[] = [
   {
-    id: 'u001',
-    fullname: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    emailVerified: true,
-    isLock: false,
-    phone: '0912345678',
-    isProfessional: false,
-    active: true,
-    lastActive: '2023-10-15T10:30:00Z',
-    address: '123 Đường Lê Lợi, Quận 1, TP.HCM',
-    gender: Gender.Male,
-    dateOfBirth: '1990-05-15T00:00:00Z',
-    avatar: '/placeholder.svg?height=40&width=40',
-    coverPhoto: '/placeholder.svg?height=200&width=800',
-    balance: 0,
-    roles: Roles.User,
-    score: 120,
-    selfIntroduction: null,
-    certificates: null,
-    experienceYears: null,
-    expertise: null,
-    createdAt: '2023-01-15T10:30:00Z',
+    id: 'lt001',
+    listingType: ListingTypes.APARTMENT,
+    slug: 'can-ho',
+    createdAt: '2023-10-15T10:30:00Z',
     updatedAt: '2023-10-15T10:30:00Z',
+    propertyCount: 245,
   },
   {
-    id: 'u002',
-    fullname: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    emailVerified: true,
-    isLock: false,
-    phone: '0923456789',
-    isProfessional: true,
-    active: true,
-    lastActive: '2023-10-14T14:15:00Z',
-    address: '456 Đường Nguyễn Huệ, Quận 1, TP.HCM',
-    gender: Gender.Female,
-    dateOfBirth: '1988-08-20T00:00:00Z',
-    avatar: '/placeholder.svg?height=40&width=40',
-    coverPhoto: '/placeholder.svg?height=200&width=800',
-    balance: 500000,
-    roles: Roles.Agent,
-    score: 450,
-    selfIntroduction: 'Chuyên viên môi giới bất động sản với hơn 5 năm kinh nghiệm',
-    certificates: 'Chứng chỉ môi giới bất động sản',
-    experienceYears: '5',
-    expertise: ['Căn hộ', 'Nhà phố', 'Biệt thự'],
-    createdAt: '2023-02-10T09:45:00Z',
+    id: 'lt002',
+    listingType: ListingTypes.HOUSE,
+    slug: 'nha-o',
+    createdAt: '2023-10-14T14:15:00Z',
     updatedAt: '2023-10-14T14:15:00Z',
+    propertyCount: 378,
+  },
+  {
+    id: 'lt003',
+    listingType: ListingTypes.CONDO,
+    slug: 'chung-cu',
+    createdAt: '2023-10-13T09:45:00Z',
+    updatedAt: '2023-10-13T09:45:00Z',
+    propertyCount: 156,
   },
 ];
 
-export function UserTable() {
+export function ListingTypeTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<User[]>([...userData]);
-
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [lockDialogOpen, setLockDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleDelete = async () => {};
-  const handleToggleLock = async () => {};
+  const [data, setData] = useState<ListingType[]>([...listingTypeData]);
+  const handleListingTypeCreated = (newListingType: ListingType) => {
+    setData((prev) => [newListingType, ...prev]);
+  };
 
   const table = useReactTable({
     data,
@@ -130,53 +89,47 @@ export function UserTable() {
       <div className='flex items-center justify-between py-3'>
         <div className='flex items-center gap-2'>
           <Input
-            placeholder='Tìm kiếm theo tên...'
-            value={(table.getColumn('fullname')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('fullname')?.setFilterValue(event.target.value)}
-            className='max-w-sm outline-none px-[14px] py-[6px]  '
+            placeholder='Tìm kiếm theo slug...'
+            value={(table.getColumn('slug')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('slug')?.setFilterValue(event.target.value)}
+            className='max-w-sm h-8 text-xs outline-none px-[12px] py-[8px] '
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size='sm' className='h-8 text-xs'>
                 <Filter className='mr-1.5 h-3 w-3' />
-                Vai trò
+                Loại
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='text-xs'>
-              <DropdownMenuLabel className='text-xs'>Lọc theo vai trò</DropdownMenuLabel>
+              <DropdownMenuLabel className='text-xs'>Lọc theo loại</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {Object.values(Roles).map((role) => (
+              {Object.values(ListingTypes).map((type) => (
                 <DropdownMenuCheckboxItem
-                  key={role}
+                  key={type}
                   className='text-xs'
                   checked={
-                    table.getColumn('roles')?.getFilterValue() === role ||
-                    (Array.isArray(table.getColumn('roles')?.getFilterValue()) &&
-                      (table.getColumn('roles')?.getFilterValue() as string[])?.includes(role))
+                    table.getColumn('listingType')?.getFilterValue() === type ||
+                    (Array.isArray(table.getColumn('listingType')?.getFilterValue()) &&
+                      (table.getColumn('listingType')?.getFilterValue() as string[])?.includes(type))
                   }
                   onCheckedChange={(checked) => {
-                    const filterValues = (table.getColumn('roles')?.getFilterValue() as string[]) || [];
+                    const filterValues = (table.getColumn('listingType')?.getFilterValue() as string[]) || [];
                     if (checked) {
-                      table.getColumn('roles')?.setFilterValue([...filterValues, role]);
+                      table.getColumn('listingType')?.setFilterValue([...filterValues, type]);
                     } else {
-                      table.getColumn('roles')?.setFilterValue(filterValues.filter((val) => val !== role));
+                      table.getColumn('listingType')?.setFilterValue(filterValues.filter((val) => val !== type));
                     }
                   }}
                 >
-                  {role === Roles.Admin
-                    ? 'Quản trị viên'
-                    : role === Roles.Agent
-                      ? 'Môi giới'
-                      : role === Roles.Moderator
-                        ? 'Điều hành viên'
-                        : 'Người dùng'}
+                  {type}
                 </DropdownMenuCheckboxItem>
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className='text-xs'
                 onClick={() => {
-                  table.getColumn('roles')?.setFilterValue(null);
+                  table.getColumn('listingType')?.setFilterValue(null);
                 }}
               >
                 Xóa bộ lọc
@@ -185,6 +138,8 @@ export function UserTable() {
           </DropdownMenu>
         </div>
         <div className='flex items-center gap-2'>
+          <ListingTypeCreateDialog onListingTypeCreated={handleListingTypeCreated} />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size='sm' className='h-8 text-xs'>
@@ -203,23 +158,19 @@ export function UserTable() {
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
-                      {column.id === 'fullname'
-                        ? 'Họ tên'
-                        : column.id === 'phone'
-                          ? 'Số điện thoại'
-                          : column.id === 'roles'
-                            ? 'Vai trò'
-                            : column.id === 'status'
-                              ? 'Trạng thái'
-                              : column.id === 'isProfessional'
-                                ? 'Chuyên nghiệp'
-                                : column.id === 'score'
-                                  ? 'Điểm'
-                                  : column.id === 'createdAt'
-                                    ? 'Ngày tạo'
-                                    : column.id === 'actions'
-                                      ? 'Hành động'
-                                      : column.id}
+                      {column.id === 'listingType'
+                        ? 'Loại danh sách'
+                        : column.id === 'slug'
+                          ? 'Slug'
+                          : column.id === 'propertyCount'
+                            ? 'Số lượng BĐS'
+                            : column.id === 'createdAt'
+                              ? 'Ngày tạo'
+                              : column.id === 'updatedAt'
+                                ? 'Cập nhật'
+                                : column.id === 'actions'
+                                  ? 'Hành động'
+                                  : column.id}
                     </DropdownMenuCheckboxItem>
                   );
                 })}
