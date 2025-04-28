@@ -340,7 +340,7 @@ function PostDetail() {
           </div>
           <div className='col-span-12 lg:col-span-3 ml-[15px]'>
             <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
-              <InforBrokerPpost user={data?.user} />
+              <InforBrokerPpost user={data?.user} postId={postId} />
             </div>
           </div>
         </div>
