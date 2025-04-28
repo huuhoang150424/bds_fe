@@ -22,7 +22,7 @@ interface PaymentModalProps {
   plan: any;
 }
 
-export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProps) {
+export default function PaymentDigLog({ isOpen, onClose, plan }: PaymentModalProps) {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);

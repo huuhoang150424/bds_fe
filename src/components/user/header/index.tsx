@@ -26,9 +26,10 @@ import { toSlug } from '@/lib/slug';
 import { BarChart3, FileText, Package, Briefcase, Wallet, Settings, LogOut, ChevronRight,} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
+import PaymentDigLog from './components/payment-modal';
 
 function Header() {
+  const [isModalOpenPayment, setIsModalOpenPayment] = useState(false);
   const navigate = useNavigate();
   const { openModal } = useAuthModal();
   const dispatch = useDispatch<AppDispatch>();
@@ -119,7 +120,7 @@ function Header() {
       id: 'nap-tien',
       label: 'Nạp tiền',
       icon: <Wallet className='w-5 h-5' />,
-      onClick: () => console.log(' Nạp tiền'),
+      onClick: () => setIsModalOpenPayment(true),
     },
     {
       id: 'quan-tri',
@@ -449,6 +450,13 @@ function Header() {
           </SheetContent>
         </Sheet>
       </div>
+
+      <PaymentDigLog
+        open={isModalOpenPayment}
+        onOpenChange={() => setIsModalOpenPayment(false)}
+      />
+
+
     </header>
   );
 }
