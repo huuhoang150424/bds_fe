@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Ckeditor from '@/page/agent/post/components/CKEditor';
 import { formSchema, type FormCreateNews } from '../schema/create-news';
+import { useCreateNews } from '../hooks/use-create-news';
 
 const CategoryNew = {
   POLITICS: 'Chính trị',
@@ -24,7 +25,6 @@ const CategoryNew = {
 };
 
 export default function NewsForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,40 +34,51 @@ export default function NewsForm() {
     defaultValues: {
       title: '',
       content: '',
-      origin: '',
+      origin_post: '',
       category: undefined,
       readingtime: 0,
       image: null,
     },
   });
 
-  async function onSubmit(values: FormCreateNews) {
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append('title', values.title);
-      formData.append('content', values.content);
-      formData.append('origin', values.origin);
-      formData.append('category', values.category || '');
-      formData.append('readingtime', String(calculateReadingTime(values.content)));
-      
-      if (values.image) {
-        formData.append('image', values.image);
-      }
-      
-      
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  const resetForm = () => {
+    form.reset();
+    setImagePreview(null);
+  };
+
+  const createNewsMutation = useCreateNews(resetForm);
+  const isSubmitting = createNewsMutation.isPending;
 
   const calculateReadingTime = (content: string) => {
     const wordsPerMinute = 200;
     const words = content.trim().split(/\s+/).length;
     return Math.ceil(words / wordsPerMinute);
   };
+
+  async function onSubmit(values: FormCreateNews) {
+    try {
+      const formData = new FormData();
+      formData.append('title', values.title);
+      formData.append('content', values.content);
+      formData.append('origin_post', values.origin_post);
+      formData.append('category', values.category || '');
+      
+      // Calculate and add reading time
+      const readingTime = calculateReadingTime(values.content);
+      formData.append('readingtime', String(readingTime));
+      form.setValue('readingtime', readingTime);
+      
+      if (values.image) {
+        formData.append('image', values.image);
+      }
+      
+      // Call mutation to send data to API
+      createNewsMutation.mutate({ data: formData });
+      
+    } catch (error) {
+      console.error('Error preparing form data:', error);
+    }
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -83,7 +94,7 @@ export default function NewsForm() {
     setIsDragging(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0]; // Just take the first file
+      const file = e.dataTransfer.files[0]; 
       handleFileSelected(file);
     }
   };
@@ -95,6 +106,12 @@ export default function NewsForm() {
       setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleContentChange = (newContent: string) => {
+    form.setValue('content', newContent);
+    const readingTime = calculateReadingTime(newContent);
+    form.setValue('readingtime', readingTime);
   };
 
   return (
@@ -137,7 +154,7 @@ export default function NewsForm() {
                       <SelectContent>
                         {Object.entries(CategoryNew).map(([key, value]) => (
                           <SelectItem key={key} value={value} className="text-xs">
-                            {key.charAt(0) + key.slice(1).toLowerCase().replace('_', ' ')}
+                            {value}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -246,7 +263,7 @@ export default function NewsForm() {
 
             <FormField
               control={form.control}
-              name="origin"
+              name="origin_post"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-[14px] text-gray-700 font-[500]">Link gốc bài viết</FormLabel>
@@ -270,7 +287,12 @@ export default function NewsForm() {
                 <FormItem>
                   <FormLabel className="text-[14px] text-gray-700 font-[500]">Nội dung bài viết</FormLabel>
                   <FormControl>
-                    <Ckeditor value={field.value || ''} onChange={field.onChange} />
+                    <Ckeditor 
+                      value={field.value || ''} 
+                      onChange={(value) => {
+                        handleContentChange(value);
+                      }} 
+                    />
                   </FormControl>
                   <div className="flex items-center justify-between mt-1.5">
                     <FormDescription className="text-[11px]">Viết mô tả bài viết dành cho bạn.</FormDescription>
@@ -284,10 +306,23 @@ export default function NewsForm() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="readingtime"
+              render={({ field }) => (
+                <input type="hidden" {...field} value={field.value} />
+              )}
+            />
+
             <Separator className="bg-red-100" />
 
             <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" className="text-xs">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="text-xs"
+                onClick={resetForm}
+              >
                 Hủy
               </Button>
               <Button
@@ -297,7 +332,7 @@ export default function NewsForm() {
                 className="bg-red-500 hover:bg-red-600 transition-all duration-300 ease-in-out text-xs text-white"
               >
                 {isSubmitting && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
-                {isSubmitting ? 'Loading...' : 'Tạo mới'}
+                {isSubmitting ? 'Đang xử lý...' : 'Tạo mới'}
               </Button>
             </div>
           </form>

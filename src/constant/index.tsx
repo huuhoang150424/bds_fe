@@ -52,11 +52,14 @@ export const navItems: NavItem[] = [
   {
     icon: <MdNotificationsNone size={22} />,
     name: 'Quản lý thông báo',
-    subItems: [{ name: 'Danh sách thông báo', path: '/admin/notifications', pro: false }],
+    subItems: [{ name: 'Danh sách thông báo', path: '/admin/notification', pro: false }],
   },
   {
     icon: <MdImage size={22} />,
     name: 'Banner',
-    subItems: [{ name: 'Danh sách banner', path: '/admin/banner', pro: false }],
+    subItems: [
+      { name: 'Danh sách banner', path: '/admin/banner', pro: false },
+      { name: 'Tạo mới banner', path: '/admin/create-banner', pro: false }
+    ],
   },
 ];

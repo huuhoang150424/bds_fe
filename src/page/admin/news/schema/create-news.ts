@@ -7,7 +7,7 @@ export const formSchema = z.object({
   content: z.string().min(50, {
     message: 'Content must be at least 50 characters.',
   }),
-  origin: z.string().min(10, {
+  origin_post: z.string().min(10, {
     message: 'Origin post must be at least 10 characters.',
   }),
   category: z.string().min(6, {

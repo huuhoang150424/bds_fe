@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addPost as addPostService } from "../services/add-post";
 import { toast } from "@/hooks/use-toast";
+import { createNews } from "../service/create-news";
 
-export const useAddPost = (resetForm: any) => {
+export const useCreateNews = (resetForm: any) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ type, data }: { type: string, data: FormData }) => 
-      addPostService(type, data),
+    mutationFn: ({ data }: {data: FormData }) => 
+      createNews( data),
     onSuccess: (data) => {
       toast({
         title: "Thành công",
@@ -14,7 +14,7 @@ export const useAddPost = (resetForm: any) => {
         variant: "success",
       });
       queryClient.invalidateQueries({
-        queryKey: ['myPosts'],
+        queryKey: ['newsAdmin'],
       });
       window.scrollTo(0,0);
       resetForm();
