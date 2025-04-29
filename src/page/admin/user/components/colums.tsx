@@ -1,46 +1,15 @@
-import { useRef, useState } from 'react';
+import {  useState } from 'react';
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+  type ColumnDef
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, Filter, Trash2, Lock, Unlock, Eye, UserCog } from 'lucide-react';
+import { ArrowUpDown, Filter, Trash2, Lock, Unlock, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import LockUser from './lock-user';
 import DeleteUser from './delete-user';
 export enum Roles {
@@ -186,7 +155,7 @@ export const columns: ColumnDef<User>[] = [
           </Badge>
           {!isLock && (
             <Badge className={`text-[10px] ${active ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-              {active ? 'Đang hoạt động' : 'Không hoạt động'}
+              {active ? 'Online' : 'Offline'}
             </Badge>
           )}
         </div>

@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { NotificationDeleteDialog } from './delete-notification';
 
@@ -13,52 +12,8 @@ export type Notification = {
   message: string;
   isRead: boolean;
   createdAt: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-  };
 };
 
-export const notificationData: Notification[] = [
-  {
-    id: 'n001',
-    message: 'Your account has been verified successfully.',
-    isRead: true,
-    createdAt: '2023-10-15T10:30:00Z',
-    user: {
-      id: 'u1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-  },
-  {
-    id: 'n002',
-    message: "New comment on your post: 'Getting Started with React'",
-    isRead: false,
-    createdAt: '2023-10-14T14:15:00Z',
-    user: {
-      id: 'u2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-  },
-  {
-    id: 'n003',
-    message: 'Your subscription will expire in 3 days. Renew now to avoid service interruption.',
-    isRead: false,
-    createdAt: '2023-10-13T09:45:00Z',
-    user: {
-      id: 'u3',
-      name: 'Robert Johnson',
-      email: 'robert.johnson@example.com',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-  },
-];
 
 export const columns: ColumnDef<Notification>[] = [
   {
@@ -100,25 +55,6 @@ export const columns: ColumnDef<Notification>[] = [
       const message = row.getValue('message') as string;
       const isRead = row.original.isRead;
       return <div className={`font-medium text-xs max-w-[300px] ${isRead ? '' : 'font-semibold'}`}>{message}</div>;
-    },
-  },
-  {
-    accessorKey: 'user',
-    header: 'Người dùng',
-    cell: ({ row }) => {
-      const user = row.original.user;
-      return (
-        <div className='flex items-center gap-1.5'>
-          <Avatar className='h-5 w-5'>
-            <AvatarImage src={user.avatar || '/placeholder.svg'} alt={user.name} />
-            <AvatarFallback className='text-[10px] bg-red-100 text-red-500'>{user.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <span className='text-xs block'>{user.name}</span>
-            <span className='text-[10px] text-muted-foreground'>{user.email}</span>
-          </div>
-        </div>
-      );
     },
   },
   {

@@ -31,6 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Pagination } from '@/components/user/pagination';
+import { useGetAllBanners } from '../hooks/use-getbanners';
 
 export type Banner = {
   banner_id: string;
@@ -68,25 +69,7 @@ export const data: Banner[] = [
     },
     created_at: '2023-05-15T10:30:00Z',
     updated_at: '2023-05-15T10:30:00Z',
-  },
-  {
-    banner_id: 'b002',
-    title: 'New Collection Launch',
-    thumb_url:
-      'https://images2.thanhnien.vn/zoom/686_429/528068263637045248/2025/3/6/1-phu-long-17412487262271808788930-0-85-1010-1701-crop-17412487681591454151366.jpeg',
-    target_url: 'https://example.com/new-collection',
-    display_order: 2,
-    is_active: true,
-    start_date: '2023-07-15T00:00:00Z',
-    end_date: '2023-09-15T23:59:59Z',
-    created_by: {
-      user_id: 2,
-      name: 'Jane Smith',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-    created_at: '2023-07-01T14:15:00Z',
-    updated_at: '2023-07-02T09:20:00Z',
-  },
+  }
 ];
 
 export const columns: ColumnDef<Banner>[] = [
@@ -329,7 +312,16 @@ export function BannerTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+    const [page, setPage] = useState(1);
+    const limit = 10;
 
+
+  const {data:allBanner,isLoading}=useGetAllBanners(page,limit);
+  console.log(allBanner)
+
+  const handleChangePage = (page: number) => {
+    setPage(page);
+  };
   const table = useReactTable({
     data,
     columns,
@@ -469,7 +461,7 @@ export function BannerTable() {
         </div>
         <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
           <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 bất động sản</div>
-          <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} className='mt-0' />
+          <Pagination currentPage={1} totalPages={100} onPageChange={handleChangePage} className='mt-0' />
         </div>
       </div>
     </div>

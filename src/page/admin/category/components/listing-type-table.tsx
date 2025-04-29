@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ChevronDown, Filter, Trash2, Edit } from 'lucide-react';
+import { ChevronDown, Filter } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,47 +26,24 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ListingTypeCreateDialog } from './listing-type-create-dialog';
 import { ListingTypes, type ListingType, columns } from './column';
-import { Pagination } from '@/components/user/pagination';
+import { useGetListType } from '@/page/agent/post/hooks/use-get-list-type';
+import { Loading } from '@/components/common';
 
-export const listingTypeData: ListingType[] = [
-  {
-    id: 'lt001',
-    listingType: ListingTypes.APARTMENT,
-    slug: 'can-ho',
-    createdAt: '2023-10-15T10:30:00Z',
-    updatedAt: '2023-10-15T10:30:00Z',
-    propertyCount: 245,
-  },
-  {
-    id: 'lt002',
-    listingType: ListingTypes.HOUSE,
-    slug: 'nha-o',
-    createdAt: '2023-10-14T14:15:00Z',
-    updatedAt: '2023-10-14T14:15:00Z',
-    propertyCount: 378,
-  },
-  {
-    id: 'lt003',
-    listingType: ListingTypes.CONDO,
-    slug: 'chung-cu',
-    createdAt: '2023-10-13T09:45:00Z',
-    updatedAt: '2023-10-13T09:45:00Z',
-    propertyCount: 156,
-  },
-];
 
 export function ListingTypeTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<ListingType[]>([...listingTypeData]);
   const handleListingTypeCreated = (newListingType: ListingType) => {
-    setData((prev) => [newListingType, ...prev]);
+
   };
+  const {data:allListingType, isLoading} = useGetListType();
+  const tableData = allListingType || [];
+  
 
   const table = useReactTable({
-    data,
+    data: tableData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -179,50 +156,55 @@ export function ListingTypeTable() {
         </div>
       </div>
       <div className='rounded-md border border-red-100'>
-        <div className='relative max-h-[500px] overflow-auto'>
-          <Table>
-            <TableHeader className='bg-red-50/50'>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className='py-2 text-xs'>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        {isLoading ? (
+          <Loading className='mt-[200px] '/>
+        ) : (
+          <>
+            <div className='relative max-h-[500px] overflow-auto'>
+              <Table>
+                <TableHeader className='bg-red-50/50'>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
+                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && 'selected'}
+                        className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id} className='py-2 text-xs'>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
+                        Không có dữ liệu.
                       </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
-                    Không có dữ liệu.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
-          <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 bài đăng hệ thống</div>
-          <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} className='mt-0' />
-        </div>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+              <div className='text-xs text-gray-500'>Hiển thị danh mục hệ thống</div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

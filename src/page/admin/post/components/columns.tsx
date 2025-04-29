@@ -242,7 +242,7 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
       <DeletePost post={post} open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen} />
 
       {!post.verified && <ApprovePost post={post} open={isApproveModalOpen} onOpenChange={setIsApproveModalOpen} />}
-      <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} />
+      {/* <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} /> */}
     </>
   );
 }

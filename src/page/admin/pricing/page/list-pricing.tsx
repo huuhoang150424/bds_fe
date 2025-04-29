@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
-import { pricingData, PricingTable } from '../components/pricing-table';
 import PricingCard from '../components/pricing-card';
 import { PricingLevel } from '../components/column';
+import { useGetPricings } from '../hooks/use-get-pricings';
+import { PricingTable } from '../components/pricing-table';
 
 export default function ListPricing() {
   useScrollToTopOnMount();
-  const [packages, setPackages] = useState([...pricingData]);
-
-  const handleDelete = (id: string) => {
-    setPackages((prev) => prev.filter((pkg) => pkg.id !== id));
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  const { data, isLoading } = useGetPricings(page, limit);
+  const handleChangePage = (page: number) => {
+    setPage(page);
   };
+  const handleDelete = (id: string) => {};
 
   return (
     <div className=''>
@@ -39,20 +42,20 @@ export default function ListPricing() {
           </TabsList>
         </div>
         <TabsContent value='tables' className='space-y-5'>
-          <PricingTable />
+          <PricingTable data={data} isLoading={isLoading} handleChangePage={handleChangePage} />
         </TabsContent>
         <TabsContent value='card' className='space-y-5 '>
           <div className='grid gap-5 grid-cols-4 mt-4'>
-            {packages.map((pkg) => (
+            {data?.data?.data?.map((pkg: any) => (
               <PricingCard
-                key={pkg.id}
+                key={pkg?.id}
                 pricing={pkg}
-                onDelete={() => handleDelete(pkg.id)}
-                featured={pkg.name === PricingLevel.PREMIUM}
+                onDelete={() => handleDelete(pkg?.id)}
+                featured={pkg?.name === PricingLevel.PREMIUM}
               />
             ))}
           </div>
-          {packages.length === 0 && (
+          {data?.data?.data?.length === 0 && (
             <div className='text-center py-10 text-muted-foreground text-xs'>No pricing packages found.</div>
           )}
         </TabsContent>

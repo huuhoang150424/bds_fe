@@ -3,14 +3,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import NotificationCard from '../components/notification-card';
 import { NotificationTable } from '../components/notification-table';
-import { notificationData } from '../components/column';
+import { useGetNotification } from '../hooks/use-get-notification';
 
 export default function ListNotification() {
   useScrollToTopOnMount();
-  const [notifications, setNotifications] = useState([...notificationData]);
+  const [page,setPage]=useState(1);
+  const limit=10;
+  const {data,isLoading}=useGetNotification(page,limit);
+  const handleChangePage=(page:number)=>{
+    setPage(page);
+  }
   const handleDelete = (id: string) => {
   };
-
 
   return (
     <div className=''>
@@ -32,11 +36,15 @@ export default function ListNotification() {
           </TabsList>
         </div>
         <TabsContent value='tables'>
-          <NotificationTable />
+          <NotificationTable 
+            data={data}
+            isLoading={isLoading}
+            handleChangePage={handleChangePage}
+          />
         </TabsContent>
         <TabsContent value='unread' className='space-y-5'>
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4'>
-            {notifications.map((notification) => (
+            {data?.data?.data?.map((notification:any) => (
               <NotificationCard
                 key={notification.id}
                 notification={notification}
@@ -44,7 +52,7 @@ export default function ListNotification() {
               />
             ))}
           </div>
-          {notifications.length === 0 && (
+          {data?.data?.data?.length === 0 && (
             <div className='text-center py-10 text-muted-foreground text-xs'>No notifications found.</div>
           )}
         </TabsContent>

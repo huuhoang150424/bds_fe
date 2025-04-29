@@ -1,8 +1,8 @@
 import { handleApi } from "@/service";
 
-export const getAllPost = async (page: number, limit: number) => {
+export const getAllBanner = async (page: number, limit: number) => {
   try {
-    const response = await handleApi('/post/getAllPosts', null, 'GET', {
+    const response = await handleApi('/banner/getAllBanners', null, 'GET', {
       page,
       limit,
     });

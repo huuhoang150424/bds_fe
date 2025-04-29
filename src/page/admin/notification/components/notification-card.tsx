@@ -59,18 +59,6 @@ export default function NotificationCard({ notification, className, onDelete }: 
     >
       <CardContent className='p-3 border-gray-200 hover:border-gray-200 '>
         <div className='flex items-center justify-between mb-2'>
-          <div className='flex items-center space-x-1.5'>
-            <Avatar className='h-8 w-8'>
-              <AvatarImage src={notification.user.avatar || '/placeholder.svg'} alt={notification.user.name} />
-              <AvatarFallback className='text-[11px]'>{notification.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className='text-[13px]  font-medium'>{notification.user.name}</p>
-              <p className='text-[11px] text-muted-foreground'>
-                {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-              </p>
-            </div>
-          </div>
           <div className='flex items-center gap-1'>
             <Badge
               className={`text-[11px] ${
