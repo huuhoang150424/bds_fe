@@ -44,8 +44,10 @@ export function PricingTable({
 
   const handlePricingCreated = (newPricing: Pricing) => {};
 
+  const allPricing=data?.data?.data || [];
+
   const table = useReactTable({
-    data: data?.data?.data,
+    data: allPricing,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
