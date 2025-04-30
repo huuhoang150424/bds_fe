@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ListingTypeCreateDialog } from './listing-type-create-dialog';
-import { ListingTypes, type ListingType, columns } from './column';
+import { ListingTypeCreateDialog } from './listing-type-create';
+import { ListingTypes, columns } from './column';
 import { useGetListType } from '@/page/agent/post/hooks/use-get-list-type';
 import { Loading } from '@/components/common';
 
@@ -35,9 +35,6 @@ export function ListingTypeTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const handleListingTypeCreated = (newListingType: ListingType) => {
-
-  };
   const {data:allListingType, isLoading} = useGetListType();
   const tableData = allListingType || [];
   
@@ -115,7 +112,7 @@ export function ListingTypeTable() {
           </DropdownMenu>
         </div>
         <div className='flex items-center gap-2'>
-          <ListingTypeCreateDialog onListingTypeCreated={handleListingTypeCreated} />
+          <ListingTypeCreateDialog />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
