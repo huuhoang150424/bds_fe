@@ -1,49 +1,68 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from "@/components/ui/button";
-import { type Notification } from "./column";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { useDeleteNotification } from '../hooks/use-delete-notification';
 
 interface NotificationDeleteDialogProps {
-  notification: Notification | null;
+  notificationId: string | '';
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (id: string) => void;
 }
 
-export function NotificationDeleteDialog({
-  notification,
-  open,
-  onOpenChange,
-  onConfirm,
-}: NotificationDeleteDialogProps) {
-  if (!notification) return null;
+export function NotificationDeleteDialog({ notificationId, open, onOpenChange }: NotificationDeleteDialogProps) {
+  const { mutate: deleteNotification, isPending } = useDeleteNotification();
+
+  if (!notificationId) return null;
+
+  const handleDelete = () => {
+    deleteNotification(notificationId, {
+      onSuccess: () => {
+        onOpenChange(false); 
+      },
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px]">
+      <DialogContent className='max-w-[400px]'>
         <DialogHeader>
-          <DialogTitle className="text-[15px] text-gray-700">Xác nhận xóa thông báo</DialogTitle>
-          <DialogDescription className="text-[14px] text-gray-700">
-            Bạn có chắc chắn muốn xóa thông báo này? Hành động này không thể hoàn tác.
+          <DialogTitle className='text-[15px] text-gray-700'>Xác nhận xóa thông báo</DialogTitle>
+          <DialogDescription className='text-[14px] text-gray-700'>
+            Bạn có chắc chắn muốn xóa thông báo. Hành động này không thể hoàn tác.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button asChild>
-            <Button
-              variant={'outline'}
-              className="text-xs h-8 bg-white hover:bg-white text-gray-700"
-            >
-              Hủy
-            </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            className='text-xs h-8 bg-white hover:bg-gray-100 text-gray-700'
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+          >
+            Hủy
           </Button>
-          <Button asChild>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="text-xs h-8 bg-red-500 hover:bg-red-600"
-              onClick={() => onConfirm(notification.id)}
-            >
-              Xóa
-            </Button>
+          <Button
+            variant='destructive'
+            size='sm'
+            className='text-xs h-8 bg-red-500 hover:bg-red-600'
+            onClick={handleDelete}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <>
+                <Loader2 className='mr-1.5 h-3 w-3 animate-spin' />
+                Đang xóa...
+              </>
+            ) : (
+              'Xóa'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

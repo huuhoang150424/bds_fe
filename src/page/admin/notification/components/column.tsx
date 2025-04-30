@@ -105,9 +105,6 @@ export default function DeleteAction({ row, table }: { row: any; table: any }) {
   const notification = row.original;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const handleDeleteConfirm = (id: string) => {
-    setIsDeleteDialogOpen(false);
-  };
 
   return (
     <>
@@ -134,10 +131,9 @@ export default function DeleteAction({ row, table }: { row: any; table: any }) {
         </Button>
       </div>
       <NotificationDeleteDialog
-        notification={notification}
+        notificationId={notification.id}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={handleDeleteConfirm}
       />
     </>
   );

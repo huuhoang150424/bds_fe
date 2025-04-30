@@ -4,7 +4,7 @@ import { getAllNotification } from "../service/get-notification";
 
 export const useGetNotification = (page: number, limit: number) => {
   return useQuery({
-    queryKey: ["allPricing", page, limit],
+    queryKey: ["allNotifications", page, limit],
     queryFn: () => getAllNotification(page, limit),
   });
 };
