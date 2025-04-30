@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -33,21 +33,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
-// These should match your backend enums
-enum ProcessingStatus {
-  PENDING = 'CHỜ_XỬ_LÝ',
-  IN_PROGRESS = 'ĐANG_XỬ_LÝ',
-  RESOLVED = 'ĐÃ_GIẢI_QUYẾT',
-  REJECTED = 'ĐÃ_TỪ_CHỐI',
-}
-
-// Severity levels for admin classification
-enum Severity {
-  EMERGENCY = 'KHẨN_CẤP',
-  IMPORTANT = 'QUAN_TRỌNG',
-  FEEDBACK = 'GÓP_Ý',
-}
+import { getSeverityBadge, getStatusBadge, ProcessingStatus, SeverityStatus } from './reports-list';
 
 type Report = {
   id: string;
@@ -65,7 +51,7 @@ type Report = {
   post: {
     id: string;
     title: string;
-    content: string;
+    description: string;
     userId: string;
   } | null;
   severity: string;
@@ -83,68 +69,12 @@ interface ReportDetailProps {
 
 export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailProps) {
   const [adminNotes, setAdminNotes] = useState(report.adminNotes || '');
-  const [selectedSeverity, setSelectedSeverity] = useState(report.severity);
+  const [selectedSeverity, setSelectedSeverity] = useState(report.severity || '');
   const [activeTab, setActiveTab] = useState('details');
   const formattedReason = report.reason
     .split('_')
     .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
     .join(' ');
-
-  const getSeverityBadge = (severity: string) => {
-    switch (severity) {
-      case Severity.EMERGENCY:
-        return (
-          <Badge variant='outline' className='bg-red-100 text-red-800'>
-            🔴 Khẩn cấp
-          </Badge>
-        );
-      case Severity.IMPORTANT:
-        return (
-          <Badge variant='outline' className='bg-yellow-100 text-yellow-800'>
-            🟡 Quan trọng
-          </Badge>
-        );
-      case Severity.FEEDBACK:
-        return (
-          <Badge variant='outline' className='bg-blue-100 text-blue-800'>
-            🔵 Góp ý
-          </Badge>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case ProcessingStatus.PENDING:
-        return (
-          <Badge variant='outline' className='bg-gray-100'>
-            Chờ xử lý
-          </Badge>
-        );
-      case ProcessingStatus.IN_PROGRESS:
-        return (
-          <Badge variant='outline' className='bg-blue-100 text-blue-800'>
-            Đang xử lý
-          </Badge>
-        );
-      case ProcessingStatus.RESOLVED:
-        return (
-          <Badge variant='outline' className='bg-green-100 text-green-800'>
-            Đã giải quyết
-          </Badge>
-        );
-      case ProcessingStatus.REJECTED:
-        return (
-          <Badge variant='outline' className='bg-red-100 text-red-800'>
-            Đã từ chối
-          </Badge>
-        );
-      default:
-        return null;
-    }
-  };
 
   const handleSaveNotes = () => {
     console.log(`Lưu ghi chú cho báo cáo ${report.id}: ${adminNotes}`);
@@ -158,6 +88,10 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
   const handleTakeAction = (action: string, details: any) => {
     console.log(`Thực hiện hành động ${action} trên báo cáo ${report.id}:`, details);
   };
+
+  useEffect(()=>{
+    setSelectedSeverity(report.severity || '');
+  },[report])
 
   return (
     <Card className='border border-gray-200 rounded-[8px] '>
@@ -181,9 +115,24 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
       <CardContent>
         <Tabs defaultValue='details' value={activeTab} onValueChange={setActiveTab}>
           <TabsList className='grid w-full grid-cols-3 border border-gray-200 bg-transparent rounded-[8px] '>
-            <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value='details'>Chi tiết</TabsTrigger>
-            <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value='content'>Nội dung báo cáo</TabsTrigger>
-            <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value='actions'>Thực hiện hành động</TabsTrigger>
+            <TabsTrigger
+              className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+              value='details'
+            >
+              Chi tiết
+            </TabsTrigger>
+            <TabsTrigger
+              className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+              value='content'
+            >
+              Nội dung báo cáo
+            </TabsTrigger>
+            <TabsTrigger
+              className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+              value='actions'
+            >
+              Thực hiện hành động
+            </TabsTrigger>
           </TabsList>
 
           {/* Details Tab */}
@@ -219,19 +168,39 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                       <SelectValue placeholder='Chọn mức độ' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={Severity.EMERGENCY}>
+                      <SelectItem value={SeverityStatus.Urgent}>
                         <div className='flex items-center'>
                           <span className='mr-2'>🔴</span> Khẩn cấp
                         </div>
                       </SelectItem>
-                      <SelectItem value={Severity.IMPORTANT}>
+                      <SelectItem value={SeverityStatus.Important}>
                         <div className='flex items-center'>
                           <span className='mr-2'>🟡</span> Quan trọng
                         </div>
                       </SelectItem>
-                      <SelectItem value={Severity.FEEDBACK}>
+                      <SelectItem value={SeverityStatus.Feedback}>
                         <div className='flex items-center'>
                           <span className='mr-2'>🔵</span> Góp ý
+                        </div>
+                      </SelectItem>
+                      <SelectItem value={SeverityStatus.Suggestion}>
+                        <div className='flex items-center'>
+                          <span className='mr-2'>🟢</span> Đề xuất
+                        </div>
+                      </SelectItem>
+                      <SelectItem value={SeverityStatus.Bug}>
+                        <div className='flex items-center'>
+                          <span className='mr-2'>🪲</span> Lỗi hệ thống
+                        </div>
+                      </SelectItem>
+                      <SelectItem value={SeverityStatus.Inappropriate}>
+                        <div className='flex items-center'>
+                          <span className='mr-2'>⚠️</span> Nội dung không phù hợp
+                        </div>
+                      </SelectItem>
+                      <SelectItem value={SeverityStatus.AIFlagged}>
+                        <div className='flex items-center'>
+                          <span className='mr-2'>🤖</span> AI phát hiện
                         </div>
                       </SelectItem>
                     </SelectContent>
@@ -247,7 +216,11 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                   onChange={(e) => setAdminNotes(e.target.value)}
                   className='min-h-[100px]'
                 />
-                <Button variant={'outline'} onClick={handleSaveNotes} className='w-full bg-red-500 hover:bg-red-600 text-white' >
+                <Button
+                  variant={'outline'}
+                  onClick={handleSaveNotes}
+                  className='w-full bg-red-500 hover:bg-red-600 text-white'
+                >
                   Lưu ghi chú
                 </Button>
               </div>
@@ -270,7 +243,7 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                 <div className='grid gap-2'>
                   <h3 className='font-[500] text-gray-700 '>Nội dung bài viết</h3>
                   <div className='rounded-md border p-4 bg-slate-50'>
-                    <p className='text-[14px]  whitespace-pre-wrap'>{report.post.content}</p>
+                    <p className='text-[14px]  whitespace-pre-wrap'>{report.post.description}</p>
                   </div>
                 </div>
               </div>
@@ -289,7 +262,7 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
               <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
                 {report.post && (
                   <>
-                    <Dialog >
+                    <Dialog>
                       <DialogTrigger asChild>
                         <Button variant='outline' className='w-full'>
                           <Trash2 className='mr-2 h-4 w-4' />
@@ -350,7 +323,11 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                           <DialogClose asChild>
                             <Button variant='outline'>Hủy</Button>
                           </DialogClose>
-                          <Button variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white' onClick={() => handleTakeAction('requestEdit', { postId: report.post?.id })}>
+                          <Button
+                            variant={'outline'}
+                            className='bg-red-500 hover:bg-red-600 text-white'
+                            onClick={() => handleTakeAction('requestEdit', { postId: report.post?.id })}
+                          >
                             Gửi yêu cầu
                           </Button>
                         </DialogFooter>
@@ -386,7 +363,11 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                           <DialogClose asChild>
                             <Button variant='outline'>Hủy</Button>
                           </DialogClose>
-                          <Button variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white' onClick={() => handleTakeAction('lockPost', { postId: report.post?.id })}>
+                          <Button
+                            variant={'outline'}
+                            className='bg-red-500 hover:bg-red-600 text-white'
+                            onClick={() => handleTakeAction('lockPost', { postId: report.post?.id })}
+                          >
                             Khóa bài viết
                           </Button>
                         </DialogFooter>
@@ -417,7 +398,11 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                       <DialogClose asChild>
                         <Button variant='outline'>Hủy</Button>
                       </DialogClose>
-                      <Button variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white' onClick={() => handleTakeAction('warnUser', { userId: report.post?.userId })}>
+                      <Button
+                        variant={'outline'}
+                        className='bg-red-500 hover:bg-red-600 text-white'
+                        onClick={() => handleTakeAction('warnUser', { userId: report.post?.userId })}
+                      >
                         Gửi cảnh báo
                       </Button>
                     </DialogFooter>
@@ -499,7 +484,7 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                         className='bg-red-500 hover:bg-red-600 text-white'
                         onClick={() => {
                           handleTakeAction('resolveReport', { reportId: report.id });
-                          onStatusChange(report.id, ProcessingStatus.RESOLVED);
+                          onStatusChange(report.id, ProcessingStatus.Resolved);
                         }}
                       >
                         Đánh dấu đã giải quyết
@@ -534,7 +519,7 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                         className='bg-red-500 hover:bg-red-600 text-white'
                         onClick={() => {
                           handleTakeAction('dismissReport', { reportId: report.id });
-                          onStatusChange(report.id, ProcessingStatus.REJECTED);
+                          onStatusChange(report.id, ProcessingStatus.Rejected);
                         }}
                       >
                         Bỏ qua báo cáo
@@ -553,20 +538,20 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
           Đóng
         </Button>
 
-        {report.status === ProcessingStatus.PENDING && (
-          <Button onClick={() => onStatusChange(report.id, ProcessingStatus.IN_PROGRESS)}>
+        {report.status === ProcessingStatus.Pending && (
+          <Button onClick={() => onStatusChange(report.id, ProcessingStatus.Reviewing)}>
             <Clock className='mr-2 h-4 w-4' />
             Đánh dấu đang xử lý
           </Button>
         )}
 
-        {report.status === ProcessingStatus.IN_PROGRESS && (
+        {report.status === ProcessingStatus.Reviewing && (
           <Dialog>
             <DialogTrigger asChild>
               <Button variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white'>
-                <div className="flex items-center gap-[8px] ">
+                <div className='flex items-center gap-[8px] '>
                   <Send className='mr-2 h-4 w-4' />
-                  <span className="">Gửi thông báo</span>
+                  <span className=''>Gửi thông báo</span>
                 </div>
               </Button>
             </DialogTrigger>
@@ -592,7 +577,11 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
                 <DialogClose asChild>
                   <Button variant='outline'>Hủy</Button>
                 </DialogClose>
-                <Button variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white' onClick={() => handleTakeAction('sendNotification', { reportId: report.id })}>
+                <Button
+                  variant={'outline'}
+                  className='bg-red-500 hover:bg-red-600 text-white'
+                  onClick={() => handleTakeAction('sendNotification', { reportId: report.id })}
+                >
                   Gửi thông báo
                 </Button>
               </DialogFooter>

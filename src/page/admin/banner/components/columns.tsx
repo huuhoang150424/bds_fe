@@ -1,10 +1,8 @@
-
 import {
   type ColumnDef
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal, ExternalLink, Calendar, Eye, EyeOff } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, MoreHorizontal, ExternalLink, Calendar, Eye, EyeOff, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -18,6 +16,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useState } from 'react';
+import BannerDelete from './banner-delete';
+import BannerEditDialog from './banner-edit';
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -225,31 +226,81 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const banner = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-6 w-6 p-0 hover:bg-red-50'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-3 w-3' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end' className='text-xs'>
-            <DropdownMenuLabel className='text-xs'>Actions</DropdownMenuLabel>
-            <DropdownMenuItem className='text-xs cursor-pointer'>Edit</DropdownMenuItem>
-            <DropdownMenuItem className='text-xs cursor-pointer'>View</DropdownMenuItem>
-            <DropdownMenuItem className='text-xs cursor-pointer'>
-              {banner.isActive ? 'Deactivate' : 'Activate'}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className='text-xs cursor-pointer'>Duplicate</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className='text-xs text-red-500 cursor-pointer'>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ActionsCell row={row} />
   },
 ];
+
+function ActionsCell({ row }: { row: any }) {
+  const banner = row.original;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant='ghost' className='h-6 w-6 p-0 hover:bg-red-50'>
+            <span className='sr-only'>Open menu</span>
+            <MoreHorizontal className='h-3 w-3' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='text-xs'>
+          <DropdownMenuLabel className='text-xs'>Hành động</DropdownMenuLabel>
+          <DropdownMenuItem
+            className='text-xs cursor-pointer'
+            onSelect={(e) => {
+              e.preventDefault();
+              setIsDropdownOpen(false);
+              setEditDialogOpen(true); 
+            }}
+          >
+            <Edit className='h-3 w-3 mr-2' />
+            Sửa
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className='text-xs cursor-pointer'
+            onSelect={(e) => {
+              e.preventDefault();
+              setIsDropdownOpen(false);
+            }}
+          >
+            {banner.isActive ? (
+              <>
+                <EyeOff className='h-3 w-3 mr-2' />
+                Hủy kích hoạt
+              </>
+            ) : (
+              <>
+                <Eye className='h-3 w-3 mr-2' />
+                Kích hoạt
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className='text-xs text-red-500 cursor-pointer'
+            onSelect={(e) => {
+              e.preventDefault();
+              setIsDropdownOpen(false);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <Trash2 className='h-3 w-3 mr-2' />
+            Xóa
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <BannerDelete
+        selectedBanner={banner}
+        deleteDialogOpen={deleteDialogOpen}
+        setDeleteDialogOpen={setDeleteDialogOpen}
+      />
+      <BannerEditDialog
+        banner={banner}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+    </>
+  );
+}

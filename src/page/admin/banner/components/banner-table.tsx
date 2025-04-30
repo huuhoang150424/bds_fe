@@ -47,6 +47,8 @@ export function BannerTable() {
   const totalPages = allBanner?.data?.totalPages || 1;
   const currentPage = allBanner?.data?.currentPage || 1;
 
+  console.log(allBanner)
+
   const handleChangePage = (newPage: number) => {
     if (newPage === page) return; 
     setPage(newPage);
