@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PricingCreateDialog } from './pricing-create-dialog';
+import { PricingCreateDialog } from './pricing-create';
 import { PricingLevel, type Pricing, columns } from './column';
 import { Pagination } from '@/components/user/pagination';
 import { Loading } from '@/components/common';

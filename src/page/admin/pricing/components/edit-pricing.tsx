@@ -1,7 +1,6 @@
 import type React from 'react';
-import { useState } from 'react';
-import { Plus, Loader2, DollarSign, Percent, Calendar, Tag } from 'lucide-react';
-
+import { useState, useEffect } from 'react';
+import { Edit, Loader2, DollarSign, Percent, Calendar, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,27 +19,57 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import { z } from 'zod';
+import { PricingFormData, PricingSchema } from '../schema/create-pricing';
 import { PricingLevel } from './column';
+import { useEditPricing } from '../hooks/use-edit-pricings';
+import { toast } from '@/hooks/use-toast';
 
-interface PricingCreateDialogProps {
+interface PricingEditDialogProps {
+  pricing: any;
   trigger?: React.ReactNode;
-  onPricingCreated?: (pricing: any) => void;
+  onPricingUpdated?: (pricing: any) => void;
 }
 
-export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreateDialogProps) {
+export function PricingEditDialog({ pricing, trigger, onPricingUpdated }: PricingEditDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pricingData, setPricingData] = useState({
-    name: PricingLevel.BASIC,
-    description: '',
-    price: 9.99,
-    discountPercent: 0,
-    displayDay: 10,
-    hasReport: false,
-    maxPost: 10,
-    boostDays: 1,
-    expiredDay: 30,
+  const [error, setError] = useState<string | null>(null);
+  const editMutation = useEditPricing();
+  const [nameType, setNameType] = useState<string>(
+    Object.values(PricingLevel).includes(pricing.name) ? pricing.name : 'CUSTOM',
+  );
+  const [customName, setCustomName] = useState(Object.values(PricingLevel).includes(pricing.name) ? '' : pricing.name);
+
+  const [pricingData, setPricingData] = useState<PricingFormData>({
+    name: pricing.name,
+    description: pricing.description,
+    price: pricing.price,
+    discountPercent: pricing.discountPercent || 0,
+    displayDay: pricing.displayDay,
+    hasReport: pricing.hasReport || false,
+    maxPost: pricing.maxPost || 0,
+    boostDays: pricing.boostDays || 0,
+    expiredDay: pricing.expiredDay,
+    isActive: pricing.isActive ?? true,
   });
+
+  useEffect(() => {
+    setPricingData({
+      name: pricing.name,
+      description: pricing.description,
+      price: pricing.price,
+      discountPercent: pricing.discountPercent || 0,
+      displayDay: pricing.displayDay,
+      hasReport: pricing.hasReport || false,
+      maxPost: pricing.maxPost || 0,
+      boostDays: pricing.boostDays || 0,
+      expiredDay: pricing.expiredDay,
+      isActive: pricing.isActive ?? true,
+    });
+    setNameType(Object.values(PricingLevel).includes(pricing.name) ? pricing.name : 'CUSTOM');
+    setCustomName(Object.values(PricingLevel).includes(pricing.name) ? '' : pricing.name);
+  }, [pricing]);
 
   const calculateDiscountedPrice = (price: number, discountPercent: number) => {
     return price - (price * discountPercent) / 100;
@@ -54,43 +83,102 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
     }).format(amount);
   };
 
-  const handleSubmit = async () => {};
+  const handleNameChange = (value: string) => {
+    setNameType(value);
+    if (value !== 'CUSTOM') {
+      setPricingData({ ...pricingData, name: value });
+      setCustomName('');
+    } else {
+      setPricingData({ ...pricingData, name: customName || '' });
+    }
+  };
+
+  const handleCustomNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setCustomName(newName);
+    if (nameType === 'CUSTOM') {
+      setPricingData({ ...pricingData, name: newName });
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      const validatedData = PricingSchema.parse(pricingData);
+      console.log('Submitting pricing data:', validatedData); 
+
+      await editMutation.mutateAsync(
+        { id: pricing.id, pricingData: validatedData },
+        {
+          onSuccess: (updatedPricing) => {
+            toast({ variant: 'success', title: 'Cập nhật gói thành viên thành công' });
+            setOpen(false);
+            if (onPricingUpdated) {
+              onPricingUpdated(updatedPricing);
+            }
+          },
+          onError: (err: any) => {
+            setError(err.message || 'Không thể cập nhật gói giá');
+          },
+        },
+      );
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+      } else {
+        setError('Đã xảy ra lỗi không mong muốn');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isFormValid =
+    pricingData.name &&
+    pricingData.description.trim() !== '' &&
+    pricingData.price >= 0 &&
+    pricingData.displayDay >= 1 &&
+    pricingData.expiredDay >= 1;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button size='sm' variant={'outline'} className='bg-red-500 hover:bg-red-600 text-white'>
-            <Plus className='mr-1.5 h-3 w-3' />
-            Tạo Gói
+          <Button size='sm' variant={'outline'} className='bg-blue-500 hover:bg-blue-600 text-white'>
+            <Edit className='mr-1.5 h-3 w-3' />
+            Cập nhật Gói
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className='sm:max-w-lg border-red-100 overflow-hidden max-h-[90vh] p-0'>
+      <DialogContent className='sm:max-w-lg border-blue-100 overflow-hidden max-h-[90vh] p-0'>
         <div className='overflow-y-auto max-h-[calc(90vh-30px)] px-6 py-6'>
           <DialogHeader>
             <DialogTitle className='text-base flex items-center gap-2'>
-              <Tag className='h-4 w-4 text-red-500' />
-              Tạo Gói Giá
+              <Tag className='h-4 w-4 text-blue-500' />
+              Cập nhật Gói Giá
             </DialogTitle>
-            <DialogDescription className='text-[13px]'>
-              Tạo một gói giá mới với các tính năng và giá cả tùy chỉnh.
-            </DialogDescription>
+            <DialogDescription className='text-[13px]'>Chỉnh sửa thông tin gói giá hiện tại.</DialogDescription>
           </DialogHeader>
+          {error && (
+            <div className='mt-2 p-2 bg-red-100 rounded text-[12px] text-red-800'>
+              <strong>Lỗi:</strong> {error}
+            </div>
+          )}
           <div className='space-y-4 py-2'>
             <div className='grid grid-cols-2 gap-4'>
               <div className='space-y-2'>
                 <Label htmlFor='name' className='text-[13px] font-medium'>
-                  Cấp Gói <span className='text-red-500'>*</span>
+                  Tên Gói <span className='text-red-500'>*</span>
                 </Label>
-                <Select
-                  value={pricingData.name}
-                  onValueChange={(value: PricingLevel) => setPricingData({ ...pricingData, name: value })}
-                >
-                  <SelectTrigger id='name' className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px]  py-[6px] rounded-[8px]'>
-                    <SelectValue placeholder='Chọn cấp gói' />
+                <Select value={nameType} onValueChange={handleNameChange}>
+                  <SelectTrigger
+                    id='name'
+                    className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px] py-[6px] rounded-[8px]'
+                  >
+                    <SelectValue placeholder='Chọn tên gói' />
                   </SelectTrigger>
-                  <SelectContent className='z-[99999] '>
+                  <SelectContent className='z-[99999]'>
                     {Object.values(PricingLevel).map((level) => (
                       <SelectItem key={level} value={level} className='text-[13px]'>
                         <div className='flex items-center gap-2'>
@@ -113,8 +201,23 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                         </div>
                       </SelectItem>
                     ))}
+                    <SelectItem value='CUSTOM' className='text-[13px]'>
+                      <div className='flex items-center gap-2'>
+                        <Badge className='text-[10px] font-medium bg-yellow-100 text-yellow-700'>Tùy chỉnh</Badge>
+                        <span>Tùy chỉnh</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
+                {nameType === 'CUSTOM' && (
+                  <Input
+                    id='customName'
+                    placeholder='Nhập tên gói tùy chỉnh'
+                    className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px] py-[6px] rounded-[8px] mt-2'
+                    value={customName}
+                    onChange={handleCustomNameChange}
+                  />
+                )}
               </div>
               <div className='space-y-2'>
                 <Label htmlFor='price' className='text-[13px] font-medium'>
@@ -127,7 +230,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                     type='number'
                     step='0.01'
                     min='0'
-                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px]  py-[6px] rounded-[8px] '
+                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px] py-[6px] rounded-[8px]'
                     value={pricingData.price}
                     onChange={(e) => setPricingData({ ...pricingData, price: Number.parseFloat(e.target.value) || 0 })}
                   />
@@ -152,10 +255,11 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                   Phần Trăm Chiết Khấu
                 </Label>
                 <div className='flex items-center gap-2'>
-                  <Badge className='text-[10px] bg-red-100 text-red-700'>{pricingData.discountPercent}%</Badge>
+                  <Badge className='text-[10px] bg-blue-100 text-blue-700'>{pricingData.discountPercent}%</Badge>
                   {pricingData.discountPercent > 0 && (
                     <div className='text-[10px] text-muted-foreground'>
-                      Giá cuối: {formatCurrency(calculateDiscountedPrice(pricingData.price, pricingData.discountPercent))}
+                      Giá cuối:{' '}
+                      {formatCurrency(calculateDiscountedPrice(pricingData.price, pricingData.discountPercent))}
                     </div>
                   )}
                 </div>
@@ -177,7 +281,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                     min={0}
                     max={100}
                     step={1}
-                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px]  py-[6px] rounded-[8px]  w-20'
+                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px] py-[6px] rounded-[8px] w-20'
                     value={pricingData.discountPercent}
                     onChange={(e) =>
                       setPricingData({
@@ -189,7 +293,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                 </div>
               </div>
             </div>
-            <Separator className='my-2 bg-red-100' />
+            <Separator className='my-2 bg-blue-100' />
             <div className='grid grid-cols-2 gap-4'>
               <div className='space-y-2'>
                 <Label htmlFor='displayDay' className='text-[13px] font-medium'>
@@ -201,7 +305,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                     id='displayDay'
                     type='number'
                     min='1'
-                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px]  py-[6px] rounded-[8px] '
+                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px] py-[6px] rounded-[8px]'
                     value={pricingData.displayDay}
                     onChange={(e) =>
                       setPricingData({ ...pricingData, displayDay: Number.parseInt(e.target.value) || 0 })
@@ -220,7 +324,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                     id='expiredDay'
                     type='number'
                     min='1'
-                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px]  py-[6px] rounded-[8px] '
+                    className='text-[14px] text-gray-700 outline-none pl-[26px] pr-[10px] py-[6px] rounded-[8px]'
                     value={pricingData.expiredDay}
                     onChange={(e) =>
                       setPricingData({ ...pricingData, expiredDay: Number.parseInt(e.target.value) || 0 })
@@ -239,7 +343,7 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                   id='maxPost'
                   type='number'
                   min='0'
-                  className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px]  py-[6px] rounded-[8px]'
+                  className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px] py-[6px] rounded-[8px]'
                   value={pricingData.maxPost}
                   onChange={(e) => setPricingData({ ...pricingData, maxPost: Number.parseInt(e.target.value) || 0 })}
                 />
@@ -253,14 +357,14 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                   id='boostDays'
                   type='number'
                   min='0'
-                  className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px]  py-[6px] rounded-[8px]'
+                  className='text-[14px] text-gray-700 outline-none pl-[10px] pr-[10px] py-[6px] rounded-[8px]'
                   value={pricingData.boostDays}
                   onChange={(e) => setPricingData({ ...pricingData, boostDays: Number.parseInt(e.target.value) || 0 })}
                 />
                 <p className='text-[10px] text-muted-foreground'>Số ngày nội dung sẽ được tăng tốc</p>
               </div>
             </div>
-            <div className='flex items-center justify-between rounded-lg border border-red-100 p-3'>
+            <div className='flex items-center justify-between rounded-lg border border-blue-100 p-3'>
               <div className='space-y-0.5'>
                 <Label htmlFor='hasReport' className='text-[13px] font-medium'>
                   Bao Gồm Báo Cáo
@@ -271,7 +375,21 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
                 id='hasReport'
                 checked={pricingData.hasReport}
                 onCheckedChange={(checked) => setPricingData({ ...pricingData, hasReport: checked })}
-                className='data-[state=checked]:bg-red-500'
+                className='data-[state=checked]:bg-blue-500'
+              />
+            </div>
+            <div className='flex items-center justify-between rounded-lg border border-blue-100 p-3'>
+              <div className='space-y-0.5'>
+                <Label htmlFor='isActive' className='text-[13px] font-medium'>
+                  Kích Hoạt
+                </Label>
+                <p className='text-[10px] text-muted-foreground'>Kích hoạt gói giá</p>
+              </div>
+              <Switch
+                id='isActive'
+                checked={pricingData.isActive}
+                onCheckedChange={(checked) => setPricingData({ ...pricingData, isActive: checked })}
+                className='data-[state=checked]:bg-blue-500'
               />
             </div>
           </div>
@@ -290,19 +408,19 @@ export function PricingCreateDialog({ trigger, onPricingCreated }: PricingCreate
               type='button'
               size='sm'
               variant={'outline'}
-              className='bg-red-500 hover:bg-red-600 text-white'
+              className='bg-blue-500 hover:bg-blue-600 text-white'
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isFormValid}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className='mr-1.5 h-3 w-3 animate-spin' />
-                  Đang tạo...
+                  Đang cập nhật...
                 </>
               ) : (
                 <>
-                  <Plus className='mr-1.5 h-3 w-3' />
-                  Tạo Gói
+                  <Edit className='mr-1.5 h-3 w-3' />
+                  Cập nhật Gói
                 </>
               )}
             </Button>
