@@ -25,6 +25,8 @@ import FloatingBubbles from '../components/animations/floating-bubbles';
 import SakuraFall from '../components/animations/sakura-fall';
 import GentleFireflies from '../components/animations/gentle-fireflies';
 import RainEffect from '../components/animations/rain-effect';
+import NightSky from '../components/animations/night-sky';
+import DaySky from '../components/animations/day-sky';
 
 export default function Chat() {
   useScrollToTopOnMount();
@@ -146,6 +148,8 @@ export default function Chat() {
     { id: 'sakura', label: 'Hoa anh đào' },
     { id: 'fireflies', label: 'Đom đóm' },
     { id: 'rain', label: 'Mưa rơi' },
+    { id: 'night', label: 'Buổi tối' },
+    { id: 'day', label: 'Ánh nắng bình minh' },
   ];
 
   const getBackgroundColor = () => {
@@ -237,6 +241,8 @@ export default function Chat() {
                   {backgroundEffect === 'sakura' && <SakuraFall />}
                   {backgroundEffect === 'fireflies' && <GentleFireflies />}
                   {backgroundEffect === 'rain' && <RainEffect />}
+                  {backgroundEffect === 'night' && <NightSky />}
+                  {backgroundEffect === 'day' && <DaySky />}
                 </div>
               </div>
               <div className='relative z-10'>

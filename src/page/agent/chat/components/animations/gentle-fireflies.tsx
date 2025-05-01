@@ -45,30 +45,24 @@ export default function GentleFireflies() {
       angle: number;
       wingAngle: number;
       wingSpeed: number;
+      isGathering: boolean;
+      gatheringSpeed: number;
 
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        // Tăng kích thước đom đóm
-        this.bodyLength = Math.random() * 5 + 8; // Thân dài hơn
-        this.wingSize = Math.random() * 4 + 6; // Kích thước cánh lớn hơn
+        this.bodyLength = Math.random() * 5 + 8;
+        this.wingSize = Math.random() * 4 + 6;
 
-        // Màu thân đom đóm
-        this.color = 'hsl(40, 100%, 50%)'; // Màu vàng cam cho thân
+        this.color = 'hsl(40, 100%, 50%)';
 
-        // Màu phát sáng
-        const glowColors = [
-          'hsl(60, 100%, 75%)', // Yellow
-          'hsl(120, 100%, 75%)', // Green
-          'hsl(90, 100%, 75%)', // Yellow-green
-        ];
+        const glowColors = ['hsl(60, 100%, 75%)', 'hsl(120, 100%, 75%)', 'hsl(90, 100%, 75%)'];
         this.glowColor = glowColors[Math.floor(Math.random() * glowColors.length)];
 
-        // Very slow movement
+        // Slower initial movement for smoother effect
         this.speedX = 0;
         this.speedY = 0;
 
-        // Pulsing glow effect
         this.pulseSpeed = Math.random() * 0.05 + 0.01;
         this.pulseOffset = Math.random() * Math.PI * 2;
 
@@ -76,55 +70,91 @@ export default function GentleFireflies() {
         this.minOpacity = Math.random() * 0.1;
         this.opacity = this.maxOpacity;
 
-        // Target-based movement
         this.targetX = this.x;
         this.targetY = this.y;
         this.changeTargetCounter = 0;
 
-        // Angle for direction
         this.angle = Math.random() * Math.PI * 2;
 
-        // Wing animation
         this.wingAngle = 0;
         this.wingSpeed = Math.random() * 0.2 + 0.1;
+
+        // Gathering behavior
+        this.isGathering = false;
+        this.gatheringSpeed = Math.random() * 0.5 + 1.5; // Faster when gathering
       }
 
-      update(time: number) {
+      update(time: number, gatheringPoint: { x: number; y: number } | null) {
         // Pulse opacity for the glow
         this.opacity =
           this.minOpacity +
           ((Math.sin(time * this.pulseSpeed + this.pulseOffset) + 1) / 2) * (this.maxOpacity - this.minOpacity);
 
-        // Occasionally change target
-        this.changeTargetCounter++;
-        if (this.changeTargetCounter > Math.random() * 200 + 100) {
-          this.targetX = Math.random() * canvas.width;
-          this.targetY = Math.random() * canvas.height;
-          this.changeTargetCounter = 0;
-        }
+        // If in gathering mode, move toward gathering point
+        if (gatheringPoint && this.isGathering) {
+          const dx = gatheringPoint.x - this.x;
+          const dy = gatheringPoint.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Move slowly toward target
-        const dx = this.targetX - this.x;
-        const dy = this.targetY - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > 1) {
-          this.speedX = (dx / distance) * 0.2;
-          this.speedY = (dy / distance) * 0.2;
-          // Update angle based on movement direction
-          this.angle = Math.atan2(this.speedY, this.speedX);
+          if (distance > 5) {
+            // Move toward gathering point with easing
+            this.speedX = (dx / distance) * this.gatheringSpeed * 0.05;
+            this.speedY = (dy / distance) * this.gatheringSpeed * 0.05;
+            this.angle = Math.atan2(this.speedY, this.speedX);
+          } else {
+            // Slow down when close to gathering point
+            this.speedX *= 0.95;
+            this.speedY *= 0.95;
+          }
         } else {
-          this.speedX *= 0.95;
-          this.speedY *= 0.95;
+          // Normal wandering behavior
+          this.changeTargetCounter++;
+          if (this.changeTargetCounter > Math.random() * 200 + 100) {
+            this.targetX = Math.random() * canvas.width;
+            this.targetY = Math.random() * canvas.height;
+            this.changeTargetCounter = 0;
+          }
+
+          const dx = this.targetX - this.x;
+          const dy = this.targetY - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance > 1) {
+            // Smoother acceleration with easing
+            this.speedX += (dx / distance) * 0.01;
+            this.speedY += (dy / distance) * 0.01;
+
+            // Limit maximum speed for smoother movement
+            const currentSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+            if (currentSpeed > 0.5) {
+              this.speedX = (this.speedX / currentSpeed) * 0.5;
+              this.speedY = (this.speedY / currentSpeed) * 0.5;
+            }
+
+            // Update angle based on movement direction with smoothing
+            const targetAngle = Math.atan2(this.speedY, this.speedX);
+            const angleDiff = targetAngle - this.angle;
+
+            // Normalize angle difference to -PI to PI
+            let normalizedDiff = angleDiff;
+            while (normalizedDiff > Math.PI) normalizedDiff -= Math.PI * 2;
+            while (normalizedDiff < -Math.PI) normalizedDiff += Math.PI * 2;
+
+            // Smooth angle change
+            this.angle += normalizedDiff * 0.1;
+          } else {
+            this.speedX *= 0.98;
+            this.speedY *= 0.98;
+          }
+
+          // Add very slight random movement for natural feel
+          this.speedX += (Math.random() - 0.5) * 0.01;
+          this.speedY += (Math.random() - 0.5) * 0.01;
         }
 
-        // Add slight random movement
-        this.speedX += (Math.random() - 0.5) * 0.1;
-        this.speedY += (Math.random() - 0.5) * 0.1;
-
-        // Dampen speed
-        this.speedX *= 0.98;
-        this.speedY *= 0.98;
+        // Apply damping for smoother movement
+        this.speedX *= 0.95;
+        this.speedY *= 0.95;
 
         // Update position
         this.x += this.speedX;
@@ -133,11 +163,23 @@ export default function GentleFireflies() {
         // Update wing animation
         this.wingAngle += this.wingSpeed;
 
-        // Keep within bounds
-        if (this.x < 0) this.x = 0;
-        if (this.x > canvas.width) this.x = canvas.width;
-        if (this.y < 0) this.y = 0;
-        if (this.y > canvas.height) this.y = canvas.height;
+        // Keep within bounds with smooth bounce
+        if (this.x < 0) {
+          this.x = 0;
+          this.speedX *= -0.5;
+        }
+        if (this.x > canvas.width) {
+          this.x = canvas.width;
+          this.speedX *= -0.5;
+        }
+        if (this.y < 0) {
+          this.y = 0;
+          this.speedY *= -0.5;
+        }
+        if (this.y > canvas.height) {
+          this.y = canvas.height;
+          this.speedY *= -0.5;
+        }
       }
 
       draw() {
@@ -176,7 +218,7 @@ export default function GentleFireflies() {
         ctx!.beginPath();
         ctx!.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx!.save();
-        ctx!.rotate(Math.sin(this.wingAngle) * 0.3); // Wing flapping
+        ctx!.rotate(Math.sin(this.wingAngle) * 0.3);
         ctx!.ellipse(0, -this.bodyLength / 2, this.wingSize, this.wingSize / 2, 0, 0, Math.PI * 2);
         ctx!.fill();
         ctx!.restore();
@@ -184,7 +226,7 @@ export default function GentleFireflies() {
         // Bottom wing
         ctx!.beginPath();
         ctx!.save();
-        ctx!.rotate(Math.sin(this.wingAngle + Math.PI) * 0.3); // Opposite flapping
+        ctx!.rotate(Math.sin(this.wingAngle + Math.PI) * 0.3);
         ctx!.ellipse(0, this.bodyLength / 2, this.wingSize, this.wingSize / 2, 0, 0, Math.PI * 2);
         ctx!.fill();
         ctx!.restore();
@@ -199,23 +241,48 @@ export default function GentleFireflies() {
     }
 
     let time = 0;
+    let gatheringPoint: { x: number; y: number } | null = null;
+    let gatheringTimer = 0;
+    const gatheringInterval = 500; // Time between gatherings
+    const gatheringDuration = 300; // How long the gathering lasts
 
     const animate = () => {
-      // Xóa hoàn toàn canvas mỗi khung hình để không còn vết mờ
+      // Clear canvas
       ctx.fillStyle = '#0a1a0a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       time += 0.01;
+      gatheringTimer++;
 
+      // Manage gathering behavior
+      if (gatheringTimer === gatheringInterval) {
+        // Start gathering
+        gatheringPoint = {
+          x: Math.random() * canvas.width * 0.6 + canvas.width * 0.2,
+          y: Math.random() * canvas.height * 0.6 + canvas.height * 0.2,
+        };
+        fireflies.forEach((firefly) => {
+          firefly.isGathering = true;
+        });
+      } else if (gatheringTimer === gatheringInterval + gatheringDuration) {
+        // Stop gathering
+        fireflies.forEach((firefly) => {
+          firefly.isGathering = false;
+        });
+        gatheringPoint = null;
+        gatheringTimer = 0;
+      }
+
+      // Update and draw fireflies
       fireflies.forEach((firefly) => {
-        firefly.update(time);
+        firefly.update(time, gatheringPoint);
         firefly.draw();
       });
 
       requestAnimationFrame(animate);
     };
 
-    // Initial dark green background
+    // Initial background
     ctx.fillStyle = '#0a1a0a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 

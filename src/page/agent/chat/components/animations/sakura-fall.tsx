@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
+
 export default function SakuraFall() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -37,11 +38,12 @@ export default function SakuraFall() {
       wobbleAmount: number;
       wobbleOffset: number;
       opacity: number;
+      isGathering: boolean;
+      gatheringSpeed: number;
 
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        // Tăng kích thước hoa
         this.size = Math.random() * 12 + 8;
 
         // Sakura colors
@@ -68,14 +70,36 @@ export default function SakuraFall() {
         this.wobbleOffset = Math.random() * Math.PI * 2;
 
         this.opacity = Math.random() * 0.5 + 0.5;
+
+        // Gathering behavior
+        this.isGathering = false;
+        this.gatheringSpeed = Math.random() * 0.5 + 1.0;
       }
 
-      update(time: number) {
-        // Add wobble to movement
-        const wobbleX = Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
-        const wobbleY = Math.cos(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
-        this.x += this.speedX + wobbleX * 0.05;
-        this.y += this.speedY + wobbleY * 0.05;
+      update(time: number, gatheringPoint: { x: number; y: number } | null) {
+        // If in gathering mode, move toward gathering point
+        if (gatheringPoint && this.isGathering) {
+          const dx = gatheringPoint.x - this.x;
+          const dy = gatheringPoint.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance > 5) {
+            // Add wobble to movement
+            const wobbleX = Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+            const wobbleY = Math.cos(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+
+            // Move toward gathering point with easing
+            this.x += (dx / distance) * this.gatheringSpeed + wobbleX * 0.02;
+            this.y += (dy / distance) * this.gatheringSpeed + wobbleY * 0.02;
+          }
+        } else {
+          // Normal floating behavior
+          // Add wobble to movement
+          const wobbleX = Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+          const wobbleY = Math.cos(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+          this.x += this.speedX + wobbleX * 0.05;
+          this.y += this.speedY + wobbleY * 0.05;
+        }
 
         // Rotate the flower
         this.rotation += this.rotationSpeed;
@@ -130,16 +154,40 @@ export default function SakuraFall() {
     }
 
     let time = 0;
+    let gatheringPoint: { x: number; y: number } | null = null;
+    let gatheringTimer = 0;
+    const gatheringInterval = 700; // Time between gatherings
+    const gatheringDuration = 350; // How long the gathering lasts
 
     const animate = () => {
-      // Xóa hoàn toàn canvas mỗi khung hình để không còn vết mờ
+      // Clear canvas
       ctx.fillStyle = '#1a0a1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       time += 0.01;
+      gatheringTimer++;
+
+      // Manage gathering behavior
+      if (gatheringTimer === gatheringInterval) {
+        // Start gathering
+        gatheringPoint = {
+          x: Math.random() * canvas.width * 0.6 + canvas.width * 0.2,
+          y: Math.random() * canvas.height * 0.6 + canvas.height * 0.2,
+        };
+        flowers.forEach((flower) => {
+          flower.isGathering = true;
+        });
+      } else if (gatheringTimer === gatheringInterval + gatheringDuration) {
+        // Stop gathering
+        flowers.forEach((flower) => {
+          flower.isGathering = false;
+        });
+        gatheringPoint = null;
+        gatheringTimer = 0;
+      }
 
       flowers.forEach((flower) => {
-        flower.update(time);
+        flower.update(time, gatheringPoint);
         flower.draw();
       });
 

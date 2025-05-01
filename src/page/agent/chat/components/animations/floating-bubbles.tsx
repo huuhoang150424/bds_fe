@@ -34,38 +34,65 @@ export default function FloatingBubbles() {
       wobbleAmount: number;
       wobbleOffset: number;
       opacity: number;
+      rotation: number;
+      rotationSpeed: number;
+      isGathering: boolean;
+      gatheringSpeed: number;
 
       constructor() {
+        // Đặt vị trí ban đầu ngẫu nhiên trên màn hình (giống hoa anh đào)
         this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 100;
+        this.y = Math.random() * canvas.height;
 
         // Slow movement
-        this.speedX = (Math.random() * 0.4 - 0.2) * 0.5;
-        this.speedY = Math.random() * -0.5 - 0.2;
+        this.speedX = (Math.random() * 0.4 - 0.2) * 0.3;
+        this.speedY = (Math.random() * 0.4 - 0.2) * 0.3;
         this.opacity = Math.random() * 0.5 + 0.5;
 
         // Wobble effect parameters
         this.wobbleSpeed = Math.random() * 0.02 + 0.01;
         this.wobbleAmount = Math.random() * 2 + 1;
         this.wobbleOffset = Math.random() * Math.PI * 2;
+
+        // Rotation
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() * 0.02 - 0.01) * 0.3;
+
+        // Gathering behavior
+        this.isGathering = false;
+        this.gatheringSpeed = Math.random() * 0.5 + 1.0;
       }
 
-      update(time: number) {
-        // Add a gentle wobble to x position
-        const wobble = Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
-        this.x += this.speedX + wobble * 0.05;
-        this.y += this.speedY;
+      update(time: number, gatheringPoint: { x: number; y: number } | null) {
+        // Add a gentle wobble to movement
+        const wobbleX = Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+        const wobbleY = Math.cos(time * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
 
-        // Bounce off walls with damping
-        if (this.x < 0 || this.x > canvas.width) {
-          this.speedX *= -0.8;
+        // If in gathering mode, move toward gathering point
+        if (gatheringPoint && this.isGathering) {
+          const dx = gatheringPoint.x - this.x;
+          const dy = gatheringPoint.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance > 5) {
+            // Move toward gathering point with easing
+            this.x += (dx / distance) * this.gatheringSpeed + wobbleX * 0.02;
+            this.y += (dy / distance) * this.gatheringSpeed + wobbleY * 0.02;
+          }
+        } else {
+          // Normal floating behavior
+          this.x += this.speedX + wobbleX * 0.05;
+          this.y += this.speedY + wobbleY * 0.05;
         }
 
-        // Reset if off screen
-        if (this.y < -50) {
-          this.y = canvas.height + 50;
-          this.x = Math.random() * canvas.width;
-        }
+        // Rotate the object
+        this.rotation += this.rotationSpeed;
+
+        // Wrap around screen edges
+        if (this.x < -50) this.x = canvas.width + 50;
+        if (this.x > canvas.width + 50) this.x = -50;
+        if (this.y < -50) this.y = canvas.height + 50;
+        if (this.y > canvas.height + 50) this.y = -50;
       }
 
       draw() {
@@ -74,66 +101,57 @@ export default function FloatingBubbles() {
     }
 
     // Bubble class
-    class Bubble extends FloatingObject {
-      radius: number;
-      color: string;
+    // class Bubble extends FloatingObject {
+    //   radius: number
+    //   color: string
 
-      constructor() {
-        super();
-        this.radius = Math.random() * 30 + 5;
+    //   constructor() {
+    //     super()
+    //     this.radius = Math.random() * 30 + 5
 
-        // Beautiful ocean colors
-        const colors = [
-          'hsl(195, 100%, 75%)', // Light blue
-          'hsl(210, 100%, 80%)', // Sky blue
-          'hsl(180, 100%, 85%)', // Cyan
-          'hsl(240, 80%, 80%)', // Lavender
-          'hsl(220, 100%, 90%)', // Very light blue
-        ];
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-      }
+    //     // Beautiful ocean colors
+    //     const colors = [
+    //       "hsl(195, 100%, 75%)", // Light blue
+    //       "hsl(210, 100%, 80%)", // Sky blue
+    //       "hsl(180, 100%, 85%)", // Cyan
+    //       "hsl(240, 80%, 80%)", // Lavender
+    //       "hsl(220, 100%, 90%)", // Very light blue
+    //     ]
+    //     this.color = colors[Math.floor(Math.random() * colors.length)]
+    //   }
 
-      draw() {
-        ctx!.beginPath();
+    //   draw() {
+    //     ctx!.beginPath()
 
-        // Create gradient for bubble
-        const gradient = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+    //     // Create gradient for bubble
+    //     const gradient = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius)
 
-        gradient.addColorStop(0, this.color);
-        gradient.addColorStop(0.8, this.color.replace('hsl', 'hsla').replace(')', ', 0.5)'));
-        gradient.addColorStop(1, this.color.replace('hsl', 'hsla').replace(')', ', 0)'));
+    //     gradient.addColorStop(0, this.color)
+    //     gradient.addColorStop(0.8, this.color.replace("hsl", "hsla").replace(")", ", 0.5)"))
+    //     gradient.addColorStop(1, this.color.replace("hsl", "hsla").replace(")", ", 0)"))
 
-        ctx!.fillStyle = gradient;
-        ctx!.globalAlpha = this.opacity;
-        ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx!.fill();
+    //     ctx!.fillStyle = gradient
+    //     ctx!.globalAlpha = this.opacity
+    //     ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+    //     ctx!.fill()
 
-        // Highlight
-        ctx!.beginPath();
-        ctx!.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx!.arc(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.2, 0, Math.PI * 2);
-        ctx!.fill();
+    //     // Highlight
+    //     ctx!.beginPath()
+    //     ctx!.fillStyle = "rgba(255, 255, 255, 0.3)"
+    //     ctx!.arc(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.2, 0, Math.PI * 2)
+    //     ctx!.fill()
 
-        ctx!.globalAlpha = 1;
-      }
-    }
+    //     ctx!.globalAlpha = 1
+    //   }
+    // }
 
     // Soccer ball class
     class SoccerBall extends FloatingObject {
       radius: number;
-      rotation: number;
-      rotationSpeed: number;
 
       constructor() {
         super();
-        this.radius = Math.random() * 15 + 20; // Slightly larger than bubbles
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = Math.random() * 0.02 - 0.01;
-      }
-
-      update(time: number) {
-        super.update(time);
-        this.rotation += this.rotationSpeed;
+        this.radius = Math.random() * 15 + 20;
       }
 
       draw() {
@@ -180,19 +198,10 @@ export default function FloatingBubbles() {
     // Basketball class
     class BasketBall extends FloatingObject {
       radius: number;
-      rotation: number;
-      rotationSpeed: number;
 
       constructor() {
         super();
-        this.radius = Math.random() * 15 + 20; // Slightly larger than bubbles
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = Math.random() * 0.02 - 0.01;
-      }
-
-      update(time: number) {
-        super.update(time);
-        this.rotation += this.rotationSpeed;
+        this.radius = Math.random() * 15 + 20;
       }
 
       draw() {
@@ -239,32 +248,51 @@ export default function FloatingBubbles() {
     // Create a mix of objects
     const floatingObjects: FloatingObject[] = [];
 
-    // Add bubbles
-    for (let i = 0; i < 10; i++) {
-      floatingObjects.push(new Bubble());
-    }
-
     // Add soccer balls
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 8; i++) {
       floatingObjects.push(new SoccerBall());
     }
 
     // Add basketballs
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 8; i++) {
       floatingObjects.push(new BasketBall());
     }
 
     let time = 0;
+    let gatheringPoint: { x: number; y: number } | null = null;
+    let gatheringTimer = 0;
+    const gatheringInterval = 600; // Time between gatherings
+    const gatheringDuration = 300; // How long the gathering lasts
 
     const animate = () => {
-      // Xóa hoàn toàn canvas mỗi khung hình để không còn vết mờ
+      // Clear canvas
       ctx.fillStyle = '#062035';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       time += 0.01;
+      gatheringTimer++;
+
+      // Manage gathering behavior
+      if (gatheringTimer === gatheringInterval) {
+        // Start gathering
+        gatheringPoint = {
+          x: Math.random() * canvas.width * 0.6 + canvas.width * 0.2,
+          y: Math.random() * canvas.height * 0.6 + canvas.height * 0.2,
+        };
+        floatingObjects.forEach((obj) => {
+          obj.isGathering = true;
+        });
+      } else if (gatheringTimer === gatheringInterval + gatheringDuration) {
+        // Stop gathering
+        floatingObjects.forEach((obj) => {
+          obj.isGathering = false;
+        });
+        gatheringPoint = null;
+        gatheringTimer = 0;
+      }
 
       floatingObjects.forEach((object) => {
-        object.update(time);
+        object.update(time, gatheringPoint);
         object.draw();
       });
 
