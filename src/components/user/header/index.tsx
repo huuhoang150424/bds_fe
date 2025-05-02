@@ -14,7 +14,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { AppDispatch } from '@/redux/store';
 import { handleApi } from '@/service';
 import { toast } from '@/hooks/use-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Loading } from '../../common';
 import Wishlist from './components/wishlist';
 import CreatePostButton from './components/create-post';
@@ -140,6 +140,25 @@ function Header() {
     (item) => !item.adminOnly || (item.adminOnly && user?.roles === 'Admin')
   );
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const orderCode = searchParams.get('orderCode');
+    const status = searchParams.get('status');
+    const cancel = searchParams.get('cancel');
+
+    if (orderCode && (status === 'PAID' || cancel === 'true')) {
+      setIsModalOpenPayment(true);
+    }
+  }, [location]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setIsModalOpenPayment(false);
+      localStorage.removeItem('pendingPayment');
+    }
+  };
 
   return (
     <header
@@ -453,7 +472,7 @@ function Header() {
 
       <PaymentDigLog
         open={isModalOpenPayment}
-        onOpenChange={() => setIsModalOpenPayment(false)}
+        onOpenChange={handleOpenChange}
       />
 
 
