@@ -2,20 +2,18 @@ import {  useState } from 'react';
 import {
   type ColumnDef
 } from '@tanstack/react-table';
-import { ArrowUpDown, Filter, Trash2, Lock, Unlock, Eye } from 'lucide-react';
+import { ArrowUpDown, Lock, Unlock, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LockUser from './lock-user';
-import DeleteUser from './delete-user';
 export enum Roles {
-  Admin = 'ADMIN',
-  User = 'USER',
-  Agent = 'AGENT',
+  Admin = 'Admin',
+  User = 'User',
+  Agent = 'Agent',
   Moderator = 'MODERATOR',
 }
 
@@ -223,7 +221,6 @@ export const columns: ColumnDef<User>[] = [
 
 function ActionsCell({ row }: { row: any }) {
   const [lockDialogOpen, setLockDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const user = row.original;
 
   return (
@@ -242,19 +239,7 @@ function ActionsCell({ row }: { row: any }) {
         {user.isLock ? <Unlock className='h-3 w-3' /> : <Lock className='h-3 w-3' />}
         <span className='sr-only'>{user.isLock ? 'Mở khóa' : 'Khóa'}</span>
       </Button>
-      <Button
-        variant='ghost'
-        size='icon'
-        className='h-6 w-6 p-0 hover:bg-red-50 hover:text-red-500'
-        onClick={() => setDeleteDialogOpen(true)}
-        title='Xóa'
-      >
-        <Trash2 className='h-3 w-3' />
-        <span className='sr-only'>Xóa</span>
-      </Button>
-
       <LockUser selectedUser={user} lockDialogOpen={lockDialogOpen} setLockDialogOpen={setLockDialogOpen} />
-      <DeleteUser deleteDialogOpen={deleteDialogOpen} setDeleteDialogOpen={setDeleteDialogOpen} selectedUser={user} />
     </div>
   );
 }

@@ -102,7 +102,7 @@ export function UserTable() {
                     ? 'Quản trị viên'
                     : role === Roles.Agent
                       ? 'Môi giới'
-                      : role === Roles.Moderator
+                      : role === Roles.User
                         ? 'Điều hành viên'
                         : 'Người dùng'}
                 </DropdownMenuCheckboxItem>

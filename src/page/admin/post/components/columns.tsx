@@ -209,7 +209,7 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
               onSelect={(e) => {
                 e.preventDefault();
                 setIsDropdownOpen(false);
-                setViewPosts(true);
+                setIsApproveModalOpen(true);
               }}
             >
               <Shield className='mr-2 h-4 w-4' /> Duyệt bài đăng
@@ -239,10 +239,9 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DeletePost post={post} open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen} />
-
+      {isDeleteModalOpen && <DeletePost post={post} open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen} />}
       {!post.verified && <ApprovePost post={post} open={isApproveModalOpen} onOpenChange={setIsApproveModalOpen} />}
-      {/* <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} /> */}
+      {viewPosts &&  <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} />}
     </>
   );
 }

@@ -1,29 +1,29 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { useDeletePosts } from '../hooks/use-delete-posts';
-import type { Post } from './columns';
 
-interface DeletePostProps {
-  post: Post;
+interface ConfirmBatchDeleteDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  setOpen: (open: boolean) => void;
+  totalPosts: number;
+  postIds: string[];
+  resetSelection: () => void;
 }
 
-export function DeletePost({ post, open, onOpenChange }: DeletePostProps) {
+export default function ConfirmBatchDeleteDialog({
+  open,
+  setOpen,
+  totalPosts,
+  postIds,
+  resetSelection,
+}: ConfirmBatchDeleteDialogProps) {
   const [reason, setReason] = useState('');
   const { mutate: deletePosts, isPending: isProcessing } = useDeletePosts();
 
-  const handleDelete = () => {
+  const handleConfirm = () => {
     if (!reason.trim()) {
       toast({
         variant: 'destructive',
@@ -34,15 +34,16 @@ export function DeletePost({ post, open, onOpenChange }: DeletePostProps) {
     }
 
     deletePosts(
-      { postIds: [post.id], reason },
+      { postIds, reason },
       {
         onSuccess: (response) => {
           toast({
             variant: 'success',
-            title: response.message || 'Xóa bài đăng thành công',
+            title: response.message || `Xóa ${postIds.length} bài đăng thành công`,
           });
-          onOpenChange(false);
+          setOpen(false);
           setReason('');
+          resetSelection();
         },
         onError: (error: any) => {
           toast({
@@ -56,12 +57,12 @@ export function DeletePost({ post, open, onOpenChange }: DeletePostProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px]" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-[400px]">
         <DialogHeader>
           <DialogTitle className="text-[15px] text-gray-700">Xác nhận xóa bài đăng</DialogTitle>
           <DialogDescription className="text-[14px] text-gray-700">
-            Bạn có chắc chắn muốn xóa bài đăng "{post.title}"? Vui lòng nhập lý do xóa để thông báo đến người dùng.
+            Bạn có chắc muốn xóa {totalPosts} bài đăng đã chọn? Vui lòng nhập lý do xóa để thông báo đến người dùng.
           </DialogDescription>
         </DialogHeader>
         <div className="my-4">
@@ -78,7 +79,7 @@ export function DeletePost({ post, open, onOpenChange }: DeletePostProps) {
             variant="outline"
             className="text-xs h-8 bg-white hover:bg-white text-gray-700"
             onClick={() => {
-              onOpenChange(false);
+              setOpen(false);
               setReason('');
             }}
             disabled={isProcessing}
@@ -86,10 +87,8 @@ export function DeletePost({ post, open, onOpenChange }: DeletePostProps) {
             Hủy
           </Button>
           <Button
-            variant="destructive"
-            size="sm"
-            className="text-xs h-8 bg-red-500 hover:bg-red-600"
-            onClick={handleDelete}
+            className="text-xs h-8 bg-red-500 hover:bg-red-600 text-white"
+            onClick={handleConfirm}
             disabled={isProcessing}
           >
             {isProcessing ? 'Đang xóa...' : 'Xóa'}
