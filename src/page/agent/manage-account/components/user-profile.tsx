@@ -4,6 +4,8 @@ import PersonalInfo from './personal-info';
 import AccountInfo from './account-info';
 import ProfessionalInfo from './professional-info';
 import StatsOverview from './stats-overview';
+import { selectUser } from '@/redux/authReducer';
+import { useSelector } from 'react-redux';
 
 const userData = {
   id: 'f2bb40dc-553b-48a0-ab6f-dc93d1c04eaa',
@@ -40,6 +42,10 @@ const userData = {
 };
 
 export default function Profile() {
+  const user = useSelector(selectUser);
+
+
+
   return (
     <div className='container mx-auto py-4 px-3 md:px-4'>
       <ProfileHeader user={userData} />

@@ -1,7 +1,8 @@
+import { useState, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit2Icon, MapPinIcon, MoreHorizontalIcon } from 'lucide-react';
+import { Edit2Icon, MapPinIcon, MoreHorizontalIcon, LockIcon, PhoneIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -12,19 +13,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import ChangePasswordModal from './change-password';
+import ChangePhoneModal from './changep-phone';
 
 interface ProfileHeaderProps {
   user: any;
 }
 
 export default function ProfileHeader({ user }: ProfileHeaderProps) {
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isChangePhoneOpen, setIsChangePhoneOpen] = useState(false);
+  const handleOpenChangePhone = useCallback(() => {
+    setIsChangePhoneOpen(true);
+  }, []);
+  const handleCloseChangePhone = useCallback(() => {
+    setIsChangePhoneOpen(false);
+  }, []);
+  const handleOpenChangePassword = useCallback(() => {
+    setIsChangePasswordOpen(true);
+  }, []);
+
+  const handleCloseChangePassword = useCallback(() => {
+    setIsChangePasswordOpen(false);
+  }, []);
+
   return (
     <div className='relative'>
-      <div className='h-48 md:h-64 w-full  rounded-lg relative'>
+      <div className='h-48 md:h-64 w-full rounded-lg relative'>
         <div className='absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10 rounded-lg'></div>
         <img src={user.coverPhoto} alt='Cover' className='w-full h-full object-cover rounded-lg' />
-        <div className='absolute z-[50] top-[200px] left-[2%] '>
-          <Avatar className='h-28 w-28 border-3 border-white dark:border-gray-900 shadow-md rounded-full overflow-hidden '>
+        <div className='absolute z-[50] top-[200px] left-[2%]'>
+          <Avatar className='h-28 w-28 border-3 border-white dark:border-gray-900 shadow-md rounded-full overflow-hidden'>
             <AvatarImage
               src={user.avatar || '/placeholder.svg?height=112&width=112'}
               alt={user.fullname}
@@ -35,7 +55,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
         </div>
       </div>
 
-      <div className='relative pr-6 pl-[150px]  mt-3 pb-3 z-20'>
+      <div className='relative pr-6 pl-[150px] mt-3 pb-3 z-20'>
         <div className='flex flex-col md:flex-row items-start md:items-end gap-3'>
           <div className='flex w-full justify-between items-center mt-1 md:mt-0'>
             <div>
@@ -81,7 +101,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
             </div>
 
             <div className='flex items-center gap-2 mt-3 md:mt-0'>
-              <DropdownMenu>
+              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant='outline' size='icon' className='h-8 w-8 border-gray-200 dark:border-gray-700'>
                     <MoreHorizontalIcon className='h-4 w-4' />
@@ -90,11 +110,45 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                 <DropdownMenuContent align='end' className='w-48'>
                   <DropdownMenuLabel className='text-xs'>Tùy chọn</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className='text-xs'>
+                  <DropdownMenuItem
+                    className='text-xs cursor-pointer'
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsDropdownOpen(false);
+                      handleOpenChangePassword();
+                    }}
+                  >
+                    <LockIcon className='h-3 w-3 mr-2' />
+                    Đổi mật khẩu
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className='text-xs cursor-pointer'
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsDropdownOpen(false);
+                      handleOpenChangePhone();
+                    }}
+                  >
+                    <PhoneIcon className='h-3 w-3 mr-2' />
+                    Thay đổi số điện thoại
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className='text-xs cursor-pointer'
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsDropdownOpen(false);
+                    }}
+                  >
                     <Edit2Icon className='h-3 w-3 mr-2' />
                     Chỉnh sửa hồ sơ
                   </DropdownMenuItem>
-                  <DropdownMenuItem className='text-xs'>
+                  <DropdownMenuItem
+                    className='text-xs cursor-pointer'
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsDropdownOpen(false);
+                    }}
+                  >
                     <svg className='h-3 w-3 mr-2' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
                       <path
                         d='M19 9L12 16L5 9'
@@ -112,6 +166,9 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
           </div>
         </div>
       </div>
+
+      <ChangePasswordModal open={isChangePasswordOpen} onOpenChange={handleCloseChangePassword} />
+      <ChangePhoneModal open={isChangePhoneOpen} onOpenChange={handleCloseChangePhone} />
     </div>
   );
 }
