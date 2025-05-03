@@ -40,6 +40,7 @@ export function SuccessNotification({
       setIsVisible(false);
     }
   }, [show, autoClose, autoCloseTime, onClose]);
+  
   const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     x: Math.random() * 100 - 50,
@@ -48,6 +49,7 @@ export function SuccessNotification({
     duration: Math.random() * 1 + 1,
     delay: Math.random() * 0.5,
   }));
+  
   const ripples = Array.from({ length: 4 }, (_, i) => ({
     delay: i * 0.2,
     duration: 1.8 - i * 0.1,
@@ -113,16 +115,16 @@ export function SuccessNotification({
                 />
               ))}
 
-              {/* Main success circle with glow */}
+              {/* Main success circle with glow - FIXED ANIMATION */}
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.2, 1] }}
+                animate={{ scale: 1 }} // Thay đổi từ [0, 1.2, 1] thành giá trị đơn 1
                 transition={{
                   type: 'spring',
                   stiffness: 200,
                   damping: 15,
                   delay: 0.3,
-                  times: [0, 0.7, 1],
+                  // Hiệu ứng overshoot được xử lý thông qua stiffness và damping
                   onComplete: () => setAnimationComplete(true),
                 }}
                 className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-full bg-gradient-to-br from-teal-400 to-green-300 shadow-lg flex items-center justify-center'

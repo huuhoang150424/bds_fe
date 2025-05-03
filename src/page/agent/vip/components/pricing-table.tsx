@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import PaymentModal from './payment-modal';
+import { useGetPricings } from '@/page/admin/pricing/hooks/use-get-pricings';
 
 export default function PricingTable() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -14,110 +15,97 @@ export default function PricingTable() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
+  const { data: pricings, isLoading } = useGetPricings(1, 10);
+  const allPricings = pricings?.data?.data || [];
+
   useEffect(() => {
     if (isInView) {
       controls.start('visible');
     }
   }, [controls, isInView]);
 
-  const plans = [
-    {
-      id: 'free',
-      name: 'Free',
-      icon: <Star className='h-8 w-8 text-yellow-400' />,
-      description: 'Phù hợp với người mới hoặc giỏ hàng nhỏ',
-      price: '0',
-      originalPrice: '',
-      discount: '',
-      savings: '',
-      color: 'bg-gradient-to-b from-white to-gray-50',
-      hoverColor: 'hover:border-yellow-400',
-      shadowColor: 'shadow-yellow-400/10',
-      features: [
-        { name: '15 tin mỗi tháng', included: true },
-        { name: 'Hiện thị trong 10 ngày', included: true },
-        { name: 'Ưu tiên đề xuất', included: false },
-        { name: 'Báo cáo tương tác', included: false },
-        { name: 'Giảm giá cho lần sau', included: false },
-      ],
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'decimal',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const plans = allPricings.map((plan: any, index: number) => {
+    const discountPercent = plan.discountPercent || 0;
+    const originalPrice = discountPercent > 0 ? Math.round(plan.price / (1 - discountPercent / 100)) : plan.price;
+    const savings = originalPrice - plan.price;
+
+    const features = [
+      {
+        name: plan.maxPost === -1 ? 'Không giới hạn tin đăng' : `${plan.maxPost} tin mỗi tháng`,
+        included: true,
+      },
+      {
+        name: plan.displayDay === -1 ? 'Không giới hạn thời gian' : `Hiển thị trong ${plan.displayDay} ngày`,
+        included: true,
+      },
+      {
+        name: plan.boostDays > 0 ? `Ưu tiên đề xuất (${plan.boostDays} ngày)` : 'Ưu tiên đề xuất',
+        included: plan.boostDays > 0,
+      },
+      {
+        name: 'Báo cáo tương tác',
+        included: plan.hasReport,
+      },
+      {
+        name: discountPercent > 0 ? `Giảm giá ${discountPercent}% cho lần sau` : 'Giảm giá cho lần sau',
+        included: discountPercent > 0,
+      },
+    ];
+
+    const iconMap = [
+      { icon: <Star className='h-8 w-8 text-yellow-400' />, bg: 'bg-yellow-100', button: 'bg-gray-800 hover:bg-gray-700' },
+      { icon: <Shield className='h-8 w-8 text-red-500' />, bg: 'bg-red-100', button: 'bg-red-500 hover:bg-red-600' },
+      { icon: <Crown className='h-8 w-8 text-amber-500' />, bg: 'bg-amber-100', button: 'bg-amber-500 hover:bg-amber-600' },
+      { icon: <Zap className='h-8 w-8 text-blue-500' />, bg: 'bg-blue-100', button: 'bg-blue-500 hover:bg-blue-600' },
+    ];
+
+    const colorMap = [
+      { color: 'bg-gradient-to-b from-white to-gray-50', hoverColor: 'hover:border-yellow-400', shadowColor: 'shadow-yellow-400/10' },
+      { color: 'bg-gradient-to-b from-white to-red-50', hoverColor: 'hover:border-red-500', shadowColor: 'shadow-red-500/10' },
+      { color: 'bg-gradient-to-b from-white to-amber-50', hoverColor: 'hover:border-amber-500', shadowColor: 'shadow-amber-500/20' },
+      { color: 'bg-gradient-to-b from-white to-blue-50', hoverColor: 'hover:border-blue-500', shadowColor: 'shadow-blue-500/10' },
+    ];
+
+    const iconData = iconMap[index % iconMap.length];
+    const colorData = colorMap[index % iconMap.length];
+
+    return {
+      id: plan.id,
+      name: plan.name,
+      icon: iconData.icon,
+      iconBg: iconData.bg,
+      description: plan.description,
+      price: formatCurrency(plan.price),
+      originalPrice: formatCurrency(originalPrice),
+      discount: discountPercent > 0 ? `-${discountPercent}%` : '',
+      savings: savings > 0 ? `Tiết kiệm ${formatCurrency(savings)}đ mỗi tháng` : '',
+      color: colorData.color,
+      hoverColor: colorData.hoverColor,
+      shadowColor: colorData.shadowColor,
+      features,
       buttonText: 'Mua ngay',
-    },
-    {
-      id: 'silver',
-      name: 'Bạc',
-      icon: <Shield className='h-8 w-8 text-red-500' />,
-      description: 'Phù hợp với môi giới chuyên nghiệp có giỏ hàng từ 10 BĐS',
-      price: '250.000',
-      originalPrice: '500.000',
-      discount: '-50%',
-      savings: 'Tiết kiệm 250.000đ mỗi tháng',
-      color: 'bg-gradient-to-b from-white to-red-50',
-      hoverColor: 'hover:border-red-500',
-      shadowColor: 'shadow-red-500/10',
-      features: [
-        { name: '30 tin mỗi tháng', included: true },
-        { name: 'Hiện thị trong 30 ngày', included: true },
-        { name: 'Ưu tiên đề xuất (7 ngày)', included: true },
-        { name: 'Báo cáo tương tác', included: false },
-        { name: 'Giảm giá 8% cho lần sau', included: false },
-      ],
-      buttonText: 'Mua ngay',
-    },
-    {
-      id: 'gold',
-      name: 'Vàng',
-      icon: <Crown className='h-8 w-8 text-amber-500' />,
-      description: 'Phù hợp với môi giới có giỏ hàng và ngân sách quảng cáo lớn',
-      price: '500.000',
-      originalPrice: '750.000',
-      discount: '-33%',
-      savings: 'Tiết kiệm 250.000đ mỗi tháng',
-      color: 'bg-gradient-to-b from-white to-amber-50',
-      hoverColor: 'hover:border-amber-500',
-      shadowColor: 'shadow-amber-500/20',
-      features: [
-        { name: 'Không giới hạn tin đăng', included: true },
-        { name: 'Hiện thị trong 60 ngày', included: true },
-        { name: 'Ưu tiên đề xuất (14 ngày)', included: true },
-        { name: 'Báo cáo tương tác', included: true },
-        { name: 'Giảm giá 8% cho lần sau', included: true },
-      ],
-      buttonText: 'Mua ngay',
-      popular: true,
-    },
-    {
-      id: 'diamond',
-      name: 'Kim Cương',
-      icon: <Zap className='h-8 w-8 text-blue-500' />,
-      description: 'Phù hợp với môi giới có giỏ hàng và ngân sách quảng cáo lớn',
-      price: '800.000',
-      originalPrice: '1.200.000',
-      discount: '-33%',
-      savings: 'Tiết kiệm 400.000đ mỗi tháng',
-      color: 'bg-gradient-to-b from-white to-blue-50',
-      hoverColor: 'hover:border-blue-500',
-      shadowColor: 'shadow-blue-500/10',
-      features: [
-        { name: 'Không giới hạn tin đăng', included: true },
-        { name: 'Không giới hạn thời gian', included: true },
-        { name: 'Ưu tiên đề xuất (30 ngày)', included: true },
-        { name: 'Báo cáo tương tác', included: true },
-        { name: 'Giảm giá 15% cho lần sau', included: true },
-      ],
-      buttonText: 'Mua ngay',
-    },
-  ];
+      buttonClass: iconData.button,
+      popular: plan.name.includes('VIP_3'),
+    };
+  });
 
   const handleOpenModal = (plan: any) => {
     setSelectedPlan(plan);
     setIsModalOpen(true);
   };
 
-
   return (
     <>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4' ref={ref}>
-        {plans.map((plan, i) => (
+        {plans.map((plan:any, i:number) => (
           <motion.div
             key={plan.id}
             custom={i}
@@ -167,17 +155,7 @@ export default function PricingTable() {
 
               <CardHeader className='pb-3 relative'>
                 <div className='flex justify-between items-center mb-1'>
-                  <div
-                    className={`p-2 rounded-full ${
-                      plan.id === 'free'
-                        ? 'bg-yellow-100'
-                        : plan.id === 'silver'
-                          ? 'bg-red-100'
-                          : plan.id === 'gold'
-                            ? 'bg-amber-100'
-                            : 'bg-blue-100'
-                    }`}
-                  >
+                  <div className={`p-2 rounded-full ${plan.iconBg}`}>
                     {plan.icon}
                   </div>
                 </div>
@@ -212,7 +190,7 @@ export default function PricingTable() {
                 <div className='space-y-3'>
                   <h4 className='text-xs font-medium border-b pb-1'>Gói tin hàng tháng</h4>
                   <ul className='space-y-2'>
-                    {plan.features.map((feature, index) => (
+                    {plan.features.map((feature: any, index: number) => (
                       <li key={index} className='flex items-start'>
                         {feature.included ? (
                           <Check className='h-3 w-3 text-green-500 mr-1.5 mt-0.5 shrink-0' />
@@ -229,15 +207,7 @@ export default function PricingTable() {
               </CardContent>
               <CardFooter>
                 <Button
-                  className={`w-full group relative overflow-hidden text-xs py-1.5 ${
-                    plan.id === 'free'
-                      ? 'bg-gray-800 hover:bg-gray-700'
-                      : plan.id === 'silver'
-                        ? 'bg-red-500 hover:bg-red-600'
-                        : plan.id === 'gold'
-                          ? 'bg-amber-500 hover:bg-amber-600'
-                          : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
+                  className={`w-full group relative overflow-hidden text-xs py-1.5 ${plan.buttonClass}`}
                   onClick={() => handleOpenModal(plan)}
                 >
                   <span className='relative z-10 flex items-center justify-center'>
