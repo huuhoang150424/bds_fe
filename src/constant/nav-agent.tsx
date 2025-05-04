@@ -61,10 +61,6 @@ export const data = {
           url: "profile",
         },
         {
-          title: "Chỉnh sửa thông tin cá nhân",
-          url: "manage-account",
-        },
-        {
           title: "Tài chính cá nhân",
           url: "finance",
         },

@@ -108,25 +108,17 @@ export default function ProfessionalInfo({ user }: ProfessionalInfoProps) {
           <div className="font-medium text-sm">
             {user.certificates ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {(user.certificates.split(',') || []).map((cert: string, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30"
-                  >
-                    <div className="h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
-                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 15L8.5 10L15.5 10L12 15Z" fill="currentColor" />
-                        <path
-                          d="M9 6H15M12 3V6M7.8 7.8L9.5 9.5M16.2 7.8L14.5 9.5M7 21H17C18.1046 21 19 20.1046 19 19V13C19 11.8954 18.1046 11 17 11H7C5.89543 11 5 11.8954 5 13V19C5 20.1046 5.89543 21 7 21Z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                    <span className="font-medium text-xs text-gray-800 dark:text-gray-200">{cert.trim() || 'Không xác định'}</span>
-                  </div>
-                ))}
+                <div className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30">
+                  <img
+                    src={user.certificates}
+                    alt="Certificate"
+                    className="h-16 w-24 object-cover rounded-md mr-2"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg?height=64&width=96';
+                    }}
+                  />
+                  <span className="font-medium text-xs text-gray-800 dark:text-gray-200">Chứng chỉ</span>
+                </div>
               </div>
             ) : (
               <div className="text-gray-500 text-xs p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-center">

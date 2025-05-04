@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit2Icon, MapPinIcon, MoreHorizontalIcon, LockIcon, PhoneIcon } from 'lucide-react';
+import { Edit2Icon, MapPinIcon, MoreHorizontalIcon, LockIcon, PhoneIcon, Sparkles, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -16,6 +16,7 @@ import {
 import ChangePasswordModal from './change-password';
 import UpdateProfileModal from './update-profile';
 import ChangePhoneModal from './changep-phone';
+import Conditions from './conditions';
 
 interface ProfileHeaderProps {
   user: any;
@@ -26,7 +27,8 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
   const [isChangePhoneOpen, setIsChangePhoneOpen] = useState(false);
   const [isUpdateProfileOpen, setIsUpdateProfileOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const [showModal, setShowModal] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const handleOpenChangePhone = useCallback(() => {
     setIsChangePhoneOpen(true);
   }, []);
@@ -123,7 +125,23 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-3 md:mt-0">
+            <div className="flex items-center gap-4 mt-3 md:mt-0">
+            <Button
+            onClick={() => setShowModal(true)}
+            className="relative overflow-hidden bg-gradient-to-r from-red-500 via-red-600 to-rose-500 text-white px-8 py-5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <span className="absolute inset-0 flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-20 transition-opacity duration-300">
+                <div className="absolute w-40 h-40 rounded-full bg-white blur-xl"></div>
+              </div>
+            </span>
+            <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-300 transform -translate-x-full group-hover:translate-x-full"></span>
+            <span className="relative flex items-center text-sm font-medium">
+              <Sparkles className="h-4 w-4 mr-2 animate-pulse" />
+              Đăng ký môi giới chuyên nghiệp
+              <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Button>
               <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon" className="h-8 w-8 border-gray-200 dark:border-gray-700">
@@ -190,6 +208,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
           </div>
         </div>
       </div>
+      <Conditions open={showModal} onOpenChange={setShowModal}  />
       {isChangePasswordOpen && <ChangePasswordModal open={isChangePasswordOpen} onOpenChange={handleCloseChangePassword} /> }
       {isChangePhoneOpen && <ChangePhoneModal open={isChangePhoneOpen} onOpenChange={handleCloseChangePhone} />}
       {isUpdateProfileOpen && <UpdateProfileModal open={isUpdateProfileOpen} onOpenChange={handleCloseUpdateProfile} userSelect={user} />}

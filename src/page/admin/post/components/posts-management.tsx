@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Loader2, Shield, Trash2, Sparkles, ChevronDown } from 'lucide-react';
+import { Loader2, Shield, Trash2, Sparkles, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -27,6 +27,7 @@ import { useGetAllPost } from '../hooks/use-get-all-post';
 import { Loading } from '@/components/common';
 import ConfirmBatchVerifyDialog from './bulk-approve';
 import ConfirmBatchDeleteDialog from './confirm-batch-delete';
+import ConfirmBatchRejectDialog from './reject-bulk-posts';
 
 enum StatusPost {
   AVAILABLE = 'Còn trống',
@@ -44,6 +45,7 @@ export function PostsManagement() {
   const [confirmVerifyDialogOpen, setConfirmVerifyDialogOpen] = useState(false);
   const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
 
+  const [confirmRejectDialogOpen, setConfirmRejectDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 10;
   const handleChangePage = (page: number) => {
@@ -53,6 +55,8 @@ export function PostsManagement() {
   const { data: allPost, isLoading } = useGetAllPost(page, limit);
 
   const tableData = allPost?.data?.data || [];
+
+  console.log(tableData)
 
   const handleAiVerifyAll = () => {
     // TODO: Triển khai AI duyệt tự động sau
@@ -72,7 +76,6 @@ export function PostsManagement() {
   };
 
   const handleBatchVerify = () => {
-    // Chỉ cho phép duyệt nếu có bài chưa duyệt trong danh sách chọn
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const hasUnverified = selectedRows.some((row) => !row.original.verified);
     if (!hasUnverified) {
@@ -80,7 +83,14 @@ export function PostsManagement() {
     }
     setConfirmVerifyDialogOpen(true);
   };
-
+  const handleBatchReject = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const hasNonRejected = selectedRows.some((row) => !row.original.isRejected);
+    if (!hasNonRejected) {
+      return;
+    }
+    setConfirmRejectDialogOpen(true);
+  };
   const handleBatchDelete = () => {
     setConfirmDeleteDialogOpen(true);
   };
@@ -250,6 +260,19 @@ export function PostsManagement() {
                   >
                     Chưa xác minh
                   </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={(table.getColumn('verified')?.getFilterValue() as string[])?.includes('rejected')}
+                    onCheckedChange={(checked) => {
+                      const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
+                      if (checked) {
+                        table.getColumn('verified')?.setFilterValue([...filterValues, 'rejected']);
+                      } else {
+                        table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'rejected'));
+                      }
+                    }}
+                  >
+                    Đã bị từ chối
+                  </DropdownMenuCheckboxItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -306,6 +329,14 @@ export function PostsManagement() {
                   disabled={isLoading || !table.getFilteredSelectedRowModel().rows.some((row) => !row.original.verified)}
                 >
                   <Shield className="mr-2 h-4 w-4" /> Duyệt đã chọn
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBatchReject}
+                  disabled={isLoading || !table.getFilteredSelectedRowModel().rows.some((row) => !row.original.isRejected)}
+                >
+                  <X className="mr-2 h-4 w-4" /> Từ chối đã chọn
                 </Button>
                 <Button
                   variant="outline"
@@ -383,6 +414,13 @@ export function PostsManagement() {
           <ConfirmBatchDeleteDialog
             open={confirmDeleteDialogOpen}
             setOpen={setConfirmDeleteDialogOpen}
+            totalPosts={selectedRowCount}
+            postIds={selectedPostIds}
+            resetSelection={() => setRowSelection({})}
+          />
+          <ConfirmBatchRejectDialog
+            open={confirmRejectDialogOpen}
+            setOpen={setConfirmRejectDialogOpen}
             totalPosts={selectedRowCount}
             postIds={selectedPostIds}
             resetSelection={() => setRowSelection({})}

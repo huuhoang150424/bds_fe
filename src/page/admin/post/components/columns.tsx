@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Check, MoreHorizontal, Shield, Trash2, ArrowUpDown } from 'lucide-react';
+import { Check, MoreHorizontal, Shield, Trash2, ArrowUpDown, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DeletePost } from './delete-post';
 import { ApprovePost } from './approve-post';
 import { PostDetailModal } from './post-detail';
+import { RejectPost } from './reject-post';
 
 const formatPrice = (price: number, unit: string) => {
   if (unit === PriceUnit.VND) {
@@ -54,6 +55,7 @@ export type Post = {
   isFurniture: boolean;
   direction: string;
   verified: boolean;
+  isRejected: boolean;
   expiredDate: Date;
   status: string;
   slug: string;
@@ -137,8 +139,8 @@ export const columns: ColumnDef<Post>[] = [
             status === StatusPost.AVAILABLE
               ? 'bg-green-100 text-green-800'
               : status === StatusPost.NEGOTIATING
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-blue-100 text-blue-800'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-blue-100 text-blue-800'
           }
         >
           {status}
@@ -151,21 +153,32 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     accessorKey: 'verified',
-    header: 'Xác minh',
+    header: 'Trạng thái duyệt',
     cell: ({ row }) => {
-      const verified = row.original.verified;
+      const { verified, isRejected } = row.original;
+      if (isRejected) {
+        return (
+          <Badge variant='outline' className='bg-red-100 text-red-800'>
+            <X className='mr-1 h-3 w-3' /> Đã bị từ chối
+          </Badge>
+        );
+      }
       return verified ? (
         <Badge variant='outline' className='bg-green-100 text-green-800'>
           <Check className='mr-1 h-3 w-3' /> Đã xác minh
         </Badge>
       ) : (
-        <Badge variant='outline' className='bg-red-100 text-red-800'>
-          Chưa xác minh
+        <Badge variant='outline' className='bg-yellow-100 text-yellow-800'>
+          Chờ xác minh
         </Badge>
       );
     },
     filterFn: (row, id, value) => {
-      return value.includes((row.getValue(id) as boolean).toString());
+      const { verified, isRejected } = row.original;
+      if (value.includes('rejected') && isRejected) {
+        return true;
+      }
+      return value.includes(verified.toString());
     },
   },
   {
@@ -189,6 +202,7 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
   const post = row.original;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [viewPosts, setViewPosts] = useState(false);
   const dropdownRefs = useRef<HTMLButtonElement | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -204,7 +218,7 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='text-xs'>
           <DropdownMenuLabel className='text-xs'>Thao tác</DropdownMenuLabel>
-          {!post.verified && (
+          {!post.verified && !post.isRejected && (
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
@@ -213,6 +227,17 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
               }}
             >
               <Shield className='mr-2 h-4 w-4' /> Duyệt bài đăng
+            </DropdownMenuItem>
+          )}
+          {!post.verified && !post.isRejected && (
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setIsDropdownOpen(false);
+                setIsRejectModalOpen(true);
+              }}
+            >
+              <X className='mr-2 h-4 w-4' /> Từ chối bài đăng
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
@@ -240,8 +265,9 @@ function ActionsCell({ row, table }: { row: any; table: any }) {
       </DropdownMenu>
 
       {isDeleteModalOpen && <DeletePost post={post} open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen} />}
-      {!post.verified && <ApprovePost post={post} open={isApproveModalOpen} onOpenChange={setIsApproveModalOpen} />}
-      {viewPosts &&  <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} />}
+      {!post.verified && !post.isRejected && <ApprovePost post={post} open={isApproveModalOpen} onOpenChange={setIsApproveModalOpen} />}
+      {!post.verified && !post.isRejected && <RejectPost post={post} open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen} />}
+      {viewPosts && <PostDetailModal post={post} onClose={setViewPosts} isOpen={viewPosts} />}
     </>
   );
 }

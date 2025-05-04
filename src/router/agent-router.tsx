@@ -11,7 +11,6 @@ import VIPRequired from '@/page/agent/vip/components/have-vip';
 import { Route, Routes } from 'react-router-dom';
 import Chat from '@/page/agent/chat/page/chat';
 import UserProfile from '@/page/agent/manage-account/infor';
-import UserProfileEditable from '@/page/agent/manage-account/update-infor';
 import CreatePost from '@/page/agent/post/page/create-post';
 import RequireAgentRole from './require-agent-role';
 import Guideline from '@/page/agent/post/page/instruct';
@@ -36,7 +35,6 @@ export default function AgentRouter() {
         </Route>
         <Route path='/profile' element={<UserProfile />} />
         <Route path='/chat' element={<Chat />} />
-        <Route path='/manage-account' element={<UserProfileEditable />} />
       </Route>
     </Routes>
   );
