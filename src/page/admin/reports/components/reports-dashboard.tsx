@@ -75,7 +75,7 @@ export function ReportsAdminDashboard() {
 
   return (
     <div className='space-y-6 mt-5'>
-      <div className='space-y-6 mt-5'>
+      <div className='space-y-6 mt-5 '>
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
           <Card className='border border-gray-200 rounded-[8px]'>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>

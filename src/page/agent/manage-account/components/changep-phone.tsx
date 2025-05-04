@@ -50,7 +50,7 @@ export default function ChangePhoneModal({ open, onOpenChange }: ChangePhoneModa
     setIsProcessing(true);
     try {
       await updatePhoneMutation.mutateAsync(
-        { userId: user.id, phone: values.phone },
+        { userId: user?.id, phone: values.phone },
         {
           onSuccess: (data) => {
             toast({

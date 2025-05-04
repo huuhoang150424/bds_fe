@@ -90,6 +90,10 @@ export const data = {
           title: "Đăng ký mua",
           url: "vip",
         },
+        {
+          title: "Gói đã mua",
+          url: "my-pricing",
+        },
       ],
     },
     

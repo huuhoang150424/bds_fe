@@ -94,7 +94,7 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
   },[report])
 
   return (
-    <Card className='border border-gray-200 rounded-[8px] '>
+    <Card className='border border-gray-200 rounded-[8px]  '>
       <CardHeader className='flex flex-row items-start justify-between space-y-0'>
         <div>
           <CardTitle className='text-xl'>Báo cáo #{report.id}</CardTitle>

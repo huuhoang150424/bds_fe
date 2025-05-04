@@ -1,8 +1,8 @@
 
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
-import HeroSection from './components/hero-section';
-import PricingTable from './components/pricing-table';
-import FaqSection from './components/faq-section';
+import HeroSection from '../components/hero-section';
+import PricingTable from '../components/pricing-table';
+import FaqSection from '../components/faq-section';
 
 function Vip() {
   useScrollToTopOnMount();
