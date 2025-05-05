@@ -6,7 +6,7 @@ export const getAllPost = async (page: number, limit: number) => {
       page,
       limit,
     });
-    return response.data.data.data;
+    return response.data;
   } catch (error) {
     throw error;
   }

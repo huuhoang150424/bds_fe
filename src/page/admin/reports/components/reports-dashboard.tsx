@@ -8,21 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ReportsList } from './reports-list';
 import { ReportDetail } from './report-detail';
+import { useGetReports } from '../hooks/use-get-reports';
+import { useGetSummary } from '../hooks/use-get-summary';
+import { Pagination } from '@/components/user/pagination';
 
-enum ReportReason {
-  INAPPROPRIATE_CONTENT = 'NỘI_DUNG_KHÔNG_PHÙ_HỢP',
-  SPAM = 'SPAM',
-  HARASSMENT = 'QUẤY_RỐI',
-  MISINFORMATION = 'THÔNG_TIN_SAI_LỆCH',
-  COPYRIGHT_VIOLATION = 'VI_PHẠM_BẢN_QUYỀN',
-  OTHER = 'KHÁC',
-}
 
-enum ProcessingStatus {
-  PENDING = 'CHỜ_XỬ_LÝ',
-  IN_PROGRESS = 'ĐANG_XỬ_LÝ',
-  RESOLVED = 'ĐÃ_GIẢI_QUYẾT',
-  REJECTED = 'ĐÃ_TỪ_CHỐI',
+
+export enum ProcessingStatus {
+  Pending = 'pending',
+  Resolved = 'resolved',
+  Rejected = 'rejected',
+  Reviewing = 'reviewing',
 }
 
 enum Severity {
@@ -31,163 +27,139 @@ enum Severity {
   FEEDBACK = 'GÓP_Ý',
 }
 
-const generateMockReports = (count = 100) => {
-  const reports = [];
-  const reasons = Object.values(ReportReason);
-  const statuses = Object.values(ProcessingStatus);
-  const severities = Object.values(Severity);
 
-  for (let i = 1; i <= count; i++) {
-    const isPostReport = Math.random() > 0.2; 
-    const randomDate = new Date();
-    randomDate.setDate(randomDate.getDate() - Math.floor(Math.random() * 30)); 
-
-    reports.push({
-      id: i.toString(),
-      userId: `user-${Math.floor(Math.random() * 20) + 1}`,
-      postId: isPostReport ? `post-${Math.floor(Math.random() * 500) + 1}` : null,
-      reason: reasons[Math.floor(Math.random() * reasons.length)],
-      content: `Nội dung báo cáo chi tiết #${i}. Đây là mô tả vấn đề mà người dùng đã gặp phải.`,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      createdAt: randomDate,
-      user: {
-        id: `user-${Math.floor(Math.random() * 20) + 1}`,
-        fullname: `Người dùng ${Math.floor(Math.random() * 20) + 1}`,
-        email: `user${Math.floor(Math.random() * 20) + 1}@example.com`,
-      },
-      post: isPostReport
-        ? {
-            id: `post-${Math.floor(Math.random() * 500) + 1}`,
-            title: `Bài viết ${Math.floor(Math.random() * 500) + 1}`,
-            content: `Đây là nội dung của bài viết đã bị báo cáo. Bài viết này có thể chứa nội dung không phù hợp hoặc vi phạm quy định của cộng đồng.`,
-            userId: `author-${Math.floor(Math.random() * 20) + 1}`,
-          }
-        : null,
-      severity: severities[Math.floor(Math.random() * severities.length)],
-      adminNotes: Math.random() > 0.7 ? 'Ghi chú của admin về báo cáo này.' : '',
-    });
-  }
-
-  return reports;
-};
-
-const mockReports = generateMockReports();
 
 export function ReportsAdminDashboard() {
-  const [selectedTab, setSelectedTab] = useState('all');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [severityFilter, setSeverityFilter] = useState('all');
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [reportsPerPage, setReportsPerPage] = useState(10);
   const [sortBy, setSortBy] = useState<string>('date_desc');
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
-
-  const filteredReports = mockReports
-    .filter((report) => {
-      if (selectedTab !== 'all' && report.status !== selectedTab) {
-        return false;
-      }
-
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          report.content.toLowerCase().includes(query) ||
-          report.user.fullname.toLowerCase().includes(query) ||
-          report.post?.title.toLowerCase().includes(query) ||
-          false
-        );
-      }
-
-      if (severityFilter !== 'all' && report.severity !== severityFilter) {
-        return false;
-      }
-
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'date_asc':
-          return a.createdAt.getTime() - b.createdAt.getTime();
-        case 'date_desc':
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        case 'severity':
-          const severityOrder = {
-            [Severity.EMERGENCY]: 0,
-            [Severity.IMPORTANT]: 1,
-            [Severity.FEEDBACK]: 2,
-          };
-          return severityOrder[a.severity as Severity] - severityOrder[b.severity as Severity];
-        default:
-          return b.createdAt.getTime() - a.createdAt.getTime();
-      }
-    });
-
-  const indexOfLastReport = currentPage * reportsPerPage;
-  const indexOfFirstReport = indexOfLastReport - reportsPerPage;
-  const currentReports = filteredReports.slice(indexOfFirstReport, indexOfLastReport);
-  const totalPages = Math.ceil(filteredReports.length / reportsPerPage);
-  const pendingCount = mockReports.filter((r) => r.status === ProcessingStatus.PENDING).length;
-  const inProgressCount = mockReports.filter((r) => r.status === ProcessingStatus.IN_PROGRESS).length;
-  const resolvedCount = mockReports.filter((r) => r.status === ProcessingStatus.RESOLVED).length;
-  const emergencyCount = mockReports.filter((r) => r.severity === Severity.EMERGENCY).length;
-
-  const reportDetail = selectedReport ? mockReports.find((r) => r.id === selectedReport) : null;
-
-  const handleBatchAction = (action: string) => {
-    if (selectedReports.length === 0) return;
-
-    console.log(`Thực hiện hành động ${action} cho các báo cáo:`, selectedReports);
-    setSelectedReports([]);
+  const [filteredReports, setFilteredReports] = useState<any[]>([]);
+  // const [reportDetail, setReportDetail] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  const { data: allReports, isLoading } = useGetReports(page, limit);
+  const handleChangePage = (page: number) => {
+    setPage(page);
   };
+  const { data: summaryData, isLoading: isLoadingSummary } = useGetSummary();
+  const reportsAll=allReports?.data?.data || [];
+  
+  const filterReportsByStatus = (reports: any[], status: string) => {
+    if (!reports) {
+      setFilteredReports([]);
+      return;
+    }
+    if (status === 'all') {
+      setFilteredReports(reports);
+      return;
+    }
+    const filteredData = reports.filter((report: any) => report.status === status);
+    setFilteredReports(filteredData);
+  };
+
+
+  const reportDetail = reportsAll.find((report: any) => report.id === selectedReport);
+
+  const handleTabChange = (value: string) => {
+    console.log(value)
+    setActiveTab(value);
+    setSelectedReports([]); 
+    setSelectedReport(null); 
+    filterReportsByStatus(reportsAll, value);
+  };
+
+  const handleBatchAction = (action: string) => {};
 
   return (
     <div className='space-y-6 mt-5'>
-      {/* Stats Overview */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <Card className='border border-gray-200 rounded-[8px] '>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Báo Cáo Chờ Xử Lý</CardTitle>
-            <Clock className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{pendingCount}</div>
-            <p className='text-xs text-muted-foreground'>Đang chờ xem xét</p>
-          </CardContent>
-        </Card>
-        <Card className='border border-gray-200 rounded-[8px] '>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Đang Xử Lý</CardTitle>
-            <AlertCircle className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{inProgressCount}</div>
-            <p className='text-xs text-muted-foreground'>Đang trong quá trình xử lý</p>
-          </CardContent>
-        </Card>
-        <Card className='border border-gray-200 rounded-[8px] '>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Đã Giải Quyết</CardTitle>
-            <CheckCircle2 className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{resolvedCount}</div>
-            <p className='text-xs text-muted-foreground'>Báo cáo đã hoàn thành</p>
-          </CardContent>
-        </Card>
-        <Card className='bg-red-50 border border-gray-200 rounded-[8px] '>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium text-red-800'>Báo Cáo Khẩn Cấp</CardTitle>
-            <AlertTriangle className='h-4 w-4 text-red-800' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold text-red-800'>{emergencyCount}</div>
-            <p className='text-xs text-red-700'>Vấn đề ưu tiên cao</p>
-          </CardContent>
-        </Card>
+      <div className='space-y-6 mt-5 '>
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+          <Card className='border border-gray-200 rounded-[8px]'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Báo Cáo Chờ Xử Lý</CardTitle>
+              <Clock className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>{summaryData?.data?.processingStatus?.pending || 0}</div>
+              <p className='text-xs text-muted-foreground'>Đang chờ xem xét</p>
+            </CardContent>
+          </Card>
+          <Card className='border border-gray-200 rounded-[8px]'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Đang Xử Lý</CardTitle>
+              <AlertCircle className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>{summaryData?.data?.processingStatus?.reviewing  || 0}</div>
+              <p className='text-xs text-muted-foreground'>Đang trong quá trình xử lý</p>
+            </CardContent>
+          </Card>
+          <Card className='border border-gray-200 rounded-[8px]'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Đã Giải Quyết</CardTitle>
+              <CheckCircle2 className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>{summaryData?.data?.processingStatus?.resolved  || 0}</div>
+              <p className='text-xs text-muted-foreground'>Báo cáo đã hoàn thành</p>
+            </CardContent>
+          </Card>
+          <Card className='bg-red-50 border border-gray-200 rounded-[8px]'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-red-800'>Báo Cáo Khẩn Cấp</CardTitle>
+              <AlertTriangle className='h-4 w-4 text-red-800' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-red-800'>{summaryData?.data?.processingStatus?.urgentReports  || 0}</div>
+              <p className='text-xs text-red-700'>Vấn đề ưu tiên cao</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className='grid gap-4 md:grid-cols-2 '>
+          <Card className='border border-gray-200 rounded-[8px]'>
+            <CardHeader className='px-6 pt-6 pb-0'>
+              <CardTitle className='text-sm font-medium'>Phân Loại Báo Cáo</CardTitle>
+            </CardHeader>
+            <CardContent className='px-6 py-4'>
+              <div className='space-y-2'>
+                {summaryData?.data && Object.entries(summaryData?.data?.severityStatus).map(([key, value]) => (
+                <div key={key} className='flex justify-between items-center'>
+                  <span className='text-sm'>{key}</span>
+                  <span className='font-medium'>{value as string}</span>
+                </div>
+              ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='border border-gray-200 rounded-[8px] self-start'>
+            <CardHeader className='px-6 pt-6 pb-0'>
+              <CardTitle className='text-sm font-medium '>Hoạt Động Gần Đây</CardTitle>
+            </CardHeader>
+            <CardContent className='px-6 py-4'>
+              <div className='space-y-2'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-sm'>7 ngày qua</span>
+                  <span className='font-medium'>{summaryData?.data?.recentActivity?.last7Days || 0} báo cáo</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-sm'>30 ngày qua</span>
+                  <span className='font-medium'>{summaryData?.data?.recentActivity?.last30Days  || 0} báo cáo</span>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-sm'>Tổng số báo cáo</span>
+                  <span className='font-medium'>{summaryData?.data?.processingStatus?.total || 0}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Batch Actions */}
       {selectedReports.length > 0 && (
         <div className='bg-slate-100 p-4 rounded-md flex items-center justify-between'>
           <div>
@@ -211,7 +183,6 @@ export function ReportsAdminDashboard() {
       )}
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-        {/* Reports List Panel */}
         <div className='lg:col-span-1'>
           <Card className='border border-gray-200 rounded-[8px]'>
             <CardHeader>
@@ -219,7 +190,6 @@ export function ReportsAdminDashboard() {
               <CardDescription>Quản lý báo cáo từ người dùng</CardDescription>
 
               <div className='flex flex-col space-y-2 mt-2'>
-                {/* Search */}
                 <div className='relative'>
                   <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                   <Input
@@ -229,8 +199,6 @@ export function ReportsAdminDashboard() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-
-                {/* Filters */}
                 <div className='flex items-center space-x-2'>
                   <Select value={severityFilter} onValueChange={setSeverityFilter}>
                     <SelectTrigger className='w-full'>
@@ -281,50 +249,95 @@ export function ReportsAdminDashboard() {
             </CardHeader>
 
             <CardContent className='p-0'>
-              <Tabs defaultValue='all' value={selectedTab} onValueChange={setSelectedTab}>
-                <TabsList className='w-full grid grid-cols-4 border-y border-gray-200 bg-transparent rounded-none '>
-                  <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value='all'>Tất cả</TabsTrigger>
-                  <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value={ProcessingStatus.PENDING}>Chờ xử lý</TabsTrigger>
-                  <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value={ProcessingStatus.IN_PROGRESS}>Đang xử lý</TabsTrigger>
-                  <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm' value={ProcessingStatus.RESOLVED}>Đã giải quyết</TabsTrigger>
+              <Tabs defaultValue='all' value={activeTab} onValueChange={handleTabChange}>
+                <TabsList className='w-full grid grid-cols-5 border-y border-gray-200 bg-transparent rounded-none '>
+                  <TabsTrigger
+                    className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+                    value='all'
+                  >
+                    Tất cả
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+                    value={ProcessingStatus.Pending}
+                  >
+                    Chờ xử lý
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+                    value={ProcessingStatus.Reviewing}
+                  >
+                    Đang xem xét
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+                    value={ProcessingStatus.Resolved}
+                  >
+                    Đã giải quyết
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className='data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-sm'
+                    value={ProcessingStatus.Rejected  }
+                  >
+                    Đã Từ chối
+                  </TabsTrigger>
                 </TabsList>
+
                 <TabsContent value='all' className='m-0 border border-gray-200 bg-transparent '>
                   <ReportsList
-                    reports={currentReports}
+                    reports={reportsAll}
                     selectedReportId={selectedReport}
                     onSelectReport={setSelectedReport}
                     selectedReports={selectedReports}
                     onSelectMultiple={setSelectedReports}
+                    isLoading={isLoading}
                   />
                 </TabsContent>
-                <TabsContent value={ProcessingStatus.PENDING} className='m-0'>
+                <TabsContent value={ProcessingStatus.Pending} className='m-0'>
                   <ReportsList
-                    reports={currentReports}
+                    reports={filteredReports}
                     selectedReportId={selectedReport}
                     onSelectReport={setSelectedReport}
                     selectedReports={selectedReports}
                     onSelectMultiple={setSelectedReports}
+                    isLoading={isLoading}
                   />
                 </TabsContent>
-                <TabsContent value={ProcessingStatus.IN_PROGRESS} className='m-0'>
+                <TabsContent value={ProcessingStatus.Reviewing} className='m-0'>
                   <ReportsList
-                    reports={currentReports}
+                    reports={filteredReports}
                     selectedReportId={selectedReport}
                     onSelectReport={setSelectedReport}
                     selectedReports={selectedReports}
                     onSelectMultiple={setSelectedReports}
+                    isLoading={isLoading}
                   />
                 </TabsContent>
-                <TabsContent value={ProcessingStatus.RESOLVED} className='m-0'>
+                <TabsContent value={ProcessingStatus.Resolved} className='m-0'>
                   <ReportsList
-                    reports={currentReports}
+                    reports={filteredReports}
                     selectedReportId={selectedReport}
                     onSelectReport={setSelectedReport}
                     selectedReports={selectedReports}
                     onSelectMultiple={setSelectedReports}
+                    isLoading={isLoading}
+                  />
+                </TabsContent>
+                <TabsContent value={ProcessingStatus.Rejected } className='m-0'>
+                  <ReportsList
+                    reports={filteredReports}
+                    selectedReportId={selectedReport}
+                    onSelectReport={setSelectedReport}
+                    selectedReports={selectedReports}
+                    onSelectMultiple={setSelectedReports}
+                    isLoading={isLoading}
                   />
                 </TabsContent>
               </Tabs>
+              <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+                <div className='text-xs text-gray-500'>Hiển thị {allReports?.data?.totalItems} báo cáo của hệ thống</div>
+                <Pagination currentPage={allReports?.data?.currentPage} totalPages={allReports?.data?.totalPages} onPageChange={handleChangePage} className='mt-0' />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -340,7 +353,7 @@ export function ReportsAdminDashboard() {
               }}
             />
           ) : (
-            <Card className='h-full flex items-center justify-center p-6 border border-gray-200 rounded-[8px] ' >
+            <Card className='h-full flex items-center justify-center p-6 border border-gray-200 rounded-[8px] '>
               <div className='text-center'>
                 <MessageCircle className='mx-auto h-12 w-12 text-muted-foreground' />
                 <h3 className='mt-4 text-lg font-medium'>Chưa chọn báo cáo</h3>

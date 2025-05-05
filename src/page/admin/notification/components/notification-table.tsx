@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {  ChevronDown, Filter } from 'lucide-react';
+import { ChevronDown, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,21 +25,29 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination } from '@/components/user/pagination';
 import { NotificationCreateDialog } from './notification-create-dialog';
-import { notificationData, type Notification ,columns} from './column';
+import { columns } from './column';
+import { Loading } from '@/components/common';
 
-export function NotificationTable() {
+export function NotificationTable({
+  data,
+  isLoading,
+  handleChangePage,
+}: {
+  data: any;
+  isLoading: boolean;
+  handleChangePage: any;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<Notification[]>([...notificationData]);
 
-  const handleNotificationCreated = (newNotification: any) => {
-    setData((prev) => [...prev, newNotification]);
-  };
+  console.log(data?.data);
+
+  const handleNotificationCreated = (newNotification: any) => {};
 
   const table = useReactTable({
-    data,
+    data: data?.data?.data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -136,54 +144,63 @@ export function NotificationTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className='rounded-md border border-red-100'>
-        <div className='relative max-h-[500px] overflow-auto'>
-          <Table>
-            <TableHeader className='bg-red-50/50'>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className='py-2 text-xs'>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+      {isLoading ? (
+        <Loading className='mt-[170px] ' />
+      ) : (
+        <div className='rounded-md border border-red-100'>
+          <div className='relative max-h-[500px] overflow-auto'>
+            <Table>
+              <TableHeader className='bg-red-50/50'>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
-                    Không có kết quả.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className='py-2 text-xs'>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
+                      Không có kết quả.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+            <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 thông báo hệ thống</div>
+            <Pagination
+              currentPage={data?.data?.currentPage}
+              totalPages={data?.data?.totalPages}
+              onPageChange={handleChangePage}
+              className='mt-0'
+            />
+          </div>
         </div>
-        <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
-          <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 thông báo hệ thống</div>
-          <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} className='mt-0' />
-        </div>
-      </div>
-
+      )}
     </div>
   );
 }
-

@@ -25,7 +25,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 
 enum ListingTypes {
   RENT = 'RENT',
@@ -53,39 +52,7 @@ enum StatusPost {
   NEGOTIATING = 'Đang đám phán',
   DELIVERED = 'Đã bàn giao',
 }
-type Post = {
-  id: string;
-  userId: string;
-  title: string;
-  priceUnit: string;
-  address: string;
-  price: number;
-  squareMeters: number;
-  description: string;
-  floor: number;
-  bedroom: number;
-  bathroom: number;
-  priority: number;
-  isFurniture: boolean;
-  direction: string;
-  verified: boolean;
-  expiredDate: Date;
-  status: string;
-  slug: string;
-  createdAt: Date;
-  updatedAt: Date;
-  user: {
-    id: string;
-    fullName: string;
-    email: string;
-  };
-  views?: number;
-  favorites?: number;
-  contacts?: number;
-  listingType?: string;
-  amenities?: string[];
-  images?: string[];
-};
+
 
 const formatPrice = (price: number, unit: string) => {
   if (unit === PriceUnit.VND) {
@@ -118,7 +85,7 @@ const formatDirection = (direction: string) => {
 };
 
 interface PostDetailModalProps {
-  post: Post | null;
+  post:  any;
   isOpen: boolean;
   onClose: any;
   onVerify?: (postId: string) => void;
@@ -138,29 +105,22 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
     'Điều hòa',
   ];
 
-  const mockImages = [
-    '/placeholder.svg?height=600&width=800',
-    '/placeholder.svg?height=600&width=800&text=Phòng+khách',
-    '/placeholder.svg?height=600&width=800&text=Phòng+ngủ',
-    '/placeholder.svg?height=600&width=800&text=Nhà+bếp',
-    '/placeholder.svg?height=600&width=800&text=Phòng+tắm',
-  ];
-
   if (!post) return null;
 
-  const postWithDefaults: Post = {
+  const postWithDefaults: any = {
     ...post,
     views: post.views || Math.floor(Math.random() * 500) + 100,
     favorites: post.favorites || Math.floor(Math.random() * 50),
     contacts: post.contacts || Math.floor(Math.random() * 20),
     listingType: post.listingType || (Math.random() > 0.5 ? ListingTypes.RENT : ListingTypes.SELL),
     amenities: post.amenities || mockAmenities,
-    images: post.images || mockImages,
+    images: post.images
   };
-
+  console.log(postWithDefaults)
   const daysUntilExpiry = Math.ceil(
-    (postWithDefaults.expiredDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+    (new Date(postWithDefaults.expiredDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
   );
+  
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -181,7 +141,7 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='max-w-4xl h-[90vh] p-0 overflow-hidden'>
+      <DialogContent className='max-w-4xl p-0 overflow-hidden'>
         <div className='overflow-y-auto max-h-[calc(90vh-30px)] px-6 py-6'>
           <div className='flex flex-col '>
             <DialogHeader className=''>
@@ -213,27 +173,21 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                 <TabsList className='h-10 border border-gray-200 bg-transparent '>
                   <TabsTrigger
                     value='overview'
-                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white'
+                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white px-[18px] '
                   >
                     Tổng quan
                   </TabsTrigger>
                   <TabsTrigger
                     value='details'
-                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white'
+                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white px-[18px] '
                   >
                     Chi tiết
                   </TabsTrigger>
                   <TabsTrigger
                     value='images'
-                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white'
+                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white px-[18px] '
                   >
                     Hình ảnh
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='analytics'
-                    className='data-[state=active]:font-medium data-[state=active]:bg-red-500 data-[state=active]:text-white'
-                  >
-                    Phân tích
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -243,7 +197,7 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                     <div className='space-y-4'>
                       <div className='aspect-video relative rounded-lg overflow-hidden border'>
                         <img
-                          src={postWithDefaults.images[0] || '/placeholder.svg'}
+                          src={postWithDefaults.images[0].imageUrl || '/placeholder.svg'}
                           alt={postWithDefaults.title}
                           className='object-cover'
                         />
@@ -278,9 +232,10 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                         </div>
                       </div>
                       <div>
-                        <h3 className='text-[16px] text-gray-700 font-semibold mb-2'>Mô tả</h3>
-                        <p className='text-slate-600'>{postWithDefaults.description}</p>
-                      </div>
+  <h3 className='text-[16px] text-gray-700 font-semibold mb-2'>Mô tả</h3>
+  <div className='text-slate-600' dangerouslySetInnerHTML={{ __html: postWithDefaults.description }} />
+</div>
+
                     </div>
                   </div>
                   <div className='space-y-6'>
@@ -289,9 +244,9 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                       <div className='flex items-center space-x-3 mb-4'>
                         <Avatar>
                           <AvatarImage
-                            src={`https://api.dicebear.com/7.x/initials/svg?seed=${postWithDefaults.user.fullName}`}
+                            src={postWithDefaults.user.avatar}
                           />
-                          <AvatarFallback>{postWithDefaults.user.fullName.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{postWithDefaults.user.fullname.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <div className='font-medium'>{postWithDefaults.user.fullName}</div>
@@ -319,14 +274,14 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                       </div>
                       <div className='flex justify-between items-center text-sm'>
                         <span className='text-slate-500'>Thời gian còn lại</span>
-                        <Badge
+                        {/* <Badge
                           variant='outline'
                           className={
                             daysUntilExpiry > 30 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                           }
                         >
                           {daysUntilExpiry} ngày
-                        </Badge>
+                        </Badge> */}
                       </div>
                       <div className='flex justify-between items-center text-sm'>
                         <span className='text-slate-500'>Xác minh</span>
@@ -455,72 +410,27 @@ export function PostDetailModal({ post, isOpen, onClose, onVerify }: PostDetailM
                 <div className='space-y-6'>
                   <div className='aspect-video relative rounded-lg overflow-hidden border'>
                     <img
-                      src={postWithDefaults.images[selectedImageIndex] || '/placeholder.svg'}
+                      src={postWithDefaults.images[selectedImageIndex].imageUrl  || '/placeholder.svg'}
                       alt={`Hình ảnh ${selectedImageIndex + 1}`}
-                      className='object-cover'
+                      className='object-cover w-full h-full '
                     />
                   </div>
                   <div className='grid grid-cols-5 gap-2'>
-                    {postWithDefaults.images.map((image, index) => (
+                    {postWithDefaults.images.map((image:any, index:number) => (
                       <div
                         key={index}
                         className={`aspect-video relative rounded-md overflow-hidden cursor-pointer border-2 ${
-                          selectedImageIndex === index ? 'border-primary' : 'border-transparent'
+                          selectedImageIndex === index ? 'border-red-300' : 'border-transparent'
                         }`}
                         onClick={() => setSelectedImageIndex(index)}
                       >
                         <img
-                          src={image || '/placeholder.svg'}
+                          src={image.imageUrl || '/placeholder.svg'}
                           alt={`Thumbnail ${index + 1}`}
-                          className='object-cover'
+                          className='object-cover w-full h-full '
                         />
                       </div>
                     ))}
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value='analytics' className='m-0'>
-                <div className='space-y-6'>
-                  <h3 className='text-[16px] text-gray-700 font-semibold'>Phân tích hiệu suất</h3>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className='border rounded-lg p-4 flex flex-col'>
-                      <div className='text-sm text-slate-500 mb-1'>Lượt xem</div>
-                      <div className='text-2xl font-bold mb-2'>{postWithDefaults.views}</div>
-                      <Progress value={Math.min((postWithDefaults.views / 500) * 100, 100)} className='h-2' />
-                    </div>
-                    <div className='border rounded-lg p-4 flex flex-col'>
-                      <div className='text-sm text-slate-500 mb-1'>Lượt yêu thích</div>
-                      <div className='text-2xl font-bold mb-2'>{postWithDefaults.favorites}</div>
-                      <Progress value={Math.min((postWithDefaults.favorites / 50) * 100, 100)} className='h-2' />
-                    </div>
-                    <div className='border rounded-lg p-4 flex flex-col'>
-                      <div className='text-sm text-slate-500 mb-1'>Lượt liên hệ</div>
-                      <div className='text-2xl font-bold mb-2'>{postWithDefaults.contacts}</div>
-                      <Progress value={Math.min((postWithDefaults.contacts / 20) * 100, 100)} className='h-2' />
-                    </div>
-                  </div>
-                  <div className='border rounded-lg p-4'>
-                    <h4 className='font-medium mb-3'>Tỷ lệ chuyển đổi</h4>
-                    <div className='space-y-3'>
-                      <div>
-                        <div className='flex justify-between text-sm mb-1'>
-                          <span>Tỷ lệ yêu thích</span>
-                          <span className='font-medium'>
-                            {((postWithDefaults.favorites / postWithDefaults.views) * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <Progress value={(postWithDefaults.favorites / postWithDefaults.views) * 100} className='h-2' />
-                      </div>
-                      <div>
-                        <div className='flex justify-between text-sm mb-1'>
-                          <span>Tỷ lệ liên hệ</span>
-                          <span className='font-medium'>
-                            {((postWithDefaults.contacts / postWithDefaults.views) * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <Progress value={(postWithDefaults.contacts / postWithDefaults.views) * 100} className='h-2' />
-                      </div>
-                    </div>
                   </div>
                 </div>
               </TabsContent>

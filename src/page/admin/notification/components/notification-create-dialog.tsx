@@ -1,8 +1,6 @@
 import type React from 'react';
-
 import { useState } from 'react';
 import { Plus, Loader2, Bell, Search, X } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,24 +20,10 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-// Sample user data for the dropdown
-const users = [
-  {
-    id: 'u1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: '/placeholder.svg?height=40&width=40',
-    department: 'Marketing',
-  },
-  {
-    id: 'u2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    avatar: '/placeholder.svg?height=40&width=40',
-    department: 'Engineering',
-  },
-];
+import { useGetAllUser } from '../../user/hooks/use-get-all-user';
+import { Pagination } from '@/components/user/pagination';
+import { toast } from '@/hooks/use-toast';
+import { useSendNotification } from '../hooks/use-send-notification';
 
 interface NotificationCreateDialogProps {
   trigger?: React.ReactNode;
@@ -48,26 +32,115 @@ interface NotificationCreateDialogProps {
 
 export function NotificationCreateDialog({ trigger, onNotificationCreated }: NotificationCreateDialogProps) {
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [manualSelectedUsers, setManualSelectedUsers] = useState<string[]>([]); 
   const [sendToAll, setSendToAll] = useState(false);
   const [notificationData, setNotificationData] = useState({
     message: '',
     priority: 'normal',
     expiresAt: '',
   });
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  const { data: allUser } = useGetAllUser(page, limit);
+  const { mutate: sendNotification, isPending: isSubmitting } = useSendNotification();
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.department.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const handleChangePage = (page: number) => {
+    setPage(page);
+    setSelectedUsers([]);
+    setManualSelectedUsers([]);
+    setSendToAll(false);
+  };
 
-  const handleUserToggle = (userId: string) => {};
+  const handleUserToggle = (userId: string) => {
+    setManualSelectedUsers((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+    if (!sendToAll) {
+      setSelectedUsers((prev) =>
+        prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      );
+    }
+  };
 
-  const handleSubmit = async () => {};
+  const handleSendToAll = (checked: boolean) => {
+    setSendToAll(checked);
+    if (checked) {
+      const pageUserIds = allUser?.data?.map((user: any) => user.id) || [];
+      setSelectedUsers(pageUserIds);
+    } else {
+      setSelectedUsers(manualSelectedUsers);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!notificationData.message) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng nhập nội dung thông báo',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!notificationData.expiresAt) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng chọn ngày hết hạn',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (selectedUsers.length === 0) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng chọn ít nhất một người nhận',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const priorityMap: { [key: string]: number } = {
+      low: 1,
+      normal: 2,
+      high: 3,
+    };
+
+    const data: any = {
+      message: notificationData.message,
+      priority: priorityMap[notificationData.priority],
+      endDate: new Date(notificationData.expiresAt).toISOString(),
+      userId: selectedUsers.length === 1 ? selectedUsers[0] : selectedUsers,
+    };
+
+    sendNotification(data, {
+      onSuccess: (response) => {
+        toast({
+          title: 'Thành công',
+          description: 'Gửi thông báo thành công',
+          variant: 'success',
+        });
+        if (onNotificationCreated) {
+          onNotificationCreated(response);
+        }
+        setNotificationData({ message: '', priority: 'normal', expiresAt: '' });
+        setSelectedUsers([]);
+        setManualSelectedUsers([]);
+        setSendToAll(false);
+        setSearchQuery('');
+        setOpen(false);
+      },
+      onError: (error: any) => {
+        toast({
+          title: 'Lỗi',
+          description: error?.response?.data?.message || 'Không thể gửi thông báo',
+          variant: 'destructive',
+        });
+      },
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -116,7 +189,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   <SelectTrigger id='priority' className='text-[14px] h-8'>
                     <SelectValue placeholder='Chọn độ ưu tiên' />
                   </SelectTrigger>
-                  <SelectContent className='z-[9999999] '>
+                  <SelectContent className='z-[9999999]'>
                     <SelectItem value='low' className='text-[14px]'>
                       <div className='flex items-center gap-2'>
                         <Badge className='bg-blue-100 text-blue-700 hover:bg-blue-200 text-[11px]'>Thấp</Badge>
@@ -151,7 +224,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   value={notificationData.expiresAt}
                   onChange={(e) => setNotificationData({ ...notificationData, expiresAt: e.target.value })}
                 />
-                <p className='text-[11px] text-muted-foreground'>Tùy chọn. Để trống nếu không muốn đặt ngày hết hạn.</p>
+                <p className='text-[11px] text-muted-foreground'>Bắt buộc. Chọn ngày hết hạn cho thông báo.</p>
               </div>
             </div>
             <Separator className='my-2 bg-red-100' />
@@ -164,11 +237,11 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   <Switch
                     id='sendToAll'
                     checked={sendToAll}
-                    onCheckedChange={setSendToAll}
+                    onCheckedChange={handleSendToAll}
                     className='data-[state=checked]:bg-red-500'
                   />
                   <Label htmlFor='sendToAll' className='text-[14px]'>
-                    Gửi đến tất cả người dùng
+                    Gửi đến tất cả người dùng trên trang này
                   </Label>
                 </div>
               </div>
@@ -177,8 +250,8 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   <div className='relative'>
                     <Search className='absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground' />
                     <Input
-                      placeholder='Tìm kiếm người dùng theo tên, email hoặc phòng ban...'
-                      className='pl-7 text-[14px] h-8'
+                      placeholder='Tìm kiếm người dùng theo tên, email hoặc vai trò...'
+                      className='pl-7 text-[14px] h-8 outline-none'
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -196,7 +269,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   {selectedUsers.length > 0 && (
                     <div className='flex flex-wrap gap-1 mt-2'>
                       {selectedUsers.map((userId) => {
-                        const user = users.find((u) => u.id === userId);
+                        const user = allUser?.data?.find((u: any) => u.id === userId);
                         if (!user) return null;
                         return (
                           <Badge
@@ -204,7 +277,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                             variant='secondary'
                             className='text-[11px] bg-red-50 text-red-700 hover:bg-red-100'
                           >
-                            {user.name}
+                            {user.fullname}
                             <Button
                               variant='ghost'
                               size='icon'
@@ -220,7 +293,10 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                         variant='ghost'
                         size='sm'
                         className='h-5 text-[11px] px-1'
-                        onClick={() => setSelectedUsers([])}
+                        onClick={() => {
+                          setSelectedUsers([]);
+                          setManualSelectedUsers([]);
+                        }}
                       >
                         Xóa tất cả
                       </Button>
@@ -228,59 +304,76 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                   )}
                   <ScrollArea className='h-[150px] rounded-md border border-red-100'>
                     <div className='p-2 space-y-1'>
-                      {filteredUsers.length > 0 ? (
-                        filteredUsers.map((user) => (
-                          <div
-                            key={user.id}
-                            className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-red-50 ${
-                              selectedUsers.includes(user.id) ? 'bg-red-50' : ''
-                            }`}
-                            onClick={() => handleUserToggle(user.id)}
-                          >
-                            <div className='flex items-center gap-2'>
-                              <Avatar className='h-6 w-6'>
-                                <AvatarImage src={user.avatar || '/placeholder.svg'} alt={user.name} />
-                                <AvatarFallback className='text-[11px] bg-red-100 text-red-500'>
-                                  {user.name.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className='text-[14px] font-medium'>{user.name}</p>
-                                <p className='text-[11px] text-muted-foreground'>{user.email}</p>
+                      {allUser?.data?.length > 0 ? (
+                        allUser?.data
+                          ?.filter((user: any) =>
+                            searchQuery
+                              ? user.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                user.roles?.toLowerCase().includes(searchQuery.toLowerCase())
+                              : true
+                          )
+                          ?.map((user: any) => (
+                            <div
+                              key={user.id}
+                              className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-red-50 ${
+                                selectedUsers.includes(user?.id) ? 'bg-red-50' : ''
+                              }`}
+                              onClick={() => handleUserToggle(user?.id)}
+                            >
+                              <div className='flex items-center gap-2'>
+                                <Avatar className='h-6 w-6'>
+                                  <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={user?.fullname} />
+                                  <AvatarFallback className='text-[11px] bg-red-100 text-red-500'>
+                                    {user?.fullname?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className='text-[14px] font-medium'>{user?.fullname}</p>
+                                  <p className='text-[11px] text-muted-foreground'>{user?.email}</p>
+                                </div>
+                              </div>
+                              <div className='flex items-center gap-2'>
+                                <Badge variant='outline' className='text-[11px]'>
+                                  {user?.roles}
+                                </Badge>
+                                <div
+                                  className={`h-4 w-4 rounded-sm border ${
+                                    selectedUsers.includes(user?.id) ? 'bg-red-500 border-red-500' : 'border-gray-300'
+                                  } flex items-center justify-center`}
+                                >
+                                  {selectedUsers.includes(user?.id) && (
+                                    <svg
+                                      xmlns='http://www.w3.org/2000/svg'
+                                      viewBox='0 0 24 24'
+                                      fill='none'
+                                      stroke='currentColor'
+                                      strokeWidth='3'
+                                      strokeLinecap='round'
+                                      strokeLinejoin='round'
+                                      className='h-3 w-3 text-white'
+                                    >
+                                      <polyline points='20 6 9 17 4 12'></polyline>
+                                    </svg>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            <div className='flex items-center gap-2'>
-                              <Badge variant='outline' className='text-[11px]'>
-                                {user.department}
-                              </Badge>
-                              <div
-                                className={`h-4 w-4 rounded-sm border ${
-                                  selectedUsers.includes(user.id) ? 'bg-red-500 border-red-500' : 'border-gray-300'
-                                } flex items-center justify-center`}
-                              >
-                                {selectedUsers.includes(user.id) && (
-                                  <svg
-                                    xmlns='http://www.w3.org/2000/svg'
-                                    viewBox='0 0 24 24'
-                                    fill='none'
-                                    stroke='currentColor'
-                                    strokeWidth='3'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    className='h-3 w-3 text-white'
-                                  >
-                                    <polyline points='20 6 9 17 4 12'></polyline>
-                                  </svg>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))
+                          ))
                       ) : (
                         <div className='text-center py-4 text-[14px] text-muted-foreground'>
                           Không tìm thấy người dùng nào khớp với "{searchQuery}"
                         </div>
                       )}
+                    </div>
+                    <div className='flex items-center justify-between px-4 py-3 border-t border-red-50 w-full'>
+                      <div className='text-xs text-gray-500'>Người dùng</div>
+                      <Pagination
+                        currentPage={allUser?.currentPage}
+                        totalPages={allUser?.totalPages}
+                        onPageChange={handleChangePage}
+                        className='mt-0'
+                      />
                     </div>
                   </ScrollArea>
                   <p className='text-[11px] text-muted-foreground'>Đã chọn {selectedUsers.length} người dùng</p>

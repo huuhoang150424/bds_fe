@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Check, Upload, User, MapPin, Phone, Mail, Briefcase, X } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUser } from '@/redux/authReducer';
+import { selectUser, updateRole } from '@/redux/authReducer';
 import { formSchemaRegisterAgent, type FormRegisterAgent } from '../../schema/register-agent';
 import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
@@ -126,6 +126,7 @@ export default function AgentRegistrationModal() {
           setSelectedExpertise([]);
           setCertificateFile(null);
         }, 2000); 
+        dispatch(updateRole({roles: 'Agent'}))
       },
       onError: () => {
         setIsSubmitting(false); 

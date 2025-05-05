@@ -78,46 +78,6 @@ export function NewsTable() {
                 Lọc
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='text-xs'>
-              <DropdownMenuLabel className='text-xs'>Lọc theo trạng thái</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                className='text-xs'
-                checked={table.getColumn('status')?.getFilterValue() === 'published'}
-                onCheckedChange={() => {
-                  table.getColumn('status')?.setFilterValue('published');
-                }}
-              >
-                Published
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                className='text-xs'
-                checked={table.getColumn('status')?.getFilterValue() === 'draft'}
-                onCheckedChange={() => {
-                  table.getColumn('status')?.setFilterValue('draft');
-                }}
-              >
-                Draft
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                className='text-xs'
-                checked={table.getColumn('status')?.getFilterValue() === 'archived'}
-                onCheckedChange={() => {
-                  table.getColumn('status')?.setFilterValue('archived');
-                }}
-              >
-                Archived
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className='text-xs'
-                onClick={() => {
-                  table.getColumn('status')?.setFilterValue(null);
-                }}
-              >
-                Xóa bộ lọc
-              </DropdownMenuItem>
-            </DropdownMenuContent>
           </DropdownMenu>
         </div>
         <div className='flex items-center gap-2'>

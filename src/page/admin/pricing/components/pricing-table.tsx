@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ChevronDown, Filter} from 'lucide-react';
+import { ChevronDown, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -23,94 +23,31 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PricingCreateDialog } from './pricing-create-dialog';
-import { PricingLevel, type Pricing,columns, formatCurrency } from './column';
+import { PricingCreateDialog } from './pricing-create';
+import { PricingLevel, type Pricing, columns } from './column';
+import { Pagination } from '@/components/user/pagination';
+import { Loading } from '@/components/common';
 
-
-export const pricingData: Pricing[] = [
-  {
-    id: 'p001',
-    name: PricingLevel.FREE,
-    description: 'Basic features for individuals',
-    price: 0,
-    discountPercent: 0,
-    displayDay: 5,
-    hasReport: false,
-    maxPost: 3,
-    boostDays: 0,
-    expiredDay: 30,
-    createdAt: '2023-10-15T10:30:00Z',
-    updatedAt: '2023-10-15T10:30:00Z',
-    userCount: 1250,
-  },
-  {
-    id: 'p002',
-    name: PricingLevel.BASIC,
-    description: 'Essential features for beginners',
-    price: 9.99,
-    discountPercent: 0,
-    displayDay: 10,
-    hasReport: false,
-    maxPost: 10,
-    boostDays: 1,
-    expiredDay: 30,
-    createdAt: '2023-10-14T14:15:00Z',
-    updatedAt: '2023-10-14T14:15:00Z',
-    userCount: 850,
-  },
-  {
-    id: 'p003',
-    name: PricingLevel.STANDARD,
-    description: 'Advanced features for professionals',
-    price: 19.99,
-    discountPercent: 10,
-    displayDay: 15,
-    hasReport: true,
-    maxPost: 25,
-    boostDays: 3,
-    expiredDay: 30,
-    createdAt: '2023-10-13T09:45:00Z',
-    updatedAt: '2023-10-13T09:45:00Z',
-    userCount: 620,
-  },
-  {
-    id: 'p004',
-    name: PricingLevel.PREMIUM,
-    description: 'Premium features for businesses',
-    price: 49.99,
-    discountPercent: 15,
-    displayDay: 30,
-    hasReport: true,
-    maxPost: 100,
-    boostDays: 7,
-    expiredDay: 30,
-    createdAt: '2023-10-12T16:20:00Z',
-    updatedAt: '2023-10-12T16:20:00Z',
-    userCount: 320,
-  }
-];
-
-export function PricingTable() {
+export function PricingTable({
+  data,
+  isLoading,
+  handleChangePage,
+}: {
+  data: any;
+  isLoading: boolean;
+  handleChangePage: any;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<Pricing[]>([...pricingData]);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedPricing, setSelectedPricing] = useState<Pricing | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const handlePricingCreated = (newPricing: Pricing) => {};
 
-  const handleDelete = async () => {
-
-  };
-
-  const handlePricingCreated = (newPricing: Pricing) => {
-    setData((prev) => [newPricing, ...prev]);
-  };
+  const allPricing=data?.data?.data || [];
 
   const table = useReactTable({
-    data,
+    data: allPricing,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -146,7 +83,7 @@ export function PricingTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='text-xs'>
-              <DropdownMenuLabel className='text-xs'>Filter by package</DropdownMenuLabel>
+              <DropdownMenuLabel className='text-xs'>Lọc gói vip</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {Object.values(PricingLevel).map((level) => (
                 <DropdownMenuCheckboxItem
@@ -210,48 +147,63 @@ export function PricingTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className='rounded-md border border-red-100'>
-        <div className='relative max-h-[500px] overflow-auto'>
-          <Table>
-            <TableHeader className='bg-red-50/50'>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className='py-2 text-xs'>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+      {isLoading ? (
+        <Loading className='mt-[200px] ' />
+      ) : (
+        <div className='rounded-md border border-red-100'>
+          <div className='relative max-h-[500px] overflow-auto'>
+            <Table>
+              <TableHeader className='bg-red-50/50'>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className='py-2 text-xs'>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+            <div className='text-xs text-gray-500'>Hiển thị gói vip của hệ thống</div>
+            <Pagination
+              currentPage={data?.data?.currentPage}
+              totalPages={data?.data?.totalPages}
+              onPageChange={handleChangePage}
+              className='mt-0'
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

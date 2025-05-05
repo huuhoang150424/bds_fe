@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,184 +8,112 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import { MoreHorizontal, FileText, Phone, Calendar, RefreshCw, ChevronFirst, ChevronLast } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MoreHorizontal, FileText, Phone, Calendar, RefreshCw, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { format } from 'date-fns';
+import { Pagination } from '@/components/user/pagination';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/redux/authReducer';
+import UpdateAppointmentDialog from './components/update-appointment';
+import DeleteAppointmentDialog from './components/delete-appointment';
+import { useGetMyAppointments } from './hook/use-get-appoinment';
+import UpdateAppointmentStatusDialog from './components/confirm-appointment';
+import ViewAppointmentDetails from './components/view-appointment-details';
 
-interface Customer {
+interface Appointment {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  status: 'Tiềm năng' | 'Đang giao dịch' | 'Đã mua';
-  lastContact: string;
-  interests: string[];
+  post: { id: string; title: string };
+  requester: { id: string; fullname: string; avatar: string };
+  receiver: { id: string; fullname: string; avatar: string };
+  status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'cancelled' | 'rescheduled';
+  appointmentTime: string;
+  message?: string;
+  duration: number;
 }
 
-const customers: Customer[] = [
-  {
-    id: 'KH001',
-    name: 'Nguyễn Văn An',
-    email: 'nguyenvanan@example.com',
-    phone: '0912 345 678',
-    status: 'Tiềm năng',
-    lastContact: '15/07/2023',
-    interests: ['Căn hộ', 'Nhà phố'],
-  },
-  {
-    id: 'KH002',
-    name: 'Trần Thị Bình',
-    email: 'tranthib@example.com',
-    phone: '0987 654 321',
-    status: 'Đang giao dịch',
-    lastContact: '20/07/2023',
-    interests: ['Thương mại', 'Đất nền'],
-  },
-  {
-    id: 'KH003',
-    name: 'Lê Minh Cường',
-    email: 'leminhc@example.com',
-    phone: '0909 456 789',
-    status: 'Đã mua',
-    lastContact: '30/06/2023',
-    interests: ['Nhà phố'],
-  },
-  {
-    id: 'KH004',
-    name: 'Phạm Thị Dung',
-    email: 'phamthid@example.com',
-    phone: '0978 234 567',
-    status: 'Tiềm năng',
-    lastContact: '10/07/2023',
-    interests: ['Căn hộ'],
-  },
-  {
-    id: 'KH005',
-    name: 'Hoàng Văn Em',
-    email: 'hoangvane@example.com',
-    phone: '0932 876 543',
-    status: 'Đang giao dịch',
-    lastContact: '18/07/2023',
-    interests: ['Nhà phố', 'Đất nền'],
-  },
-  {
-    id: 'KH006',
-    name: 'Ngô Thị Phương',
-    email: 'ngothip@example.com',
-    phone: '0918 345 678',
-    status: 'Đã mua',
-    lastContact: '05/07/2023',
-    interests: ['Thương mại'],
-  },
-  {
-    id: 'KH007',
-    name: 'Đỗ Văn Giang',
-    email: 'dovang@example.com',
-    phone: '0965 432 109',
-    status: 'Tiềm năng',
-    lastContact: '12/07/2023',
-    interests: ['Căn hộ', 'Đất nền'],
-  },
-  {
-    id: 'KH008',
-    name: 'Vũ Thị Hương',
-    email: 'vuthih@example.com',
-    phone: '0912 876 543',
-    status: 'Đang giao dịch',
-    lastContact: '22/07/2023',
-    interests: ['Nhà phố'],
-  },
-  {
-    id: 'KH009',
-    name: 'Đinh Văn Ích',
-    email: 'dinhvani@example.com',
-    phone: '0934 567 890',
-    status: 'Đã mua',
-    lastContact: '01/07/2023',
-    interests: ['Thương mại', 'Căn hộ'],
-  },
-  {
-    id: 'KH010',
-    name: 'Lý Thị Kim',
-    email: 'lythik@example.com',
-    phone: '0978 123 456',
-    status: 'Tiềm năng',
-    lastContact: '08/07/2023',
-    interests: ['Đất nền'],
-  },
-];
-import useScrollToTopOnMount from '@/hooks/use-scroll-top';
-
-export default function CustomersPage() {
+export default function AppointmentsManagement() {
   useScrollToTopOnMount();
+  const user = useSelector(selectUser);
   const [activeRow, setActiveRow] = useState<string | null>(null);
+  const [pageSentByOthers, setPageSentByOthers] = useState(1);
+  const [pageSentByMe, setPageSentByMe] = useState(1);
+  const pageSize = 10;
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const { data, isLoading } = useGetMyAppointments(pageSentByOthers, pageSize);
+
+  const appointments: Appointment[] = data?.data?.data || [];
+  const totalItems = data?.data?.totalItems || 0;
+  const totalPages = data?.data?.totalPages || 1;
+  const currentPage = data?.data?.currentPage || 1;
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveRow(null);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isUpdateDialogOpen && !isStatusDialogOpen && !isDeleteDialogOpen && !isDetailsDialogOpen && activeRow) {
+      setActiveRow(null);
+    }
+  }, [isUpdateDialogOpen, isStatusDialogOpen, isDeleteDialogOpen,isDetailsDialogOpen]);
+
+  const appointmentsSentByOthers = appointments.filter((appt) => appt.receiver.id === user?.id);
+  const appointmentsSentByMe = appointments.filter((appt) => appt.requester.id === user?.id);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Tiềm năng':
+      case 'pending':
         return (
           <Badge variant='outline' className='bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'>
-            Tiềm năng
+            Chờ xử lý
           </Badge>
         );
-      case 'Đang giao dịch':
+      case 'confirmed':
         return (
           <Badge variant='outline' className='bg-green-50 text-green-600 border-green-200 hover:bg-green-100'>
-            Đang giao dịch
+            Đã xác nhận
           </Badge>
         );
-      case 'Đã mua':
+      case 'rejected':
+        return (
+          <Badge variant='outline' className='bg-red-50 text-red-600 border-red-200 hover:bg-red-100'>
+            Đã từ chối
+          </Badge>
+        );
+      case 'completed':
         return (
           <Badge variant='outline' className='bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'>
-            Đã mua
+            Hoàn thành
+          </Badge>
+        );
+      case 'cancelled':
+        return (
+          <Badge variant='outline' className='bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'>
+            Đã hủy
+          </Badge>
+        );
+      case 'rescheduled':
+        return (
+          <Badge variant='outline' className='bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100'>
+            Đã dời lịch
           </Badge>
         );
       default:
         return <Badge variant='outline'>{status}</Badge>;
-    }
-  };
-
-  const getInterestBadge = (interest: string) => {
-    switch (interest) {
-      case 'Căn hộ':
-        return (
-          <Badge variant='outline' className='bg-purple-50 text-purple-600 border-purple-200 mr-1 text-[10px]'>
-            Căn hộ
-          </Badge>
-        );
-      case 'Nhà phố':
-        return (
-          <Badge variant='outline' className='bg-amber-50 text-amber-600 border-amber-200 mr-1 text-[10px]'>
-            Nhà phố
-          </Badge>
-        );
-      case 'Thương mại':
-        return (
-          <Badge variant='outline' className='bg-indigo-50 text-indigo-600 border-indigo-200 mr-1 text-[10px]'>
-            Thương mại
-          </Badge>
-        );
-      case 'Đất nền':
-        return (
-          <Badge variant='outline' className='bg-rose-50 text-rose-600 border-rose-200 mr-1 text-[10px]'>
-            Đất nền
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant='outline' className='mr-1 text-[10px]'>
-            {interest}
-          </Badge>
-        );
     }
   };
 
@@ -209,142 +137,251 @@ export default function CustomersPage() {
       'bg-indigo-100 text-indigo-800',
       'bg-gray-100 text-gray-800',
     ];
-
-    const index = Number.parseInt(id.replace('KH', '')) % colors.length;
+    const index = Number.parseInt(id.replace(/[^0-9]/g, '')) % colors.length;
     return colors[index];
   };
+
+  const handleChangePage = (newPage: number, tab: 'sentByOthers' | 'sentByMe') => {
+    if (tab === 'sentByOthers') {
+      setPageSentByOthers(newPage);
+    } else {
+      setPageSentByMe(newPage);
+    }
+  };
+
+  const handleOpenUpdateDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsUpdateDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleOpenStatusDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsStatusDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleOpenDeleteDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsDeleteDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleDropdownOpen = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenDropdown(openDropdown === id ? null : id);
+    setActiveRow(id);
+  };
+
+  const handleOpenViewDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsDetailsDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleModalClose = () => {
+    setIsUpdateDialogOpen(false);
+    setIsStatusDialogOpen(false);
+    setIsDeleteDialogOpen(false);
+    setIsDetailsDialogOpen(false);
+    setSelectedAppointment(null);
+    setActiveRow(null);
+  };
+
+  const renderAppointmentTable = (appointments: Appointment[], page: number, tab: 'sentByOthers' | 'sentByMe') => (
+    <>
+      <div className='overflow-x-auto'>
+        <Table className='text-xs rounded-md'>
+          <TableHeader className='bg-gray-50'>
+            <TableRow className='hover:bg-gray-50/80'>
+              <TableHead className='w-[80px] font-medium'>Mã cuộc hẹn</TableHead>
+              <TableHead className='w-[180px] font-medium'>Bài đăng</TableHead>
+              <TableHead className='w-[180px] font-medium'>Người yêu cầu</TableHead>
+              <TableHead className='w-[180px] font-medium'>Người nhận</TableHead>
+              <TableHead className='w-[120px] font-medium'>Trạng thái</TableHead>
+              <TableHead className='w-[120px] font-medium'>Thời gian</TableHead>
+              <TableHead className='w-[80px] font-medium text-right'>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className='text-center'>
+                  Đang tải...
+                </TableCell>
+              </TableRow>
+            ) : appointments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className='text-center'>
+                  Không có cuộc hẹn nào
+                </TableCell>
+              </TableRow>
+            ) : (
+              appointments.map((appointment) => (
+                <TableRow
+                  key={appointment.id}
+                  className={cn('h-14 hover:bg-gray-50/80', activeRow === appointment.id && 'bg-blue-50/50')}
+                >
+                  <TableCell className='font-medium'>{appointment.id}</TableCell>
+                  <TableCell>{appointment.post.title}</TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Avatar className={cn('h-7 w-7', getAvatarColor(appointment.requester.id))}>
+                        <AvatarFallback className='text-xs'>
+                          {getInitials(appointment.requester.fullname)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{appointment.requester.fullname}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Avatar className={cn('h-7 w-7', getAvatarColor(appointment.receiver.id))}>
+                        <AvatarFallback className='text-xs'>
+                          {getInitials(appointment.receiver.fullname)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{appointment.receiver.fullname}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(appointment.status)}</TableCell>
+                  <TableCell>{format(new Date(appointment.appointmentTime), 'dd/MM/yyyy HH:mm')}</TableCell>
+                  <TableCell className='text-right'>
+                    <DropdownMenu
+                      open={openDropdown === appointment.id}
+                      onOpenChange={(open) => {
+                        if (!open) setOpenDropdown(null);
+                      }}
+                    >
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          className='h-8 w-8 p-0'
+                          onClick={(e) => handleDropdownOpen(appointment.id, e)}
+                        >
+                          <span className='sr-only'>Mở menu</span>
+                          <MoreHorizontal className='h-4 w-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align='end'
+                        className='w-[180px]'
+                        onCloseAutoFocus={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <DropdownMenuItem className='text-xs' onSelect={(e) => e.preventDefault()} onClick={(e) => handleOpenViewDialog(appointment, e)} >
+                          <FileText className='mr-2 h-3.5 w-3.5' />
+                          <span>Xem chi tiết</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='text-xs' onSelect={(e) => e.preventDefault()}>
+                          <Phone className='mr-2 h-3.5 w-3.5' />
+                          <span>Liên hệ</span>
+                        </DropdownMenuItem>
+                        {user?.id === appointment?.requester?.id && (
+                          <DropdownMenuItem
+                            className='text-xs'
+                            onSelect={(e) => e.preventDefault()}
+                            onClick={(e) => handleOpenUpdateDialog(appointment, e)}
+                          >
+                            <Calendar className='mr-2 h-3.5 w-3.5' />
+                            <span>Sửa lịch hẹn</span>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className='text-xs'
+                          onSelect={(e) => e.preventDefault()}
+                          onClick={(e) => handleOpenStatusDialog(appointment, e)}
+                        >
+                          <RefreshCw className='mr-2 h-3.5 w-3.5' />
+                          <span>Cập nhật trạng thái</span>
+                        </DropdownMenuItem>
+                        
+                        {user?.id === appointment?.requester?.id && (
+                          <DropdownMenuItem
+                            className='text-xs'
+                            onSelect={(e) => e.preventDefault()}
+                            onClick={(e) => handleOpenDeleteDialog(appointment, e)}
+                          >
+                            <Trash2 className='mr-2 h-3.5 w-3.5' />
+                            <span>Xóa cuộc hẹn</span>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+        <div className='text-xs text-gray-500'>Hiển thị trong tổng số {totalItems} lịch hẹn</div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage) => handleChangePage(newPage, tab)}
+          className='mt-0'
+        />
+      </div>
+    </>
+  );
 
   return (
     <div className='container mx-auto py-8 px-4 max-w-[1380px]'>
       <div className='mb-6'>
-        <h1 className='text-xl font-[600] text-gray-700'>Quản Lý Khách Hàng</h1>
-        <p className='text-sm text-gray-500 mt-1'>Quản lý thông tin và theo dõi khách hàng tiềm năng</p>
+        <h1 className='text-xl font-semibold text-gray-700'>Quản Lý Cuộc Hẹn</h1>
+        <p className='text-sm text-gray-500 mt-1'>Quản lý thông tin và theo dõi các cuộc hẹn</p>
       </div>
-      <div className='rounded-md border border-gray-200 shadow-sm  '>
-        <div className='overflow-x-auto'>
-          <Table className='text-xs rounded-md'>
-            <TableHeader className='bg-gray-50 '>
-              <TableRow className='hover:bg-gray-50/80'>
-                <TableHead className='w-[80px] font-medium'>Mã KH</TableHead>
-                <TableHead className='w-[180px] font-medium'>Họ tên</TableHead>
-                <TableHead className='w-[200px] font-medium'>Liên hệ</TableHead>
-                <TableHead className='w-[120px] font-medium'>Trạng thái</TableHead>
-                <TableHead className='w-[120px] font-medium'>Liên hệ gần nhất</TableHead>
-                <TableHead className='w-[200px] font-medium'>Quan tâm</TableHead>
-                <TableHead className='w-[80px] font-medium text-right'>Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customers.map((customer) => (
-                <TableRow
-                  key={customer.id}
-                  className={cn('h-14 hover:bg-gray-50/80', activeRow === customer.id && 'bg-blue-50/50')}
-                >
-                  <TableCell className='font-medium'>{customer.id}</TableCell>
-                  <TableCell>
-                    <div className='flex items-center gap-2'>
-                      <Avatar className={cn('h-7 w-7', getAvatarColor(customer.id))}>
-                        <AvatarFallback className='text-xs'>{getInitials(customer.name)}</AvatarFallback>
-                      </Avatar>
-                      <span>{customer.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className='flex flex-col'>
-                      <span className='text-gray-700'>{customer.email}</span>
-                      <span className='text-gray-500'>{customer.phone}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                  <TableCell>{customer.lastContact}</TableCell>
-                  <TableCell>
-                    <div className='flex flex-wrap gap-1'>
-                      {customer.interests.map((interest, index) => (
-                        <span key={index}>{getInterestBadge(interest)}</span>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <TooltipProvider>
-                      <DropdownMenu>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <DropdownMenuTrigger asChild onClick={() => setActiveRow(customer.id)}>
-                              <Button variant='ghost' className='h-8 w-8 p-0'>
-                                <span className='sr-only'>Mở menu</span>
-                                <MoreHorizontal className='h-4 w-4' />
-                              </Button>
-                            </DropdownMenuTrigger>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Thao tác</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent align='end' className='w-[180px]'>
-                          <DropdownMenuItem className='text-xs'>
-                            <FileText className='mr-2 h-3.5 w-3.5' />
-                            <span>Xem hồ sơ</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className='text-xs'>
-                            <Phone className='mr-2 h-3.5 w-3.5' />
-                            <span>Liên hệ khách hàng</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className='text-xs'>
-                            <Calendar className='mr-2 h-3.5 w-3.5' />
-                            <span>Đặt lịch hẹn</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className='text-xs'>
-                            <RefreshCw className='mr-2 h-3.5 w-3.5' />
-                            <span>Cập nhật trạng thái</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TooltipProvider>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='flex items-center justify-between px-4 py-3 border-t w-full '>
-          <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 24 khách hàng</div>
-          <Pagination className='w-auto'>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationLink href='#' className='h-8 w-8 p-0 flex items-center justify-center'>
-                  <ChevronFirst className='h-3.5 w-3.5' />
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationPrevious href='#' className='h-8 px-2.5' />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' isActive className='h-8 w-8 p-0 flex items-center justify-center'>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' className='h-8 w-8 p-0 flex items-center justify-center'>
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' className='h-8 w-8 p-0 flex items-center justify-center'>
-                  3
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href='#' className='h-8 px-2.5' />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href='#' className='h-8 w-8 p-0 flex items-center justify-center'>
-                  <ChevronLast className='h-3.5 w-3.5' />
-                </PaginationLink>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      </div>
+
+      <Tabs defaultValue='sentByOthers' className='w-full'>
+        <TabsList className='grid w-full grid-cols-2 mb-4 border border-gray-200 bg-transparent p-[5px]'>
+          <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white' value='sentByOthers'>
+            Lịch hẹn người khác gửi
+          </TabsTrigger>
+          <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white' value='sentByMe'>
+            Lịch hẹn mình gửi
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value='sentByOthers'>
+          <div className='rounded-md border border-gray-200 shadow-sm'>
+            {renderAppointmentTable(appointmentsSentByOthers, pageSentByOthers, 'sentByOthers')}
+          </div>
+        </TabsContent>
+
+        <TabsContent value='sentByMe'>
+          <div className='rounded-md border border-gray-200 shadow-sm'>
+            {renderAppointmentTable(appointmentsSentByMe, pageSentByMe, 'sentByMe')}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <UpdateAppointmentDialog
+        isOpen={isUpdateDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <UpdateAppointmentStatusDialog
+        isOpen={isStatusDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <DeleteAppointmentDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <ViewAppointmentDetails
+        isOpen={isDetailsDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
     </div>
   );
 }

@@ -23,91 +23,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { columns, Gender, Roles, type User } from './colums';
 import { Pagination } from '@/components/user/pagination';
+import { useGetAllUser } from '../hooks/use-get-all-user';
+import { Loading } from '@/components/common';
 
-export const userData: User[] = [
-  {
-    id: 'u001',
-    fullname: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    emailVerified: true,
-    isLock: false,
-    phone: '0912345678',
-    isProfessional: false,
-    active: true,
-    lastActive: '2023-10-15T10:30:00Z',
-    address: '123 Đường Lê Lợi, Quận 1, TP.HCM',
-    gender: Gender.Male,
-    dateOfBirth: '1990-05-15T00:00:00Z',
-    avatar: '/placeholder.svg?height=40&width=40',
-    coverPhoto: '/placeholder.svg?height=200&width=800',
-    balance: 0,
-    roles: Roles.User,
-    score: 120,
-    selfIntroduction: null,
-    certificates: null,
-    experienceYears: null,
-    expertise: null,
-    createdAt: '2023-01-15T10:30:00Z',
-    updatedAt: '2023-10-15T10:30:00Z',
-  },
-  {
-    id: 'u002',
-    fullname: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    emailVerified: true,
-    isLock: false,
-    phone: '0923456789',
-    isProfessional: true,
-    active: true,
-    lastActive: '2023-10-14T14:15:00Z',
-    address: '456 Đường Nguyễn Huệ, Quận 1, TP.HCM',
-    gender: Gender.Female,
-    dateOfBirth: '1988-08-20T00:00:00Z',
-    avatar: '/placeholder.svg?height=40&width=40',
-    coverPhoto: '/placeholder.svg?height=200&width=800',
-    balance: 500000,
-    roles: Roles.Agent,
-    score: 450,
-    selfIntroduction: 'Chuyên viên môi giới bất động sản với hơn 5 năm kinh nghiệm',
-    certificates: 'Chứng chỉ môi giới bất động sản',
-    experienceYears: '5',
-    expertise: ['Căn hộ', 'Nhà phố', 'Biệt thự'],
-    createdAt: '2023-02-10T09:45:00Z',
-    updatedAt: '2023-10-14T14:15:00Z',
-  },
-];
 
 export function UserTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<User[]>([...userData]);
+  const { data: allUser, isLoading } = useGetAllUser(page, limit);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [lockDialogOpen, setLockDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleDelete = async () => {};
-  const handleToggleLock = async () => {};
-
+  const handleChangePage=(page:number)=>{
+    setPage(page);
+  }
   const table = useReactTable({
-    data,
+    data:allUser?.data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -167,7 +102,7 @@ export function UserTable() {
                     ? 'Quản trị viên'
                     : role === Roles.Agent
                       ? 'Môi giới'
-                      : role === Roles.Moderator
+                      : role === Roles.User
                         ? 'Điều hành viên'
                         : 'Người dùng'}
                 </DropdownMenuCheckboxItem>
@@ -227,52 +162,58 @@ export function UserTable() {
           </DropdownMenu>
         </div>
       </div>
-      <div className='rounded-md border border-red-100'>
-        <div className='relative max-h-[500px] overflow-auto'>
-          <Table>
-            <TableHeader className='bg-red-50/50'>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80'>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className='py-2 text-xs'>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+      {isLoading ? (
+        <Loading className='mt-[200px] ' />
+      ) : (
+        <div className='rounded-md border border-red-100'>
+          <div className='relative max-h-[500px] overflow-auto'>
+            <Table>
+              <TableHeader className='bg-red-50/50 '>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className='border-red-100 hover:bg-red-50/80 '>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} className='text-xs font-medium text-gray-700 h-8'>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
-                    Không có dữ liệu.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      className='border-red-100 hover:bg-red-50/50 data-[state=selected]:bg-red-50'
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className='py-2 text-xs'>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center text-xs'>
+                      Không có dữ liệu.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+            <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 bài đăng hệ thống</div>
+            <Pagination currentPage={allUser?.currentPage} totalPages={allUser?.totalPages} onPageChange={handleChangePage} className='mt-0' />
+          </div>
         </div>
-        <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
-          <div className='text-xs text-gray-500'>Hiển thị 1 đến 10 trong tổng số 100 bài đăng hệ thống</div>
-          <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} className='mt-0' />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

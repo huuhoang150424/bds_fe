@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, FileText, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function EmptyState({type}: {type:string}) {
-
+  const navigate=useNavigate();
   return (
     <div className='flex flex-col items-center h-screen'>
       <motion.div
@@ -30,7 +30,7 @@ export default function EmptyState({type}: {type:string}) {
         </p>
 
         <motion.div whileHover={{ scale: 1.02 }} className='mb-4'>
-          <Button size='sm' className='w-full bg-red-500 hover:bg-red-600 text-[14px] font-normal'>
+          <Button onClick={()=>navigate('/agent/create-post')} size='sm' className='w-full bg-red-500 hover:bg-red-600 text-[14px] font-normal'>
             <Plus className='w-3 h-3 mr-1' /> Thêm bất động sản
           </Button>
         </motion.div>

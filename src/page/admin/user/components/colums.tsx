@@ -1,52 +1,19 @@
-import { useRef, useState } from 'react';
+import {  useState } from 'react';
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+  type ColumnDef
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, Filter, Trash2, Lock, Unlock, Eye, UserCog } from 'lucide-react';
+import { ArrowUpDown, Lock, Unlock, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import LockUser from './lock-user';
-import DeleteUser from './delete-user';
 export enum Roles {
-  Admin = 'ADMIN',
-  User = 'USER',
-  Agent = 'AGENT',
+  Admin = 'Admin',
+  User = 'User',
+  Agent = 'Agent',
   Moderator = 'MODERATOR',
 }
 
@@ -186,7 +153,7 @@ export const columns: ColumnDef<User>[] = [
           </Badge>
           {!isLock && (
             <Badge className={`text-[10px] ${active ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-              {active ? 'Đang hoạt động' : 'Không hoạt động'}
+              {active ? 'Online' : 'Offline'}
             </Badge>
           )}
         </div>
@@ -254,7 +221,6 @@ export const columns: ColumnDef<User>[] = [
 
 function ActionsCell({ row }: { row: any }) {
   const [lockDialogOpen, setLockDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const user = row.original;
 
   return (
@@ -273,19 +239,7 @@ function ActionsCell({ row }: { row: any }) {
         {user.isLock ? <Unlock className='h-3 w-3' /> : <Lock className='h-3 w-3' />}
         <span className='sr-only'>{user.isLock ? 'Mở khóa' : 'Khóa'}</span>
       </Button>
-      <Button
-        variant='ghost'
-        size='icon'
-        className='h-6 w-6 p-0 hover:bg-red-50 hover:text-red-500'
-        onClick={() => setDeleteDialogOpen(true)}
-        title='Xóa'
-      >
-        <Trash2 className='h-3 w-3' />
-        <span className='sr-only'>Xóa</span>
-      </Button>
-
       <LockUser selectedUser={user} lockDialogOpen={lockDialogOpen} setLockDialogOpen={setLockDialogOpen} />
-      <DeleteUser deleteDialogOpen={deleteDialogOpen} setDeleteDialogOpen={setDeleteDialogOpen} selectedUser={user} />
     </div>
   );
 }

@@ -4,9 +4,9 @@ import { selectUser } from '@/redux/authReducer';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { FiPhoneCall } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
-function InforBrokerPpost(data: { user: any }) {
+function InforBrokerPpost(data: { user: any,postId:string }) {
   const user = useSelector(selectUser);
   const { setSelectedUser } = useAppContext();
   const navigate = useNavigate();
@@ -49,6 +49,7 @@ function InforBrokerPpost(data: { user: any }) {
       </div>
       <div className='flex flex-col gap-2 '>
         <Button
+          onClick={()=>navigate(`/business/${data?.user?.id}`,{ state: { postId:data.postId} })}
           variant={'outline'}
           className='w-full text-xs sm:text-sm text-gray-600 ] transition-colors duration-200 shadow-none'
         >

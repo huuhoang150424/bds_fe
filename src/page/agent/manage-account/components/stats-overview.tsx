@@ -1,61 +1,48 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { FileTextIcon, ShoppingCartIcon, StarIcon, UsersIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, Star, FileText, DollarSign, Heart } from 'lucide-react';
 
 interface StatsOverviewProps {
   user: any;
 }
 
 export default function StatsOverview({ user }: StatsOverviewProps) {
-  const stats = [
-    {
-      title: 'Bài đăng',
-      value: user.stats.posts,
-      icon: <FileTextIcon className='h-4 w-4' />,
-      color: 'bg-blue-100 text-blue-600',
-      darkColor: 'dark:bg-blue-900/30 dark:text-blue-400',
-    },
-    {
-      title: 'Giao dịch',
-      value: user.stats.transactions,
-      icon: <ShoppingCartIcon className='h-4 w-4' />,
-      color: 'bg-green-100 text-green-600',
-      darkColor: 'dark:bg-green-900/30 dark:text-green-400',
-    },
-    {
-      title: 'Đánh giá',
-      value: user.stats.ratings,
-      icon: <StarIcon className='h-4 w-4' />,
-      color: 'bg-amber-100 text-amber-600',
-      darkColor: 'dark:bg-amber-900/30 dark:text-amber-400',
-      suffix: '/5',
-    },
-    {
-      title: 'Người theo dõi',
-      value: user.stats.followers,
-      icon: <UsersIcon className='h-4 w-4' />,
-      color: 'bg-purple-100 text-purple-600',
-      darkColor: 'dark:bg-purple-900/30 dark:text-purple-400',
-    },
-  ];
-
+  const { stats } = user;
+  console.log(stats)
   return (
-    <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-      {stats.map((stat, index) => (
-        <Card key={stat.title} className='overflow-hidden shadow-sm rounded-[8px] border border-gray-200 '>
-          <CardContent className={`p-4 ${stat.color} ${stat.darkColor}`}>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-xs font-medium text-gray-600 dark:text-gray-300'>{stat.title}</p>
-                <h3 className='text-base font-bold mt-1'>
-                  {stat.value}
-                  {stat.suffix || ''}
-                </h3>
-              </div>
-              <div className='p-1.5 rounded-full bg-white/80 dark:bg-gray-800/80'>{stat.icon}</div>
+    <Card className="border border-gray-200 rounded-[8px] shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2 text-gray-800 dark:text-gray-200">
+          <div className="p-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+            <Users className="h-4 w-4" />
+          </div>
+          Thống kê
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+            <FileText className="h-5 w-5 text-purple-500" />
+            <div>
+              <div className="text-xs text-gray-500">Bài đăng</div>
+              <div className="font-medium text-sm">{stats?.posts}</div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          </div>
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+            <Star className="h-5 w-5 text-yellow-500" />
+            <div>
+              <div className="text-xs text-gray-500">Đánh giá</div>
+              <div className="font-medium text-sm">{stats?.ratings.toFixed(1)}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800">
+            <DollarSign className="h-5 w-5 text-green-500" />
+            <div>
+              <div className="text-xs text-gray-500">Giao dịch</div>
+              <div className="font-medium text-sm">{stats?.transactions}</div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

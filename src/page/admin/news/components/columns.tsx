@@ -1,21 +1,23 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreHorizontal, Eye, Clock, Trash2, Loader2 } from 'lucide-react';
+import { ArrowUpDown, Eye, Clock, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
-import { useRef, useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NewsDelete } from './news-delete';
+import { NewsEditDialog } from './update-news';
+
+export enum CategoryNew {
+  POLITICS = 'Chính trị',
+  BUSINESS = 'Kinh doanh',
+  TECHNOLOGY = 'Công nghệ',
+  HEALTH = 'Sức khỏe',
+  ENTERTAINMENT = 'Giải trí',
+  SPORTS = 'Thể thao',
+  SCIENCE = 'Khoa học',
+  EDUCATION = 'Giáo dục',
+}
 
 export type News = {
   id: string;
@@ -23,7 +25,10 @@ export type News = {
   category: string;
   view: number;
   readingTime: number;
+  imageUrl?: string;
+  content?: string;
   createdAt: string;
+  origin_post?: string;
   author: {
     fullname: string;
     avatar: string;
@@ -31,53 +36,15 @@ export type News = {
 };
 
 function ActionsCell({ news }: { news: News }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRefs =useRef<HTMLButtonElement | null>(null);
-  const handleDeleteClick = () => {
-    if (dropdownRefs.current) {
-      dropdownRefs.current.blur();
-    }
-    
-  };
-
   return (
-    <>
-      <DropdownMenu  open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button ref={dropdownRefs} variant='ghost' className='h-6 w-6 p-0 hover:bg-red-50'>
-            <span className='sr-only'>Hành động</span>
-            <MoreHorizontal className='h-3 w-3' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align='end'
-          className='text-xs'
-          onCloseAutoFocus={(e) => {
-            e.preventDefault(); 
-          }}
-        >
-          <DropdownMenuLabel className='text-xs'>Hành động</DropdownMenuLabel>
-          <DropdownMenuItem className='text-xs cursor-pointer'>
-            Sửa
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="text-xs text-red-500 cursor-pointer"
-            onSelect={(e) => {
-              e.preventDefault();
-              handleDeleteClick();
-
-            }}
-          >
-            <NewsDelete
-              newsId={news.id}
-              newsTitle={news.title}
-              trigger={<div className="flex items-center w-full">Xóa</div>}
-            />
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+    <div className='flex items-center gap-[5px] '>
+      <NewsEditDialog news={news} trigger={<div className='flex items-center cursor-pointer '><Edit className='h-4 w-4' /></div>} />
+      <NewsDelete
+        newsId={news.id}
+        newsTitle={news.title}
+        trigger={<div className='flex items-center cursor-pointer '><Trash2 className='h-4 w-4' /></div>}
+      />
+    </div>
   );
 }
 
@@ -236,14 +203,11 @@ export const columns: ColumnDef<News>[] = [
     },
   },
   {
+    accessorKey: 'hành động',
     id: 'actions',
     cell: ({ row }) => {
       const news = row.original;
-      return (
-        <ActionsCell
-          news={news}
-        />
-      );
+      return <ActionsCell news={news} />;
     },
   },
 ];

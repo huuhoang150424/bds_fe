@@ -11,9 +11,22 @@ import { selectUser } from '@/redux/authReducer';
 import { useSendMessage } from '../hooks/use-send-message';
 import { getTimeAgo } from '@/lib/get-time-ago';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
-
-
-
+import { Loading } from '@/components/common';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import MeteorShower from '../components/animations/meteor-shower';
+import FloatingBubbles from '../components/animations/floating-bubbles';
+import SakuraFall from '../components/animations/sakura-fall';
+import GentleFireflies from '../components/animations/gentle-fireflies';
+import RainEffect from '../components/animations/rain-effect';
+import NightSky from '../components/animations/night-sky';
+import DaySky from '../components/animations/day-sky';
 
 export default function Chat() {
   useScrollToTopOnMount();
@@ -22,6 +35,9 @@ export default function Chat() {
   const [activeReceiverId, setActiveReceiverId] = useState('');
   const [userConversation, setUserConversation] = useState<any>();
   const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [backgroundEffect, setBackgroundEffect] = useState<string>('none');
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { socket, connectSocket, selectedUser } = useAppContext();
   const [receiverStatus, setReceiverStatus] = useState<{ active: boolean; lastActive: Date | null }>({
     active: false,
@@ -29,7 +45,6 @@ export default function Chat() {
   });
   const { data: getAllMessages, isLoading } = useGetAllMessage(activeReceiverId);
   const mutationSendMessage = useSendMessage();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (userConversation) {
@@ -58,6 +73,7 @@ export default function Chat() {
   }, [getAllMessages]);
 
   useEffect(() => {
+    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [allMessages]);
 
@@ -68,7 +84,6 @@ export default function Chat() {
       socket.emit('getUserStatus', activeReceiverId);
 
       const handleNewMessage = (msg: any) => {
-        console.log('check tin nhắn mới nhất ', msg);
         setAllMessages((prev) => {
           const exists = prev.some((m) => m.id === msg.id);
           if (!exists) {
@@ -79,7 +94,6 @@ export default function Chat() {
       };
 
       const handleAllUserStatus = (userStatusList: any) => {
-        console.log('check all user status', userStatusList);
         const receiverStatusData = userStatusList.find((status: any) => status.userId === activeReceiverId);
         if (receiverStatusData) {
           setReceiverStatus({
@@ -127,14 +141,39 @@ export default function Chat() {
     setMessage('');
   };
 
+  const backgroundOptions = [
+    { id: 'none', label: 'Không có hiệu ứng' },
+    { id: 'meteor', label: 'Thiên hà & Sao băng' },
+    { id: 'bubbles', label: 'Bóng thể thao' },
+    { id: 'sakura', label: 'Hoa anh đào' },
+    { id: 'fireflies', label: 'Đom đóm' },
+    { id: 'rain', label: 'Mưa rơi' },
+    { id: 'night', label: 'Buổi tối' },
+    { id: 'day', label: 'Ánh nắng bình minh' },
+  ];
+
+  const getBackgroundColor = () => {
+    switch (backgroundEffect) {
+      case 'meteor':
+        return 'bg-[#0a0a20]';
+      case 'bubbles':
+        return 'bg-[#062035]';
+      case 'sakura':
+        return 'bg-[#1a0a1a]';
+      case 'fireflies':
+        return 'bg-[#0a1a0a]';
+      case 'rain':
+        return 'bg-[#14232D]';
+      default:
+        return 'bg-gray-900';
+    }
+  };
+
   return (
     <div className='flex h-screen bg-white'>
       <div className='w-80 border-r border-gray-200 flex flex-col'>
         <div className='p-4 border-b border-gray-200 flex justify-between items-center'>
           <h1 className='text-xl font-semibold text-gray-600'>Chats</h1>
-          <Button variant='ghost' size='icon' className='text-gray-600'>
-            <Plus className='h-5 w-5' />
-          </Button>
         </div>
         <div className='p-4'>
           <div className='relative'>
@@ -171,19 +210,44 @@ export default function Chat() {
                   )}
                 </div>
               </div>
-              <Button variant='ghost' size='icon' className='text-gray-600'>
-                <MoreVertical className='h-5 w-5' />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='ghost' size='icon'>
+                    <MoreVertical size={20} />
+                    <span className='sr-only'>More options</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-56 z-[999999]'>
+                  <DropdownMenuLabel>Hiệu ứng nền</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {backgroundOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.id}
+                      className={backgroundEffect === option.id ? 'bg-blue-50' : ''}
+                      onClick={() => setBackgroundEffect(option.id)}
+                    >
+                      {option.label}
+                      {backgroundEffect === option.id && <span className='ml-auto text-blue-600'>✓</span>}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <div className='flex-1 overflow-y-auto p-4'>
-              {isLoading ? (
-                <p>Đang tải tin nhắn...</p>
-              ) : (
-                <>
-                  <ListMessage messages={allMessages} />
-                  <div ref={messagesEndRef} />
-                </>
-              )}
+            <div ref={messagesContainerRef} className='flex-1 relative'>
+              <div className={`absolute inset-0 ${getBackgroundColor()} transition-colors z-0`}>
+                <div className='absolute inset-0 overflow-hidden'>
+                  {backgroundEffect === 'meteor' && <MeteorShower />}
+                  {backgroundEffect === 'bubbles' && <FloatingBubbles />}
+                  {backgroundEffect === 'sakura' && <SakuraFall />}
+                  {backgroundEffect === 'fireflies' && <GentleFireflies />}
+                  {backgroundEffect === 'rain' && <RainEffect />}
+                  {backgroundEffect === 'night' && <NightSky />}
+                  {backgroundEffect === 'day' && <DaySky />}
+                </div>
+              </div>
+              <div className='relative z-10'>
+                <ListMessage messages={allMessages} messagesEndRef={messagesEndRef} />
+              </div>
             </div>
             <div className='p-4 border-t border-gray-200 bg-white'>
               <form onSubmit={handleSendMessages} className='flex items-center'>
