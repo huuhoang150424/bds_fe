@@ -42,12 +42,12 @@ export function NotificationTable({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  console.log(data?.data);
-
-  const handleNotificationCreated = (newNotification: any) => {};
+  const handleNotificationCreated = (newNotification: any) => {
+    // Optionally handle the new notification (e.g., update local state or trigger refetch)
+  };
 
   const table = useReactTable({
-    data: data?.data?.data,
+    data: data?.data?.data || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -73,7 +73,7 @@ export function NotificationTable({
             placeholder='Lọc theo tin nhắn...'
             value={(table.getColumn('message')?.getFilterValue() as string) ?? ''}
             onChange={(event) => table.getColumn('message')?.setFilterValue(event.target.value)}
-            className='text-[14px] text-gray-700 outline-none px-[16px] py-[6px] rounded-[8px] '
+            className='text-[14px] text-gray-700 outline-none px-[16px] py-[6px] rounded-[8px]'
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -117,7 +117,6 @@ export function NotificationTable({
         </div>
         <div className='flex items-center gap-2'>
           <NotificationCreateDialog onNotificationCreated={handleNotificationCreated} />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size='sm' className='h-8 text-xs'>
@@ -145,7 +144,7 @@ export function NotificationTable({
         </div>
       </div>
       {isLoading ? (
-        <Loading className='mt-[170px] ' />
+        <Loading className='mt-[170px]' />
       ) : (
         <div className='rounded-md border border-red-100'>
           <div className='relative max-h-[500px] overflow-auto'>

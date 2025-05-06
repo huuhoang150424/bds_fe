@@ -174,9 +174,9 @@ export default function BannerEditDialog({ banner, open, onOpenChange }: BannerE
                         <p className='text-xs text-gray-500'>Hỗ trợ file ảnh, tối đa 5MB mỗi file.</p>
                       </div>
 
-                      {banner.imageUrls?.length > 0 && (
+                      {JSON.parse(banner?.imageUrls)?.length > 0 && (
                         <div className='space-y-2'>
-                          {banner.imageUrls.map((url: string, index: number) => (
+                          {JSON.parse(banner?.imageUrls)?.map((url: string, index: number) => (
                             !deletedImageUrls.includes(url) && ( // Only show images not marked for deletion
                               <div
                                 key={`existing-${index}`}

@@ -34,6 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { getSeverityBadge, getStatusBadge, ProcessingStatus, SeverityStatus } from './reports-list';
+import { useNavigate } from 'react-router-dom';
 
 type Report = {
   id: string;
@@ -53,6 +54,7 @@ type Report = {
     title: string;
     description: string;
     userId: string;
+    slug:string
   } | null;
   severity: string;
   adminNotes: string;
@@ -68,6 +70,8 @@ interface ReportDetailProps {
 }
 
 export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailProps) {
+  
+  const navigate=useNavigate();
   const [adminNotes, setAdminNotes] = useState(report.adminNotes || '');
   const [selectedSeverity, setSelectedSeverity] = useState(report.severity || '');
   const [activeTab, setActiveTab] = useState('details');
@@ -539,10 +543,22 @@ export function ReportDetail({ report, onClose, onStatusChange }: ReportDetailPr
         </Button>
 
         {report.status === ProcessingStatus.Pending && (
-          <Button onClick={() => onStatusChange(report.id, ProcessingStatus.Reviewing)}>
-            <Clock className='mr-2 h-4 w-4' />
-            Đánh dấu đang xử lý
-          </Button>
+          <div className='flex items-center gap-[10px] '>
+            <Button
+              variant={'outline'}
+              onClick={() => navigate(`/post/${report?.post?.slug}`)}
+            >
+              Xem chi tiết bài viết
+            </Button>
+            <Button
+              variant={'outline'}
+              className='bg-red-500 hover:bg-red-600 text-white'
+              onClick={() => onStatusChange(report.id, ProcessingStatus.Reviewing)}
+            >
+              <Clock className='mr-2 h-4 w-4' />
+              Đánh dấu đang xử lý
+            </Button>
+          </div>
         )}
 
         {report.status === ProcessingStatus.Reviewing && (

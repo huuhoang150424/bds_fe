@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import PaymentModal from './payment-modal';
 import { useGetPricings } from '@/page/admin/pricing/hooks/use-get-pricings';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { useGetPurchasedPackages } from '../hooks/use-get-my-pricing';
 
 export default function PricingTable() {
+  useScrollToTopOnMount();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -15,8 +18,10 @@ export default function PricingTable() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
-  const { data: pricings, isLoading } = useGetPricings(1, 10);
+  const { data: pricings, isLoading: isPricingsLoading } = useGetPricings(1, 10);
+  const { data: purchasedPackages, isLoading: isPurchasedLoading } = useGetPurchasedPackages(1, 10);
   const allPricings = pricings?.data?.data || [];
+  const purchased = purchasedPackages?.data?.data || [];
 
   useEffect(() => {
     if (isInView) {
@@ -30,6 +35,14 @@ export default function PricingTable() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const isPlanPurchasedAndActive = (pricingId: string) => {
+    return purchased.some(
+      (pkg: any) =>
+        pkg.pricing.id === pricingId &&
+        new Date(pkg.endDate) > new Date() 
+    );
   };
 
   const plans = allPricings.map((plan: any, index: number) => {
@@ -76,6 +89,7 @@ export default function PricingTable() {
 
     const iconData = iconMap[index % iconMap.length];
     const colorData = colorMap[index % iconMap.length];
+    const isPurchased = isPlanPurchasedAndActive(plan.id);
 
     return {
       id: plan.id,
@@ -91,21 +105,28 @@ export default function PricingTable() {
       hoverColor: colorData.hoverColor,
       shadowColor: colorData.shadowColor,
       features,
-      buttonText: 'Mua ngay',
-      buttonClass: iconData.button,
+      buttonText: isPurchased ? 'Đã mua' : 'Mua ngay',
+      buttonClass: isPurchased ? 'bg-gray-400 cursor-not-allowed' : iconData.button,
       popular: plan.name.includes('VIP_3'),
+      isPurchased,
     };
   });
 
   const handleOpenModal = (plan: any) => {
-    setSelectedPlan(plan);
-    setIsModalOpen(true);
+    if (!plan.isPurchased) {
+      setSelectedPlan(plan);
+      setIsModalOpen(true);
+    }
   };
+
+  if (isPricingsLoading || isPurchasedLoading) {
+    return <div className="text-center">Đang tải...</div>;
+  }
 
   return (
     <>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4' ref={ref}>
-        {plans.map((plan:any, i:number) => (
+        {plans.map((plan: any, i: number) => (
           <motion.div
             key={plan.id}
             custom={i}
@@ -135,6 +156,13 @@ export default function PricingTable() {
                 <div className='absolute top-0 right-0'>
                   <div className='bg-amber-500 text-white text-xs font-bold py-1 px-3 shadow-lg transform rotate-0 translate-x-2 -translate-y-0 origin-bottom-left'>
                     Bán chạy nhất
+                  </div>
+                </div>
+              )}
+              {plan.isPurchased && (
+                <div className='absolute top-0 left-0'>
+                  <div className='bg-green-500 text-white text-xs font-bold py-1 px-3 shadow-lg transform rotate-0 -translate-x-2 -translate-y-0 origin-top-left'>
+                    Đã mua
                   </div>
                 </div>
               )}
@@ -209,10 +237,13 @@ export default function PricingTable() {
                 <Button
                   className={`w-full group relative overflow-hidden text-xs py-1.5 ${plan.buttonClass}`}
                   onClick={() => handleOpenModal(plan)}
+                  disabled={plan.isPurchased}
                 >
                   <span className='relative z-10 flex items-center justify-center'>
                     {plan.buttonText}
-                    <ArrowRight className='ml-1 h-3 w-3 transition-transform group-hover:translate-x-1' />
+                    {!plan.isPurchased && (
+                      <ArrowRight className='ml-1 h-3 w-3 transition-transform group-hover:translate-x-1' />
+                    )}
                   </span>
                   <span className='absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300'></span>
                 </Button>

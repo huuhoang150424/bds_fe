@@ -24,6 +24,8 @@ import { useGetAllUser } from '../../user/hooks/use-get-all-user';
 import { Pagination } from '@/components/user/pagination';
 import { toast } from '@/hooks/use-toast';
 import { useSendNotification } from '../hooks/use-send-notification';
+import { Loading } from '@/components/common';
+import { useSendAllNotification } from '../hooks/use-sendall-notifiation';
 
 interface NotificationCreateDialogProps {
   trigger?: React.ReactNode;
@@ -34,8 +36,8 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [manualSelectedUsers, setManualSelectedUsers] = useState<string[]>([]); 
-  const [sendToAll, setSendToAll] = useState(false);
+  const [manualSelectedUsers, setManualSelectedUsers] = useState<string[]>([]);
+  const [sendMode, setSendMode] = useState<'selected' | 'page' | 'all'>('selected'); // New state for send mode
   const [notificationData, setNotificationData] = useState({
     message: '',
     priority: 'normal',
@@ -43,32 +45,35 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
   });
   const [page, setPage] = useState(1);
   const limit = 10;
-  const { data: allUser } = useGetAllUser(page, limit);
+  const { data: allUser, isLoading: isUsersLoading } = useGetAllUser(page, limit);
   const { mutate: sendNotification, isPending: isSubmitting } = useSendNotification();
+  const { mutate: sendAllNotification, isPending: isSubmittingAll } = useSendAllNotification();
 
   const handleChangePage = (page: number) => {
     setPage(page);
     setSelectedUsers([]);
     setManualSelectedUsers([]);
-    setSendToAll(false);
+    setSendMode('selected');
   };
 
   const handleUserToggle = (userId: string) => {
     setManualSelectedUsers((prev) =>
       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
     );
-    if (!sendToAll) {
+    if (sendMode === 'selected') {
       setSelectedUsers((prev) =>
         prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
       );
     }
   };
 
-  const handleSendToAll = (checked: boolean) => {
-    setSendToAll(checked);
-    if (checked) {
+  const handleSendModeChange = (mode: 'selected' | 'page' | 'all') => {
+    setSendMode(mode);
+    if (mode === 'page') {
       const pageUserIds = allUser?.data?.map((user: any) => user.id) || [];
       setSelectedUsers(pageUserIds);
+    } else if (mode === 'all') {
+      setSelectedUsers([]); // No specific users needed for all users
     } else {
       setSelectedUsers(manualSelectedUsers);
     }
@@ -93,7 +98,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
       return;
     }
 
-    if (selectedUsers.length === 0) {
+    if (sendMode !== 'all' && selectedUsers.length === 0) {
       toast({
         title: 'Lỗi',
         description: 'Vui lòng chọn ít nhất một người nhận',
@@ -108,38 +113,69 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
       high: 3,
     };
 
-    const data: any = {
+    const commonData = {
       message: notificationData.message,
       priority: priorityMap[notificationData.priority],
       endDate: new Date(notificationData.expiresAt).toISOString(),
-      userId: selectedUsers.length === 1 ? selectedUsers[0] : selectedUsers,
     };
 
-    sendNotification(data, {
-      onSuccess: (response) => {
-        toast({
-          title: 'Thành công',
-          description: 'Gửi thông báo thành công',
-          variant: 'success',
-        });
-        if (onNotificationCreated) {
-          onNotificationCreated(response);
-        }
-        setNotificationData({ message: '', priority: 'normal', expiresAt: '' });
-        setSelectedUsers([]);
-        setManualSelectedUsers([]);
-        setSendToAll(false);
-        setSearchQuery('');
-        setOpen(false);
-      },
-      onError: (error: any) => {
-        toast({
-          title: 'Lỗi',
-          description: error?.response?.data?.message || 'Không thể gửi thông báo',
-          variant: 'destructive',
-        });
-      },
-    });
+    if (sendMode === 'all') {
+      sendAllNotification(commonData, {
+        onSuccess: (response:any) => {
+          toast({
+            title: 'Thành công',
+            description: 'Gửi thông báo đến tất cả người dùng thành công',
+            variant: 'success',
+          });
+          if (onNotificationCreated) {
+            onNotificationCreated(response);
+          }
+          resetForm();
+        },
+        onError: (error: any) => {
+          toast({
+            title: 'Lỗi',
+            description: error?.response?.data?.message || 'Không thể gửi thông báo',
+            variant: 'destructive',
+          });
+        },
+      });
+    } else {
+      const data: any = {
+        ...commonData,
+        userId: selectedUsers.length === 1 ? selectedUsers[0] : selectedUsers,
+      };
+
+      sendNotification(data, {
+        onSuccess: (response) => {
+          toast({
+            title: 'Thành công',
+            description: 'Gửi thông báo thành công',
+            variant: 'success',
+          });
+          if (onNotificationCreated) {
+            onNotificationCreated(response);
+          }
+          resetForm();
+        },
+        onError: (error: any) => {
+          toast({
+            title: 'Lỗi',
+            description: error?.response?.data?.message || 'Không thể gửi thông báo',
+            variant: 'destructive',
+          });
+        },
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setNotificationData({ message: '', priority: 'normal', expiresAt: '' });
+    setSelectedUsers([]);
+    setManualSelectedUsers([]);
+    setSendMode('selected');
+    setSearchQuery('');
+    setOpen(false);
   };
 
   return (
@@ -229,23 +265,40 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
             </div>
             <Separator className='my-2 bg-red-100' />
             <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label htmlFor='recipients' className='text-[14px] font-medium'>
-                  Người nhận <span className='text-red-500'>*</span>
-                </Label>
+              <Label className='text-[14px] font-medium'>Người nhận <span className='text-red-500'>*</span></Label>
+              <div className='flex flex-col gap-2'>
                 <div className='flex items-center space-x-2'>
-                  <Switch
-                    id='sendToAll'
-                    checked={sendToAll}
-                    onCheckedChange={handleSendToAll}
-                    className='data-[state=checked]:bg-red-500'
+                  <input
+                    type='radio'
+                    id='selected'
+                    checked={sendMode === 'selected'}
+                    onChange={() => handleSendModeChange('selected')}
+                    className='h-4 w-4 text-red-500'
                   />
-                  <Label htmlFor='sendToAll' className='text-[14px]'>
-                    Gửi đến tất cả người dùng trên trang này
-                  </Label>
+                  <Label htmlFor='selected' className='text-[14px]'>Chọn người dùng cụ thể</Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <input
+                    type='radio'
+                    id='page'
+                    checked={sendMode === 'page'}
+                    onChange={() => handleSendModeChange('page')}
+                    className='h-4 w-4 text-red-500'
+                  />
+                  <Label htmlFor='page' className='text-[14px]'>Gửi đến tất cả người dùng trên trang này</Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <input
+                    type='radio'
+                    id='all'
+                    checked={sendMode === 'all'}
+                    onChange={() => handleSendModeChange('all')}
+                    className='h-4 w-4 text-red-500'
+                  />
+                  <Label htmlFor='all' className='text-[14px]'>Gửi đến tất cả người dùng trong hệ thống</Label>
                 </div>
               </div>
-              {!sendToAll && (
+              {sendMode !== 'all' && (
                 <>
                   <div className='relative'>
                     <Search className='absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground' />
@@ -303,69 +356,75 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
                     </div>
                   )}
                   <ScrollArea className='h-[150px] rounded-md border border-red-100'>
-                    <div className='p-2 space-y-1'>
-                      {allUser?.data?.length > 0 ? (
-                        allUser?.data
-                          ?.filter((user: any) =>
-                            searchQuery
-                              ? user.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                user.roles?.toLowerCase().includes(searchQuery.toLowerCase())
-                              : true
-                          )
-                          ?.map((user: any) => (
-                            <div
-                              key={user.id}
-                              className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-red-50 ${
-                                selectedUsers.includes(user?.id) ? 'bg-red-50' : ''
-                              }`}
-                              onClick={() => handleUserToggle(user?.id)}
-                            >
-                              <div className='flex items-center gap-2'>
-                                <Avatar className='h-6 w-6'>
-                                  <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={user?.fullname} />
-                                  <AvatarFallback className='text-[11px] bg-red-100 text-red-500'>
-                                    {user?.fullname?.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className='text-[14px] font-medium'>{user?.fullname}</p>
-                                  <p className='text-[11px] text-muted-foreground'>{user?.email}</p>
+                    {isUsersLoading ? (
+                      <div className='flex justify-center py-4'>
+                        <Loading className='h-6 w-6' />
+                      </div>
+                    ) : (
+                      <div className='p-2 space-y-1'>
+                        {allUser?.data?.length > 0 ? (
+                          allUser?.data
+                            ?.filter((user: any) =>
+                              searchQuery
+                                ? user.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                  user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                  user.roles?.toLowerCase().includes(searchQuery.toLowerCase())
+                                : true
+                            )
+                            ?.map((user: any) => (
+                              <div
+                                key={user.id}
+                                className={`flex items-center justify-between p-2 rounded-md cursor-pointer hover:bg-red-50 ${
+                                  selectedUsers.includes(user?.id) ? 'bg-red-50' : ''
+                                }`}
+                                onClick={() => handleUserToggle(user?.id)}
+                              >
+                                <div className='flex items-center gap-2'>
+                                  <Avatar className='h-6 w-6'>
+                                    <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={user?.fullname} />
+                                    <AvatarFallback className='text-[11px] bg-red-100 text-red-500'>
+                                      {user?.fullname?.charAt(0)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className='text-[14px] font-medium'>{user?.fullname}</p>
+                                    <p className='text-[11px] text-muted-foreground'>{user?.email}</p>
+                                  </div>
+                                </div>
+                                <div className='flex items-center gap-2'>
+                                  <Badge variant='outline' className='text-[11px]'>
+                                    {user?.roles}
+                                  </Badge>
+                                  <div
+                                    className={`h-4 w-4 rounded-sm border ${
+                                      selectedUsers.includes(user?.id) ? 'bg-red-500 border-red-500' : 'border-gray-300'
+                                    } flex items-center justify-center`}
+                                  >
+                                    {selectedUsers.includes(user?.id) && (
+                                      <svg
+                                        xmlns='http://www.w3.org/2000/svg'
+                                        viewBox='0 0 24 24'
+                                        fill='none'
+                                        stroke='currentColor'
+                                        strokeWidth='3'
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        className='h-3 w-3 text-white'
+                                      >
+                                        <polyline points='20 6 9 17 4 12'></polyline>
+                                      </svg>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                              <div className='flex items-center gap-2'>
-                                <Badge variant='outline' className='text-[11px]'>
-                                  {user?.roles}
-                                </Badge>
-                                <div
-                                  className={`h-4 w-4 rounded-sm border ${
-                                    selectedUsers.includes(user?.id) ? 'bg-red-500 border-red-500' : 'border-gray-300'
-                                  } flex items-center justify-center`}
-                                >
-                                  {selectedUsers.includes(user?.id) && (
-                                    <svg
-                                      xmlns='http://www.w3.org/2000/svg'
-                                      viewBox='0 0 24 24'
-                                      fill='none'
-                                      stroke='currentColor'
-                                      strokeWidth='3'
-                                      strokeLinecap='round'
-                                      strokeLinejoin='round'
-                                      className='h-3 w-3 text-white'
-                                    >
-                                      <polyline points='20 6 9 17 4 12'></polyline>
-                                    </svg>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                      ) : (
-                        <div className='text-center py-4 text-[14px] text-muted-foreground'>
-                          Không tìm thấy người dùng nào khớp với "{searchQuery}"
-                        </div>
-                      )}
-                    </div>
+                            ))
+                        ) : (
+                          <div className='text-center py-4 text-[14px] text-muted-foreground'>
+                            Không tìm thấy người dùng nào khớp với "{searchQuery}"
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <div className='flex items-center justify-between px-4 py-3 border-t border-red-50 w-full'>
                       <div className='text-xs text-gray-500'>Người dùng</div>
                       <Pagination
@@ -388,7 +447,7 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
               size='sm'
               className='h-8 text-[14px]'
               onClick={() => setOpen(false)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSubmittingAll}
             >
               Hủy
             </Button>
@@ -398,9 +457,9 @@ export function NotificationCreateDialog({ trigger, onNotificationCreated }: Not
               variant={'outline'}
               className='bg-red-500 hover:bg-red-600 text-white'
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSubmittingAll}
             >
-              {isSubmitting ? (
+              {isSubmitting || isSubmittingAll ? (
                 <>
                   <Loader2 className='mr-1.5 h-3 w-3 animate-spin' />
                   Loading...

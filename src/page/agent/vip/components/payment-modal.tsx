@@ -20,11 +20,11 @@ interface PaymentModalProps {
   plan: any;
 }
 
-export default function PaymentDigLog({ isOpen, onClose, plan }: PaymentModalProps) {
-  const { mutate, isPending, isSuccess, error } = useBuyPricing();
+export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProps) {
+  const { mutate, isPending, isSuccess, error, data } = useBuyPricing();
   const [userBalance, setUserBalance] = useState<number>(0);
 
-  const user=useSelector(selectUser);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
     setUserBalance(user?.balance || 0);
@@ -44,7 +44,7 @@ export default function PaymentDigLog({ isOpen, onClose, plan }: PaymentModalPro
   const totalPrice = price * 1.1; 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    mutate( plan.id);
+    mutate(plan.id);
   };
 
   return (
@@ -71,7 +71,11 @@ export default function PaymentDigLog({ isOpen, onClose, plan }: PaymentModalPro
                 <CheckCircle2 className='h-10 w-10 text-green-500' />
               </div>
               <h2 className='text-xl font-bold text-center mb-2'>Mua gói thành công!</h2>
-              <p className='text-sm text-gray-500 text-center'>Cảm ơn bạn đã đăng ký Gói Hội viên {plan.name}</p>
+              <p className='text-sm text-gray-500 text-center'>
+                {data?.refundAmount
+                  ? `Bạn đã nâng cấp lên Gói Hội viên ${plan.name}! Số tiền hoàn lại: ${data.refundAmount.toLocaleString()}đ`
+                  : `Cảm ơn bạn đã đăng ký Gói Hội viên ${plan.name}`}
+              </p>
             </motion.div>
           ) : (
             <motion.div key='form' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
