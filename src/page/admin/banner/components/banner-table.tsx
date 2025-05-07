@@ -74,7 +74,7 @@ export function BannerTable() {
       rowSelection,
     },
   });
-
+  console.log(safeData)
   return (
     <div className='w-full'>
       <div className='flex items-center justify-between py-3'>

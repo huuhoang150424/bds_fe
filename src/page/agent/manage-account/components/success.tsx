@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ChevronRight, CheckCircle2, Shield, Activity, CreditCard, User, Sparkles } from 'lucide-react';

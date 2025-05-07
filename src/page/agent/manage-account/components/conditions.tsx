@@ -62,7 +62,7 @@ export default function Conditions({
     { id: "profile", label: "Hồ sơ", icon: <User className="h-4 w-4" />, color: "from-red-200 to-rose-300" },
   ]
 
-  const conditions = {
+  const conditions:any = {
     account: [
       { id: 1, name: "Đã xác minh SĐT & Email" },
       { id: 2, name: "Không bị khóa tài khoản" },
@@ -167,7 +167,7 @@ export default function Conditions({
               transition={{ duration: 0.2 }}
               className="space-y-3"
             >
-              {conditions[activeTab].map((condition, index) => (
+              {conditions[activeTab].map((condition:any, index:number) => (
                 <motion.div
                   key={condition.id}
                   initial={{ opacity: 0, x: -10 }}

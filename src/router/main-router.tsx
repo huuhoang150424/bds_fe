@@ -10,6 +10,8 @@ import NewsDetail from '@/page/user/newsDetail';
 import BusinessDetail from '@/page/user/BusinessDetail';
 import RealEstateAgentDirectory from '@/page/user/Brokers';
 import UltilitySuport from '@/page/user/ultility-suport';
+import About from '@/page/user/staticPage/page/about';
+import Contact from '@/page/user/staticPage/page/contact';
 
 export default function MainRouter() {
   return (
@@ -24,6 +26,8 @@ export default function MainRouter() {
           <Route path='/new/:slug' element={<NewsDetail />} />
           <Route path='/business/:id' element={<BusinessDetail />} />
           <Route path='/support' element={<UltilitySuport />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
           <Route path='*' element={<NotFoundScreen />} />
         </Route>
       </Routes>

@@ -49,6 +49,7 @@
     "@tanstack/react-table": "^8.21.2",
     "@types/react-query": "^1.2.9",
     "axios": "^1.8.2",
+    "canvas-confetti": "^1.9.3",
     "checkbox": "^0.0.1",
     "ckeditor5": "^43.3.1",
     "ckeditor5-premium-features": "^43.3.1",

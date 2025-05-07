@@ -227,13 +227,19 @@ function Header() {
 
             <li className='relative mr-[30px] group text-[16px]'>
               <a href='#' className='hover:text-[#F97316] font-[500] transition-all duration-300 ease-in-out '>
-                Danh bạ
+                Nhà môi giới
               </a>
               <ul className='absolute left-0 mt-2 w-[200px] bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 <li className='py-[4px] px-[8px]  hover:bg-gray-100 text-[14px]'>
                   <Link to={'/brokers'}>Nhà môi giới</Link>
                 </li>
               </ul>
+            </li>
+            <li className="mr-[30px] text-[16px]">
+              <Link to={'/about'}>Giới thiệu</Link>
+            </li>
+            <li className="mr-[30px] text-[16px]">
+              <Link to={'/contact'}>Liên hệ</Link>
             </li>
           </ul>
         </div>
