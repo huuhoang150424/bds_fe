@@ -1,0 +1,145 @@
+.animate-float {
+  animation: float 10s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-40px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti 3s forwards ease-out;
+}
+
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(1000%) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-dialogIn {
+  animation: dialogIn 0.5s ease-out forwards;
+}
+
+@keyframes dialogIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-borderGlow {
+  animation: borderGlow 3s infinite linear;
+}
+
+@keyframes borderGlow {
+  0%,
+  100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-buttonShine {
+  animation: buttonShine 3s infinite linear;
+}
+
+@keyframes buttonShine {
+  from {
+    transform: translateX(-100%) skewX(-30deg);
+  }
+  to {
+    transform: translateX(200%) skewX(-30deg);
+  }
+}
+
+.animate-bounceLeft {
+  animation: bounceLeft 1s infinite;
+}
+
+@keyframes bounceLeft {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+}
+
+.animate-bounceRight {
+  animation: bounceRight 1s infinite;
+}
+
+@keyframes bounceRight {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.animate-ping {
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.clip-path-full {
+  clip-path: circle(150% at center);
+}
+
+.clip-path-none {
+  clip-path: circle(0% at center);
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotateY-0 {
+  transform: rotateY(0deg);
+}
+
+.rotateY-90 {
+  transform: rotateY(90deg);
+}
+
+.skew-x-30 {
+  transform: skewX(30deg);
+}
+
