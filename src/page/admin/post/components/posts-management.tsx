@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   type ColumnFiltersState,
   type SortingState,
@@ -21,13 +21,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { columns } from './columns';
 import { Pagination } from '@/components/user/pagination';
 import { useGetAllPost } from '../hooks/use-get-all-post';
+import { useBulkAiApprovePosts } from '../hooks/use-approve-posts';
 import { Loading } from '@/components/common';
 import ConfirmBatchVerifyDialog from './bulk-approve';
 import ConfirmBatchDeleteDialog from './confirm-batch-delete';
 import ConfirmBatchRejectDialog from './reject-bulk-posts';
+import { useAppContext } from '@/context/chat';
 
 enum StatusPost {
   AVAILABLE = 'Còn trống',
@@ -41,56 +46,89 @@ export function PostsManagement() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const [aiProgress, setAiProgress] = useState(0);
+  const [showResultsDialog, setShowResultsDialog] = useState(false);
+  const [approvalResults, setApprovalResults] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [processedPosts, setProcessedPosts] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(0);
   const [confirmVerifyDialogOpen, setConfirmVerifyDialogOpen] = useState(false);
   const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
-
   const [confirmRejectDialogOpen, setConfirmRejectDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  const { socket } = useAppContext();
+  const { data: allPost, isLoading } = useGetAllPost(page, limit);
+  const { mutate: aiApprovePosts, isPending: isAiApproving } = useBulkAiApprovePosts();
+
+  const tableData = allPost?.data?.data || [];
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('approvalProgress', (data: { processed: number; total: number; progress: number }) => {
+      setProcessedPosts(data.processed);
+      setTotalPosts(data.total);
+      setProgress(data.progress);
+    });
+
+    return () => {
+      socket.off('approvalProgress');
+    };
+  }, [socket]);
+
   const handleChangePage = (page: number) => {
     setPage(page);
   };
 
-  const { data: allPost, isLoading } = useGetAllPost(page, limit);
-
-  const tableData = allPost?.data?.data || [];
-
-  console.log(tableData)
-
   const handleAiVerifyAll = () => {
-    // TODO: Triển khai AI duyệt tự động sau
+    const hasUnverifiedPosts = tableData.some((post: any) => !post.verified && !post.isRejected);
+    if (!hasUnverifiedPosts) {
+      setErrorMessage('Không có bài đăng nào chưa duyệt để xử lý.');
+      return;
+    }
     setIsAiProcessing(true);
-    setAiProgress(0);
-    // Giả lập progress
-    const interval = setInterval(() => {
-      setAiProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAiProcessing(false);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 500);
+    setErrorMessage(null);
+    setProgress(0);
+    setProcessedPosts(0);
+    setTotalPosts(0);
+    aiApprovePosts(undefined, {
+      onSuccess: (data) => {
+        setApprovalResults(data.data);
+        setShowResultsDialog(true);
+        setIsAiProcessing(false);
+        setProgress(100);
+      },
+      onError: (error: any) => {
+        console.error('Lỗi khi duyệt bài đăng bằng AI:', error);
+        setErrorMessage('Không thể duyệt bài đăng do lỗi API. Vui lòng thử lại sau hoặc kiểm tra giới hạn quota.');
+        setIsAiProcessing(false);
+        setProgress(0);
+      },
+    });
   };
 
   const handleBatchVerify = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    const hasUnverified = selectedRows.some((row) => !row.original.verified);
+    const hasUnverified = selectedRows.some((row) => !row.original.verified && !row.original.isRejected);
     if (!hasUnverified) {
+      setErrorMessage('Không có bài đăng chưa duyệt trong danh sách đã chọn.');
       return;
     }
     setConfirmVerifyDialogOpen(true);
   };
+
   const handleBatchReject = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const hasNonRejected = selectedRows.some((row) => !row.original.isRejected);
     if (!hasNonRejected) {
+      setErrorMessage('Tất cả bài đăng đã chọn đã bị từ chối.');
       return;
     }
     setConfirmRejectDialogOpen(true);
   };
+
   const handleBatchDelete = () => {
     setConfirmDeleteDialogOpen(true);
   };
@@ -112,18 +150,23 @@ export function PostsManagement() {
       columnVisibility,
       rowSelection,
     },
-    // Bỏ giới hạn, cho phép chọn tất cả bài đăng
     enableRowSelection: true,
   });
 
   const hasSelectedRows = table.getFilteredSelectedRowModel()?.rows?.length > 0;
   const selectedRowCount = table.getFilteredSelectedRowModel()?.rows?.length || 0;
   const selectedPostIds = Object.keys(rowSelection).map((index) => tableData[Number(index)].id);
-  const hasUnverifiedPosts = tableData.filter((p: any) => !p.verified)?.length > 0;
+  const hasUnverifiedPosts = tableData.some((p: any) => !p.verified && !p.isRejected);
 
   return (
     <div className="space-y-4">
-      <Card className="">
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertTitle>Lỗi</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      <Card>
         <CardHeader className="p-0">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -134,10 +177,10 @@ export function PostsManagement() {
               <Button
                 variant={'outline'}
                 onClick={handleAiVerifyAll}
-                disabled={isAiProcessing || !hasUnverifiedPosts}
-                className="relative overflow-hidden group bg-red-500 hover:bg-red-600 text-white"
+                disabled={isAiApproving || !hasUnverifiedPosts}
+                className="relative overflow-hidden group bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white"
               >
-                {isAiProcessing ? (
+                {isAiApproving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang xử lý...
@@ -145,7 +188,7 @@ export function PostsManagement() {
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4 group-hover:animate-pulse" />
-                    <span>Duyệt tự động bằng AI</span>
+                    <span>Duyệt tự động bằng AI (tối đa 5 bài)</span>
                     <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   </>
                 )}
@@ -160,7 +203,7 @@ export function PostsManagement() {
                 placeholder="Tìm kiếm theo tiêu đề..."
                 value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
                 onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
-                className="max-w-sm outline-none px-[14px] py-[8px] "
+                className="max-w-sm outline-none px-[14px] py-[8px]"
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -190,9 +233,7 @@ export function PostsManagement() {
                     Còn trống
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
-                    checked={(table.getColumn('status')?.getFilterValue() as string[])?.includes(
-                      StatusPost.NEGOTIATING
-                    )}
+                    checked={(table.getColumn('status')?.getFilterValue() as string[])?.includes(StatusPost.NEGOTIATING)}
                     onCheckedChange={(checked) => {
                       const filterValues = (table.getColumn('status')?.getFilterValue() as string[]) || [];
                       if (checked) {
@@ -286,36 +327,33 @@ export function PostsManagement() {
                   {table
                     .getAllColumns()
                     .filter((column) => column.getCanHide())
-                    .map((column) => {
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={column.id}
-                          className="capitalize"
-                          checked={column.getIsVisible()}
-                          onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                        >
-                          {column.id === 'title'
-                            ? 'Tiêu đề'
-                            : column.id === 'price'
-                            ? 'Giá'
-                            : column.id === 'squareMeters'
-                            ? 'Diện tích'
-                            : column.id === 'status'
-                            ? 'Trạng thái'
-                            : column.id === 'verified'
-                            ? 'Xác minh'
-                            : column.id === 'createdAt'
-                            ? 'Ngày tạo'
-                            : column.id}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
+                    .map((column) => (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        {column.id === 'title'
+                          ? 'Tiêu đề'
+                          : column.id === 'price'
+                          ? 'Giá'
+                          : column.id === 'squareMeters'
+                          ? 'Diện tích'
+                          : column.id === 'status'
+                          ? 'Trạng thái'
+                          : column.id === 'verified'
+                          ? 'Xác minh'
+                          : column.id === 'createdAt'
+                          ? 'Ngày tạo'
+                          : column.id}
+                      </DropdownMenuCheckboxItem>
+                    ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
 
-          {/* Batch actions */}
           {hasSelectedRows && (
             <div className="bg-slate-100 p-4 rounded-md flex items-center justify-between mb-4">
               <div>
@@ -326,7 +364,7 @@ export function PostsManagement() {
                   variant="outline"
                   size="sm"
                   onClick={handleBatchVerify}
-                  disabled={isLoading || !table.getFilteredSelectedRowModel().rows.some((row) => !row.original.verified)}
+                  disabled={isLoading || !table.getFilteredSelectedRowModel().rows.some((row) => !row.original.verified && !row.original.isRejected)}
                 >
                   <Shield className="mr-2 h-4 w-4" /> Duyệt đã chọn
                 </Button>
@@ -351,22 +389,20 @@ export function PostsManagement() {
             </div>
           )}
           {isLoading ? (
-            <Loading className="mt-[200px] " />
+            <Loading className="mt-[200px]" />
           ) : (
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead className="text-[13px] " key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        );
-                      })}
+                      {headerGroup.headers.map((header) => (
+                        <TableHead className="text-[13px]" key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
                     </TableRow>
                   ))}
                 </TableHeader>
@@ -375,7 +411,7 @@ export function PostsManagement() {
                     table.getRowModel().rows.map((row) => (
                       <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell className="text-[13px] " key={cell.id}>
+                          <TableCell className="text-[13px]" key={cell.id}>
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}
@@ -428,12 +464,101 @@ export function PostsManagement() {
         </CardContent>
       </Card>
 
+      <Dialog open={showResultsDialog} onOpenChange={setShowResultsDialog}>
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              Kết quả duyệt tự động bằng AI
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-300">
+              Kết quả xử lý tối đa 5 bài đăng bất động sản bằng hệ thống AI.
+            </DialogDescription>
+          </DialogHeader>
+          {approvalResults ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-inner">
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Tổng số bài đăng:</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{approvalResults.totalCount}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Tỷ lệ duyệt:</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{approvalResults.approvalRate}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Bài đăng được duyệt:</p>
+                  <p className="text-lg font-bold text-green-600 dark:text-green-400">{approvalResults.approvedCount}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Bài đăng bị từ chối:</p>
+                  <p className="text-lg font-bold text-red-600 dark:text-red-400">{approvalResults.rejectedCount}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Chi tiết kết quả:</p>
+                <div className="max-h-[250px] overflow-y-auto border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-100 dark:bg-gray-700">
+                        <TableHead className="text-gray-800 dark:text-gray-200 font-semibold w-[150px]">
+                          ID bài đăng
+                        </TableHead>
+                        <TableHead className="text-gray-800 dark:text-gray-200 font-semibold w-[100px]">
+                          Trạng thái
+                        </TableHead>
+                        <TableHead className="text-gray-800 dark:text-gray-200 font-semibold">Lý do</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {approvalResults.details.map((result: any) => (
+                        <TableRow
+                          key={result.postId}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                            {result.postId}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={`${
+                                result.approved
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                                  : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
+                              } font-semibold`}
+                            >
+                              {result.approved ? 'Được duyệt' : 'Bị từ chối'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-700 dark:text-gray-300">
+                            {result.reason || '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={() => setShowResultsDialog(false)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                >
+                  Đóng
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-300">Không có kết quả để hiển thị.</p>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {isAiProcessing && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999999] flex items-center justify-center">
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 shadow-xl max-w-md w-full mx-4 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 animate-pulse" />
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-8 shadow-2xl max-w-md w-full mx-4 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-pulse" />
             <div className="relative z-10">
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-pulse">
                     AI
@@ -441,35 +566,37 @@ export function PostsManagement() {
                   <div className="absolute -inset-1 blur-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-30 animate-pulse" />
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-center mb-4">Đang xử lý duyệt tự động</h3>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+              <h3 className="text-2xl font-semibold text-center mb-6 text-gray-800 dark:text-gray-100">
+                Đang xử lý duyệt tự động
+              </h3>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${aiProgress}%` }}
+                  className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>Đang phân tích dữ liệu</span>
-                <span>{aiProgress}%</span>
+              <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-6">
+                <span>Đã xử lý: {processedPosts}/{totalPosts} bài</span>
+                <span>{progress.toFixed(0)}%</span>
               </div>
-              <div className="mt-4 space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center">
                   <div className="w-4 h-4 mr-2 rounded-full bg-blue-500 animate-pulse" />
-                  <span className="text-sm">Kiểm tra thông tin bài đăng</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Kiểm tra thông tin bài đăng</span>
                 </div>
                 <div className="flex items-center">
                   <div
                     className="w-4 h-4 mr-2 rounded-full bg-purple-500 animate-pulse"
                     style={{ animationDelay: '0.2s' }}
                   />
-                  <span className="text-sm">Xác minh dữ liệu</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Xác minh dữ liệu</span>
                 </div>
                 <div className="flex items-center">
                   <div
                     className="w-4 h-4 mr-2 rounded-full bg-pink-500 animate-pulse"
                     style={{ animationDelay: '0.4s' }}
                   />
-                  <span className="text-sm">Áp dụng quy tắc duyệt</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Áp dụng quy tắc duyệt</span>
                 </div>
               </div>
             </div>

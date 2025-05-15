@@ -348,9 +348,6 @@ export function ReportsAdminDashboard() {
             <ReportDetail
               report={reportDetail}
               onClose={() => setSelectedReport(null)}
-              onStatusChange={(reportId, newStatus) => {
-                console.log(`Thay đổi trạng thái của báo cáo ${reportId} thành ${newStatus}`);
-              }}
             />
           ) : (
             <Card className='h-full flex items-center justify-center p-6 border border-gray-200 rounded-[8px] '>

@@ -2,12 +2,13 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import SearchBar from './components/search-bar';
-import Map from '@/page/user/filterPost/components/Map';
 import PropertyListings from './components/property-listing';
 import { useGetPostByFilter } from './hooks/use-fill-post';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { useSearchPost } from './hooks/use-seach-post';
 import { Button } from '@/components/ui/button';
+import Map from './components/Map';
+import { useGetPostsByMapBounds } from './hooks/use-get-posts-map';
 
 function SellDetail() {
   useScrollToTopOnMount();
@@ -34,15 +35,22 @@ function SellDetail() {
   const [ratings, setRatings] = useState<number[]>([]);
   const [isFurnished, setIsFurnished] = useState<boolean | null>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [currentLocation, setCurrentLocation] = useState<string>('');
+  const [isLocation, setIsLocation] = useState(false);
 
-  // Sử dụng search API chỉ khi isUsingSearch = true và searchAddress có dữ liệu
-  const { 
-    data: searchResults, 
-    isLoading: isSearchLoading 
-  } = useSearchPost(isUsingSearch ? searchAddress : []);
+  const extractAddress = (locationString: string): string => {
+    try {
+      const addressPart = locationString.split('(')[0];
+      return addressPart.trim();
+    } catch (error) {
+      console.error('Error extracting address:', error);
+      return locationString;
+    }
+  };
+
+  const { data: searchResults, isLoading: isSearchLoading } = useSearchPost(isUsingSearch ? searchAddress : []);
 
   const filterParams = {
-    // Không sử dụng selectedProvinces cho filter khi đang dùng search
     keyword: !isUsingSearch && selectedProvinces.length > 0 ? selectedProvinces : undefined,
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -60,17 +68,16 @@ function SellDetail() {
     isFurniture: isFurnished !== null ? isFurnished : undefined,
     tags: tags.length > 0 ? tags : undefined,
     page: page,
-    limit: limit
+    limit: limit,
   };
 
-  // Chỉ gọi filter API khi không sử dụng search
-  const { 
-    data: posts, 
-    isLoading: isFilterLoading, 
-    error 
-  } = useGetPostByFilter(
-    filterParams, 
-    { enabled: !isUsingSearch }
+  const { data: posts, isLoading: isFilterLoading } = useGetPostByFilter(filterParams, { enabled: !isUsingSearch });
+
+  const { data: mapPosts, isLoading: isMapLoading } = useGetPostsByMapBounds(
+    page,
+    limit,
+    currentLocation,
+    { enabled: showMap && !isUsingSearch } 
   );
 
   const resetAllFilters = () => {
@@ -115,63 +122,63 @@ function SellDetail() {
     if (keyword) {
       setSelectedProvinces([keyword]);
     }
-    
+
     if (minPriceParam) {
       setMinPrice(minPriceParam);
     }
-    
+
     if (maxPriceParam) {
       setMaxPrice(maxPriceParam);
     }
-    
+
     if (minSquareMeters) {
       setMinArea(minSquareMeters);
     }
-    
+
     if (maxSquareMeters) {
       setMaxArea(maxSquareMeters);
     }
-    
+
     if (bedroomsParam) {
       setBedrooms(Number(bedroomsParam));
     }
-    
+
     if (bathroomsParam) {
       setBathrooms(Number(bathroomsParam));
     }
-    
+
     if (floorParam) {
       setFloors(Number(floorParam));
     }
-    
+
     if (directionParam) {
       setDirection(directionParam);
     }
-    
+
     if (propertyTypeIdsParam) {
       setPropertyTypeIds(propertyTypeIdsParam.split(','));
     }
-    
+
     if (listingTypeIdsParam) {
       setListingTypeIds(listingTypeIdsParam.split(','));
     }
-    
+
     if (statusParam.length > 0) {
       setStatus(statusParam);
     }
-    
+
     if (isProfessionalParam) {
       setIsProfessional(isProfessionalParam === 'true');
     }
-    
+
     if (ratingsParam.length > 0) {
       setRatings(ratingsParam.map(Number).filter((n) => !isNaN(n)));
     }
-    
+
     if (tagsParam.length > 0) {
       setTags(tagsParam);
     }
-    
+
     if (isFurnitureParam) {
       setIsFurnished(isFurnitureParam === 'true');
     }
@@ -190,32 +197,42 @@ function SellDetail() {
     setPage(1);
   };
 
+  const handleLocationChange = (location: string) => {
+    setCurrentLocation(location);
+    setIsLocation(true);
+  };
+
   useEffect(() => {
     if (searchResults && isSearching) {
       setIsSearching(false);
     }
   }, [searchResults, isSearching]);
-  console.log(posts)
-  const currentData = isUsingSearch ? searchResults : posts;
-  const isLoading = isUsingSearch ? isSearchLoading : isFilterLoading;
-  console.log(searchResults?.posts,currentData,isUsingSearch )
+
+  let currentData;
+  let isLoading;
+  if (showMap && !isUsingSearch) {
+    currentData = mapPosts;
+    isLoading = isMapLoading;
+  } else if (isUsingSearch) {
+    currentData = searchResults; 
+    isLoading = isSearchLoading;
+  } else {
+    currentData = posts; 
+    isLoading = isFilterLoading;
+  }
   return (
     <div className=''>
       <div className={cn('flex w-full', showMap ? 'h-[calc(100vh-80px)]' : '')}>
         <div className={cn('flex flex-col transition-all duration-300', showMap ? 'w-1/2' : 'w-full')}>
           <div className={`${showMap ? 'pl-4' : 'max-w-7xl mx-auto bg-white rounded-lg'} w-full pt-10 pb-2 py-6 `}>
-            <SearchBar
-              showMap={showMap}
-              setShowMap={setShowMap}
-              onSearch={handleSearch} 
-            />
+            <SearchBar showMap={showMap} setShowMap={setShowMap} onSearch={handleSearch} />
             {isUsingSearch && (
-              <div className="mt-2 flex items-center">
-                <span className="text-sm text-gray-500 mr-2">Đang sử dụng tìm kiếm theo địa điểm</span>
+              <div className='mt-2 flex items-center'>
+                <span className='text-sm text-gray-500 mr-2'>Đang sử dụng tìm kiếm theo địa điểm</span>
                 <Button
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-blue-500 hover:text-blue-700"
+                  variant='ghost'
+                  size='sm'
+                  className='text-blue-500 hover:text-blue-700'
                   onClick={() => {
                     setIsUsingSearch(false);
                     setSearchAddress([]);
@@ -225,11 +242,31 @@ function SellDetail() {
                 </Button>
               </div>
             )}
+
+            {/* Display current map location if available */}
+            {showMap && currentLocation && (
+              <div className='mt-2 flex items-center'>
+                <span className='text-sm text-gray-600 mr-2'>Địa điểm trên bản đồ:</span>
+                <span className='text-sm font-medium text-blue-600'>{extractAddress(currentLocation)}</span>
+
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='ml-2 h-7 text-xs'
+                  onClick={() => {
+                    const address = extractAddress(currentLocation);
+                    handleSearch([address]);
+                  }}
+                >
+                  Tìm theo địa điểm này
+                </Button>
+              </div>
+            )}
           </div>
           <div
             className={cn(
               'flex flex-col lg:flex-row flex-1 overflow-hidden',
-              showMap ? 'w-full' : 'max-w-7xl mx-auto w-full',
+              showMap ? 'w-full overflow-y-auto' : 'max-w-7xl mx-auto w-full',
             )}
           >
             <PropertyListings
@@ -241,11 +278,13 @@ function SellDetail() {
             />
           </div>
         </div>
-        {showMap && (
-          <div className='w-full md:w-1/2 bg-white h-[calc(100vh-80px)] px-4 py-6'>
-            <Map />
+        {/* {showMap && (
+          <div className='w-1/2 h-full sticky top-0'>
+            <div className='h-full p-[20px] '>
+              <Map onLocationChange={handleLocationChange} />
+            </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

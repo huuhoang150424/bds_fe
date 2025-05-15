@@ -130,7 +130,7 @@ export default function SearchBar({ showMap, setShowMap, onSearch }: SearchBarPr
           </div>
         )}
       </div>
-      <div className='md:w-[15%] h-[52px]'>
+      {/* <div className='md:w-[15%] h-[52px]'>
         <Button
           className={cn(
             'w-full h-full flex items-center justify-center gap-2 rounded-lg font-medium transition-all',
@@ -141,7 +141,7 @@ export default function SearchBar({ showMap, setShowMap, onSearch }: SearchBarPr
           <Map />
           <span className='hidden sm:inline'>{showMap ? 'Ẩn bản đồ' : 'Lọc bản đồ'}</span>
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }
