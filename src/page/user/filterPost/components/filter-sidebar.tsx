@@ -357,7 +357,7 @@ export default function FilterSidebar() {
           Áp dụng lọc
         </Button>
         <Button className='w-full text-gray-800 font-normal  ' variant='outline' onClick={resetFilters}>
-          Reset filter
+          Xóa bộ lọc
         </Button>
       </div>
     </div>

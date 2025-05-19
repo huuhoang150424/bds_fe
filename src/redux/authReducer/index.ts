@@ -12,6 +12,8 @@ interface User {
   balance:number;
   score:number;
 
+  isLock: boolean;
+
   emailVerified: boolean ;
 
 }

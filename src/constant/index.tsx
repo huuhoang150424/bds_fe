@@ -62,4 +62,14 @@ export const navItems: NavItem[] = [
       { name: 'Tạo mới banner', path: '/admin/create-banner', pro: false }
     ],
   },
+    {
+    icon: <MdImage size={22} />,
+    name: 'Thống kê',
+    subItems: [
+      { name: 'Tổng quan', path: '/admin/statistical', pro: false },
+      { name: 'Người dùng', path: '/admin/statistical-user', pro: false },
+      { name: 'Bài đăng', path: '/admin/statistical-post', pro: false },
+      // { name: 'Hệ thống', path: '/admin/statistical-post', pro: false }
+    ],
+  },
 ];
