@@ -578,10 +578,10 @@ export function PostEditModalEnhanced({ open, onOpenChange, post, onSave }: Post
                     onValueChange={(value) => handleSelectChange('status', value)}
                     disabled={isPending}
                   >
-                    <SelectTrigger className="mt-[6px] text-[15px] w-[70%] text-gray-600 font-[400] px-[12px] py-[7px] border border-gray-200 shadow-none focus:ring-0 bg-transparent outline-none rounded-[10px]">
+                    <SelectTrigger className=" mt-[6px] text-[15px] w-[70%] text-gray-600 font-[400] px-[12px] py-[7px] border border-gray-200 shadow-none focus:ring-0 bg-transparent outline-none rounded-[10px]">
                       <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className='z-[999999]'>
                       {Object.values(StatusPost).map((status) => (
                         <SelectItem key={status} value={status} className="text-base">
                           {status}

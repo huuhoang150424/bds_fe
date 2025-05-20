@@ -185,7 +185,7 @@ export function PropertyTable({
       case 'Đã hết hạng':
         return <Badge className='text-xs font-normal bg-red-500'>Đã hết hạng</Badge>;
       case 'Đang đàm phán':
-        return <Badge className='text-xs font-normal bg-blue-500'>Đang đàm phán</Badge>;
+        return <Badge className='text-xs font-normal bg-sky-500'>Đang đàm phán</Badge>;
       case 'Còn trống':
         return <Badge className='text-xs font-normal bg-blue-500'>Còn trống</Badge>;
       case 'DRAFT':
@@ -199,7 +199,6 @@ export function PropertyTable({
     }
   };
   
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTimeout(() => {
@@ -243,7 +242,7 @@ export function PropertyTable({
                 <TableHead className='w-[150px] font-medium whitespace-nowrap'>Ngày hết hạn</TableHead>
               )}
               <TableHead className='w-[100px] font-medium text-right whitespace-nowrap sticky right-0 z-20 bg-gray-100'>
-                Actions
+                Hành động
               </TableHead>
             </TableRow>
           </TableHeader>

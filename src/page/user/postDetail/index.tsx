@@ -3,7 +3,7 @@ import { EmblaOptionsType } from 'embla-carousel';
 import Carousel, { SliderContainer, SliderNextButton, SliderPrevButton, ThumsSlider } from '@/components/core/carousel';
 import { useSelector } from 'react-redux';
 import { useGetPostDetail } from './hooks/use-get-post-detail';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { CiMoneyCheck1 } from 'react-icons/ci';
 import { GrMapLocation } from 'react-icons/gr';
@@ -214,7 +214,7 @@ function PostDetail() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const navigate = useNavigate();
   const OPTIONS: EmblaOptionsType = {
     loop: true,
     align: 'start',
@@ -491,13 +491,16 @@ function PostDetail() {
               <div className="my-[20px]">
                 <span className="text-[22px] font-[500]">Tìm kiếm theo từ khóa</span>
               </div>
-              {data?.tagPosts.map((tagItem: { id: string; tag: { tagName: string } }, index: number) => (
-                <div key={tagItem.id} className="flex-wrap gap-2">
-                  <span className="text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 text-[13px]">
-                    {tagItem.tag.tagName}
-                  </span>
-                </div>
-              ))}
+              
+              <div className="flex gap-1">
+                {data?.tagPosts.map((tagItem: { id: string; tag: { tagName: string } }, index: number) => (
+                  <div  key={tagItem.id} className="cursor-pointer ">
+                    <span onClick={() => navigate(`/filter?page=1&limit=10&tags=${tagItem.id}`)} className="text-gray font-[500] mr-[10px] rounded-[15px] px-[15px] py-[5px] bg-gray-200 hover:bg-gray-300 text-[13px]">
+                      {tagItem.tag.tagName}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="border border-gray-100 my-[20px]"></div>
             {isAuthenticated === true && (

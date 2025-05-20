@@ -1,37 +1,51 @@
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useState } from 'react';
+import { useGetMonthlyRevenue } from '../hooks/use-get-monthly-revenue';
 
-const data = [
-  { name: 'Jan', total: 12000000 },
-  { name: 'Feb', total: 9000000 },
-  { name: 'Mar', total: 15000000 },
-  { name: 'Apr', total: 11000000 },
-  { name: 'May', total: 17000000 },
-  { name: 'Jun', total: 14000000 },
-  { name: 'Jul', total: 18000000 },
-  { name: 'Aug', total: 16000000 },
-  { name: 'Sep', total: 13000000 },
-  { name: 'Oct', total: 19000000 },
-  { name: 'Nov', total: 20000000 },
-  { name: 'Dec', total: 22000000 },
-]
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const Overview: React.FC = () => {
+const Overview: React.FC<{ year: number }> = ({ year }) => {
+  const { data, isLoading, error } = useGetMonthlyRevenue(year);
+
+  // Skeleton Loading Component
+  const SkeletonChart = () => (
+    <div className="animate-pulse">
+      <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+      <div className="h-[350px] w-full bg-gray-200 dark:bg-gray-700 rounded-lg" />
+    </div>
+  );
+
+  if (isLoading) return <SkeletonChart />;
+  if (error) {
+    return (
+      <Alert variant="destructive" className="m-4">
+        <AlertTitle>Lỗi</AlertTitle>
+        <AlertDescription>Không thể tải dữ liệu doanh thu. Vui lòng thử lại sau.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  const chartData = data?.data?.monthlyRevenue?.map((item: { month: number; revenue: number }) => ({
+    name: monthNames[item.month - 1],
+    total: item.revenue,
+  })) || [];
+
   return (
-    <ResponsiveContainer width='100%' height={350}>
-      <BarChart data={data}>
+    <ResponsiveContainer width="100%" height={350}>
+      <BarChart data={chartData}>
         <CartesianGrid vertical={false} stroke="#ccc" strokeDasharray="5 5" />
         <XAxis
-          dataKey='name'
-          stroke='#888888'
+          dataKey="name"
+          stroke="#888888"
           fontSize={12}
           tickLine={false}
           axisLine={false}
         />
         <YAxis
-          stroke='#888888'
+          stroke="#888888"
           fontSize={10}
           tickLine={false}
           axisLine={false}
@@ -39,49 +53,49 @@ const Overview: React.FC = () => {
         />
         <Tooltip
           cursor={{ fill: 'transparent' }}
-          formatter={(value) => [`Total: ${value.toLocaleString()} vnđ`, '']} 
+          formatter={(value: number) => [`Total: ${value.toLocaleString()} vnđ`, '']}
         />
         <Bar
-          dataKey='total'
-          fill='currentColor'
+          dataKey="total"
+          fill="currentColor"
           radius={[4, 4, 0, 0]}
-          className='fill-primary'
+          className="fill-primary"
         />
       </BarChart>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
-const Chart: React.FC=()=> {
-
+const Chart: React.FC = () => {
   const [sizePage, setSizePage] = useState(2025);
-  
+
   return (
-    <Card className='self-start col-span-1 lg:col-span-4 rounded-[6px] border border-gray-200 shadow-sm cursor-pointer dark:bg-colorDarkMode dark:border-borderDarkMode transition-all duration-500 ease-linear'>
-    <CardHeader className='flex flex-row items-center justify-between '>
-      <CardTitle>Doanh thu của từng tháng</CardTitle>
-      <Select
+    <Card className="self-start col-span-1 lg:col-span-4 rounded-lg border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Doanh thu của từng tháng</CardTitle>
+        <Select
           value={`${sizePage}`}
           onValueChange={(value) => {
-            setSizePage(Number(value))
+            setSizePage(Number(value));
           }}
         >
-          <SelectTrigger className='h-8 w-[70px]  shadow-none '>
+          <SelectTrigger className="h-8 w-[70px] shadow-none">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent side='top'>
-            {[2020, 2021, 2022, 2023, 2024,2025].map((pageSize) => (
+          <SelectContent side="top">
+            {[2020, 2021, 2022, 2023, 2024, 2025].map((pageSize) => (
               <SelectItem className="text-textColor" key={pageSize} value={`${pageSize}`}>
                 {pageSize}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-    </CardHeader>
-    <CardContent className='pl-2'>
-      <Overview />
-    </CardContent>
-  </Card>
-  )
-}
+      </CardHeader>
+      <CardContent className="pl-2">
+        <Overview year={sizePage} />
+      </CardContent>
+    </Card>
+  );
+};
+
 export default Chart;

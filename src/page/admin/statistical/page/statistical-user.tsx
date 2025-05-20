@@ -20,6 +20,8 @@ import {
   Rectangle,
 } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import ActiveUsersTable from '../components/active-users';
+import DemographicStats from '../components/demographic-stats';
 
 const userGrowthData = [
   { month: 'T1', admin: 5, agent: 25, user: 120 },
@@ -279,168 +281,12 @@ export default function StatisticalUser() {
             </CardContent>
           </Card>
         </div>
-
-        <div className='grid gap-4 md:grid-cols-3 mt-4'>
-          <Card className='col-span-1'>
-            <CardHeader>
-              <CardTitle className='text-xs'>Phân Bổ Theo Giới Tính</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='h-[250px]'>
-                <ResponsiveContainer width='100%' height='100%'>
-                  <PieChart>
-                    <Pie
-                      data={genderData}
-                      cx='50%'
-                      cy='50%'
-                      labelLine={false}
-                      outerRadius={80}
-                      fill='#8884d8'
-                      dataKey='value'
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {genderData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Legend
-                      verticalAlign='bottom'
-                      height={36}
-                      formatter={(value) => <span className='text-xs'>{value}</span>}
-                    />
-                    <Tooltip formatter={(value) => [`${value}%`, '']} contentStyle={{ fontSize: '10px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className='col-span-1'>
-            <CardHeader>
-              <CardTitle className='text-xs'>Phân Bổ Theo Độ Tuổi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='h-[250px]'>
-                <ResponsiveContainer width='100%' height='100%'>
-                  <BarChart data={ageData} layout='vertical'>
-                    <CartesianGrid strokeDasharray='3 3' horizontal={true} vertical={false} stroke='#f5f5f5' />
-                    <XAxis type='number' tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis dataKey='name' type='category' tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(value) => [`${value}%`, '']} contentStyle={{ fontSize: '10px' }} />
-                    <Bar dataKey='value' radius={[0, 4, 4, 0]}>
-                      {ageData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className='col-span-1'>
-            <CardHeader>
-              <CardTitle className='text-xs'>Phân Bổ Theo Khu Vực</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='h-[250px]'>
-                {/* <ResponsiveContainer width="100%" height="100%">
-                  <Treemap
-                    data={regionData}
-                    dataKey="size"
-                    ratio={4 / 3}
-                    stroke="#fff"
-                    fill="#8884d8"
-                    content={({ root, depth, x, y, width, height, index, payload, rank, name }) => {
-                      return (
-                        <g>
-                          <rect
-                            x={x}
-                            y={y}
-                            width={width}
-                            height={height}
-                            style={{
-                              fill: depth < 2 ? COLORS[index % COLORS.length] : COLORS[(index + 2) % COLORS.length],
-                              stroke: "#fff",
-                              strokeWidth: 2 / (depth + 1e-10),
-                              strokeOpacity: 1 / (depth + 1e-10),
-                            }}
-                          />
-                          {depth === 1 && width > 50 && height > 20 && (
-                            <text
-                              x={x + width / 2}
-                              y={y + height / 2 + 7}
-                              textAnchor="middle"
-                              fill="#fff"
-                              fontSize={10}
-                            >
-                              {name}
-                            </text>
-                          )}
-                        </g>
-                      )
-                    }}
-                  >
-                    <Tooltip contentStyle={{ fontSize: "10px" }} />
-                  </Treemap>
-                </ResponsiveContainer> */}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <DemographicStats/>
 
         <div className='mt-4'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xs'>Người Dùng Hoạt Động Tích Cực Nhất</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className='w-[50px] text-xs'>ID</TableHead>
-                    <TableHead className='text-xs'>Tên</TableHead>
-                    <TableHead className='text-right text-xs'>Số Bài Đăng</TableHead>
-                    <TableHead className='text-right text-xs'>Số Tương Tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activeUsersData.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className='text-xs'>{user.id}</TableCell>
-                      <TableCell className='text-xs'>{user.name}</TableCell>
-                      <TableCell className='text-right text-xs'>{user.posts}</TableCell>
-                      <TableCell className='text-right text-xs'>{user.interactions}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <ActiveUsersTable/>
         </div>
 
-        <div className='mt-4'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xs'>Luồng Người Dùng (User Flow)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='h-[400px]'>
-                <ResponsiveContainer width='100%' height='100%'>
-                  <Sankey
-                    data={userFlowData}
-                    nodePadding={50}
-                    nodeWidth={10}
-                    linkCurvature={0.5}
-                    link={{ stroke: '#d9d9d9' }}
-                    node={<Rectangle fill='#ef4444' fillOpacity={0.85} />}
-                    margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                  >
-                    <Tooltip contentStyle={{ fontSize: '10px' }} formatter={(value) => [`${value} người dùng`, '']} />
-                  </Sankey>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </CardContent>
     </Card>
   );

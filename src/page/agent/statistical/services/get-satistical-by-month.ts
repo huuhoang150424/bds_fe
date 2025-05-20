@@ -2,7 +2,7 @@ import {handleApi} from "@/service";
 
 export const getSatisticalByMonth = async () => {
     try {
-        const response = await handleApi(`/statistical/getPostByMonth`, null, 'GET');
+        const response = await handleApi(`/statisticalAgen/getPostByMonth`, null, 'GET');
         return response.data.data;
     } catch (error) {
         console.error('Error ', error);
