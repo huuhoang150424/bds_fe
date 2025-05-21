@@ -21,47 +21,82 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Pagination } from '@/components/user/pagination';
-import { Loading } from '@/components/common';
 import { Link } from 'react-router-dom';
 import { useGetProfessionalAgents } from './hook/use-get-all-boroker';
 import { useSearchProfessionalAgents } from './hook/use-search-boroker';
+import { useTopPosts } from '../home/hook/use-get-top-post';
+import { formatCurrency } from '@/page/admin/pricing/components/column';
 
-const projects = [
-  {
-    id: 0,
-    name: 'Vinhome Ocean Park',
-    location: 'Gia Lâm, Hà Nội',
-    badge: 'Dự án hot',
-    price: 'Từ 1.8 tỷ',
-    units: 120,
-    completion: '2023',
-  },
-  {
-    id: 1,
-    name: 'The Zenpark Residences',
-    location: 'Cầu Giấy, Hà Nội',
-    badge: 'Mở bán giai đoạn 2',
-    price: 'Từ 3.2 tỷ',
-    units: 86,
-    completion: '2024',
-  },
-  {
-    id: 2,
-    name: 'Sunshine Diamond River',
-    location: 'Long Biên, Hà Nội',
-    badge: 'Giá tốt nhất thị trường',
-    price: 'Từ 2.5 tỷ',
-    units: 150,
-    completion: '2023',
-  },
-];
+const ProjectCardSkeleton = () => {
+  return (
+    <div className="group animate-pulse">
+      <div className="relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm bg-gray-200" />
+      <div className="h-5 w-3/4 bg-gray-200 rounded mt-2" />
+      <div className="flex items-center mt-1">
+        <MapPin className="h-3 w-3 mr-0.5 text-gray-400" />
+        <div className="h-4 w-1/2 bg-gray-200 rounded" />
+      </div>
+    </div>
+  );
+};
+
+const AgentCardSkeleton = () => {
+  return (
+    <div className="rounded-xl overflow-hidden shadow-md bg-white border border-gray-200 animate-pulse">
+      <div className="flex flex-col md:flex-row">
+        <div className="w-full md:w-1/4 p-[10px] flex justify-center">
+          <div className="relative w-24 h-24 md:w-full md:h-36 bg-gray-200 rounded-lg" />
+        </div>
+        <div className="w-full md:w-3/4 p-[10px] flex flex-col md:flex-row">
+          <div className="flex-1 mb-4 md:mb-0">
+            <div className="flex items-center mb-0.5">
+              <div className="h-6 w-1/2 bg-gray-200 rounded" />
+              <div className="h-4 w-12 bg-gray-200 rounded ml-2" />
+            </div>
+            <div className="h-4 w-1/3 bg-gray-200 rounded mb-0.5" />
+            <div className="h-4 w-1/4 bg-gray-200 rounded mb-2" />
+            <div className="flex items-center gap-1 mb-3">
+              <Phone className="h-3 w-3 text-gray-400" />
+              <div className="h-4 w-1/3 bg-gray-200 rounded" />
+            </div>
+            <div className="h-6 w-20 bg-gray-200 rounded" />
+          </div>
+          <div className="flex-1">
+            <div className="h-5 w-1/3 bg-gray-200 rounded mb-1" />
+            <div className="space-y-0.5">
+              <div className="flex items-start gap-0.5">
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <div className="h-4 w-2/3 bg-gray-200 rounded" />
+              </div>
+              <div className="flex items-start gap-0.5">
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <div className="h-4 w-1/2 bg-gray-200 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100">
+          <div className="h-4 w-16 bg-gray-200 rounded" />
+        </div>
+        <div className="flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100">
+          <div className="h-4 w-20 bg-gray-200 rounded" />
+        </div>
+        <div className="flex-1 flex items-center justify-center gap-[6px] p-2">
+          <div className="h-4 w-16 bg-gray-200 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function RealEstateAgentDirectory() {
   useScrollToTopOnMount();
   const [currentPage, setCurrentPage] = useState(1);
   const [hoveredAgent, setHoveredAgent] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState(''); 
-  const [committedQuery, setCommittedQuery] = useState(''); 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [committedQuery, setCommittedQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const limit = 5;
 
@@ -70,11 +105,13 @@ export default function RealEstateAgentDirectory() {
     limit
   );
   const { data: searchData, isLoading: isSearchLoading, error: searchError } = useSearchProfessionalAgents(
-    committedQuery, 
+    committedQuery,
     currentPage,
     limit,
-    isSearching 
+    isSearching
   );
+  const { data: topPosts, isLoading: isTopPostsLoading, error: topPostsError } = useTopPosts();
+
   const data = isSearching ? searchData : defaultData;
   const isLoading = isSearching ? isSearchLoading : isDefaultLoading;
   const error = isSearching ? searchError : defaultError;
@@ -89,9 +126,9 @@ export default function RealEstateAgentDirectory() {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      setCommittedQuery(searchQuery); 
+      setCommittedQuery(searchQuery);
       setIsSearching(true);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     }
   };
 
@@ -169,7 +206,12 @@ export default function RealEstateAgentDirectory() {
           </div>
 
           {isLoading ? (
-            <Loading className="my-[200px]" />
+            <div className="space-y-6">
+              {/* Render multiple skeleton cards to mimic loading state */}
+              {Array.from({ length: limit }).map((_, index) => (
+                <AgentCardSkeleton key={index} />
+              ))}
+            </div>
           ) : error ? (
             <div className="text-center text-red-500 text-xs">Đã xảy ra lỗi: {error.message}</div>
           ) : (
@@ -299,7 +341,7 @@ export default function RealEstateAgentDirectory() {
         </div>
 
         <div className="w-full lg:w-1/4">
-          <div className="rounded-xl p-3 border border-gray-200 bg-white relative overflow-hidden">
+          <div className="rounded-xl p-3 border border-gray-200 bg-Seperator bg-white relative overflow-hidden">
             <div className="absolute -top-16 -right-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
             <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
 
@@ -309,51 +351,67 @@ export default function RealEstateAgentDirectory() {
               </span>
             </h2>
 
-            <div className="space-y-4">
-              {projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="group cursor-pointer hover:translate-y-[-3px] transition-all duration-300"
-                >
-                  <div className="relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300">
-                    <img
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkQKv-OD4gRTARNaGz8tAp0IwzR-VhzvgKcg&s"
-                      alt={project.name}
-                      className="object-cover transition-transform duration-500 group-hover:scale-105 w-full h-full"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {isTopPostsLoading ? (
+              <div className="space-y-4">
+                <ProjectCardSkeleton />
+                <ProjectCardSkeleton />
+                <ProjectCardSkeleton />
+              </div>
+            ) : topPostsError ? (
+              <div className="text-center text-red-500 text-xs">Đã xảy ra lỗi: {topPostsError.message}</div>
+            ) : topPosts && topPosts.length > 0 ? (
+              <div className="space-y-4">
+                {topPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="group cursor-pointer hover:translate-y-[-3px] transition-all duration-300"
+                  >
+                    <div className="relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300">
+                      <img
+                        src={post.images[0]?.image_url || 'https://via.placeholder.com/300x150'}
+                        alt={post.title}
+                        className="object-cover transition-transform duration-500 group-hover:scale-105 w-full h-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                    <div className="absolute inset-0 flex flex-col justify-end p-3 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <span className="bg-gradient-to-r from-red-600 to-red-500 px-1.5 py-0.5 rounded-md text-[10px] text-white shadow-sm mb-1 w-fit">
-                        {project.badge}
-                      </span>
-                      <div className="text-white font-bold text-xs mb-0.5">{project.price}</div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex space-x-1">
-                          <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
-                            <Heart className="h-3 w-3 text-white" />
-                          </button>
-                          <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
-                            <Eye className="h-3 w-3 text-white" />
-                          </button>
+                      <div className="absolute inset-0 flex flex-col justify-end p-3 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <span className="bg-gradient-to-r from-red-600 to-red-500 px-1.5 py-0.5 rounded-md text-[10px] text-white shadow-sm mb-1 w-fit">
+                          {post.tagPosts[0]?.tag.tag_name || 'Nổi bật'}
+                        </span>
+                        <div className="text-white font-bold text-xs mb-0.5">
+                          {formatCurrency(post.price)} {post.priceUnit}
                         </div>
-                        <div className="flex flex-col items-end">
-                          <span className="text-white/80 text-[10px]">{project.units} căn hộ</span>
-                          <span className="text-white/80 text-[10px]">Hoàn thành: {project.completion}</span>
+                        <div className="flex justify-between items-center">
+                          <div className="flex space-x-1">
+                            <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
+                              <Heart className="h-3 w-3 text-white" />
+                            </button>
+                            <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
+                              <Eye className="h-3 w-3 text-white" />
+                            </button>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <span className="text-white/80 text-[10px]">{post.squareMeters} m²</span>
+                            <span className="text-white/80 text-[10px]">
+                              Hết hạn: {new Date(post.expiredDate).toLocaleDateString('vi-VN')}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    <h3 className="font-[600] text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-sm">
+                      {post.title}
+                    </h3>
+                    <div className="flex items-center text-gray-600">
+                      <MapPin className="h-3 w-3 mr-0.5 text-red-500" />
+                      <span className="text-xs">{post.address}</span>
+                    </div>
                   </div>
-                  <h3 className="font-[600] text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-sm">
-                    {project.name}
-                  </h3>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="h-3 w-3 mr-0.5 text-red-500" />
-                    <span className="text-xs">{project.location}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 text-xs">Không có dự án nổi bật</div>
+            )}
 
             <Button className="w-full mt-6 bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-700 hover:to-red-600 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group text-xs">
               <span>Xem tất cả dự án</span>

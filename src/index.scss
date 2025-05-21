@@ -394,3 +394,134 @@
     }
   }
 }
+
+
+/* Gradient animation cho nền nút */
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Hiệu ứng shimmer (ánh sáng lướt qua) */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Hiệu ứng sparkle (ánh sáng nhấp nháy) */
+.sparkle {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.7) 0%,
+    transparent 60%
+  );
+  animation: sparkle 1.5s infinite ease-in-out;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Hiệu ứng particle (hạt sáng di chuyển) */
+.particle {
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><circle cx="3" cy="3" r="3" fill="rgba(255,255,255,0.9)"/></svg>') repeat;
+  background-size: 15px 15px;
+  animation: particleMove 8s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes particleMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 30px 30px;
+  }
+}
+
+/* Hiệu ứng sao lấp lánh bay ra khi hover hoặc nhấn */
+.sparkle-button {
+  position: relative;
+}
+
+.sparkle-button:hover::before,
+.sparkle-button:hover::after,
+.sparkle-button:active::before,
+.sparkle-button:active::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><polygon points="4,0 5,3 8,4 5,5 4,8 3,5 0,4 3,3" fill="rgba(255,255,255,0.9)"/></svg>');
+  pointer-events: none;
+}
+
+.sparkle-button:hover::before,
+.sparkle-button:active::before {
+  top: -10px;
+  left: 20%;
+  animation: starFlyLeft 0.8s ease-out forwards;
+}
+
+.sparkle-button:hover::after,
+.sparkle-button:active::after {
+  bottom: -10px;
+  right: 20%;
+  animation: starFlyRight 0.8s ease-out forwards;
+}
+
+@keyframes starFlyLeft {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50px, -30px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes starFlyRight {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(50px, 30px) scale(0.5);
+    opacity: 0;
+  }
+}

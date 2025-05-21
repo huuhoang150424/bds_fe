@@ -1,7 +1,8 @@
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
-import ListCards from './components/card';
+
 import Chart from './components/char';
 import UserRecent from './components/user-recent';
+import ListCards from './components/piechar';
 
 export default function DashBroad() {
   useScrollToTopOnMount();

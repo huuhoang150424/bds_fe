@@ -7,7 +7,6 @@ import { useGetPostByFilter } from './hooks/use-fill-post';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { useSearchPost } from './hooks/use-seach-post';
 import { Button } from '@/components/ui/button';
-import Map from './components/Map';
 import { useGetPostsByMapBounds } from './hooks/use-get-posts-map';
 
 function SellDetail() {

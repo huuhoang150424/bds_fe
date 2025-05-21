@@ -1,93 +1,127 @@
-import { CustomImage, Loading } from '@/components/common'
-import { Card, CardContent } from '@/components/ui/card'
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@radix-ui/react-hover-card'
-
-import { AiOutlinePicture } from 'react-icons/ai'
-import { CiHeart } from 'react-icons/ci'
-import { IoLocationOutline } from 'react-icons/io5'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import {useGetPostHabbit} from '../hooks/use-get-post-habbit'
-import { useNavigate } from 'react-router-dom'
-function BdsForU() {
-  const navigate=useNavigate()
-  const {data, isLoading, isError} = useGetPostHabbit();
+} from '@/components/ui/carousel';
+import { ChevronLeft, ChevronRight, MapPin, Bed, Bath, Maximize } from 'lucide-react';
+import { useGetPostHabbit } from '../hooks/use-get-post-habbit';
+import { useNavigate } from 'react-router-dom';
+import CardItem from '@/components/user/card';
 
-  if (isLoading) return <div><Loading /></div>
-  if (isError) return <div>Something went wrong</div>
+const CardItemSkeleton = () => {
   return (
-    <div className=' w-full  py-[30px]'>
-      <div className='content max-w-6xl '>
-        <div className='title flex justify-between items-center'>
-          <h2 className='text-2xl font-[500] mb-[30px]'>Bất động sản dành cho bạn</h2>
-          <div className='flex'>            
+    <div className="border border-gray-200 rounded-lg animate-pulse">
+      <div className="relative">
+        <div className="absolute top-3 left-3 z-[10] bg-gray-200 h-6 w-12 rounded"></div>
+        <div className="grid grid-cols-5 grid-rows-2 gap-0.5 h-[250px] px-[8px] pt-[8px]">
+          <div className="col-span-3 row-span-2 bg-gray-200 rounded-l-lg"></div>
+          <div className="col-span-2 col-start-4 bg-gray-200 rounded-tr-lg"></div>
+          <div className="col-start-4 row-start-2 bg-gray-200"></div>
+          <div className="col-start-5 row-start-2 bg-gray-200 rounded-br-lg"></div>
+        </div>
+      </div>
+      <div className="p-4">
+        <div className="space-y-2">
+          <div className="h-6 w-3/4 bg-gray-200 rounded"></div>
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-gray-400" />
+            <div className="h-4 w-1/2 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="h-5 w-24 bg-gray-200 rounded"></div>
+            <div className="flex items-center gap-2">
+              <Maximize className="h-5 w-5 text-gray-400" />
+              <div className="h-4 w-16 bg-gray-200 rounded"></div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <Bed className="h-5 w-5 text-gray-400" />
+                <div className="h-4 w-6 bg-gray-200 rounded"></div>
+              </div>
+              <div className="flex items-center gap-1">
+                <Bath className="h-5 w-5 text-gray-400" />
+                <div className="h-4 w-6 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="h-4 w-full bg-gray-200 rounded"></div>
+            <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
           </div>
         </div>
+        <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
+            <div>
+              <div className="h-4 w-20 bg-gray-200 rounded"></div>
+              <div className="h-3 w-16 bg-gray-200 rounded mt-1"></div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-28 bg-gray-200 rounded"></div>
+            <div className="h-8 w-8 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-        <div className='relative'>
+// Skeleton Component for BdsForU
+const BdsForUSkeleton = () => {
+  return (
+    <div className="w-full py-[30px] animate-pulse">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center">
+          <div className="h-8 w-1/3 bg-gray-200 rounded mb-[30px]"></div>
+          <div className="h-6 w-20 bg-gray-200 rounded"></div>
+        </div>
+        <div className="relative">
+          <div className="flex gap-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="basis-1/3">
+                <CardItemSkeleton />
+              </div>
+            ))}
+          </div>
+          <div className="absolute left-[-35px] top-1/2 -translate-y-1/2 bg-gray-200 h-10 w-10 rounded-full"></div>
+          <div className="absolute right-[-35px] top-1/2 -translate-y-1/2 bg-gray-200 h-10 w-10 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function BdsForU() {
+  const navigate = useNavigate();
+  const { data, isLoading, isError } = useGetPostHabbit();
+
+  if (isLoading) return <BdsForUSkeleton />;
+  if (isError) return <div>Something went wrong</div>;
+  return (
+    <div className="w-full py-[30px]">
+      <div className="content max-w-6xl mx-auto">
+        <div className="title flex justify-between items-center">
+          <h2 className="text-[22px] font-[500] mb-[30px]">Bất động sản dành cho bạn</h2>
+          <div className="flex"></div>
+        </div>
+
+        <div className="relative">
           <Carousel
             opts={{
-              align: "start",
+              align: 'start',
               loop: true,
               skipSnaps: false,
-              slidesToScroll: 4
+              slidesToScroll: 4,
             }}
             className="w-full"
           >
             <CarouselContent className="ml-4">
-              {data?.data?.map((post : any, index : number) => (
+              {data?.data?.map((post: any, index: number) => (
                 <CarouselItem key={post?.id} className="pl-4 basis-1/3">
-                  <Card onClick={()=>navigate(`/post/${post?.slug}`)} className='rounded-[10px] border border-gray-200 h-full cursor-pointer'>
-                    <CardContent className='p-0 pb-[10px] relative'>
-                      <div className='overflow-hidden w-full '>
-                        <CustomImage
-                          src={post?.images[0]?.image_url}
-                          alt='Placeholder Image'
-                          width='full'
-                          height='full'
-                          className='rounded-t-[5px] object-cover h-[150px] w-full'
-                        />
-                      </div>
-                      <div className='flex'>
-                        <AiOutlinePicture className='text-[#fff] absolute top-[100px] right-[30px] text-[24px]' />
-                        <p className='text-[#fff] absolute top-[100px] right-[15px] text-[16px]'>
-                          {post?.images?.length}
-                        </p>
-                      </div>
-                      <div className='px-[15px]'>
-                        <div>
-                          <span className='font-[700] text-[#2C2C2C] text-lg my-[10px]'>{post?.title}</span>
-                        </div>
-                        <div className='text-red flex'>
-                          <div className='text-[#E03C31] mr-[30px] font-[500]'>
-                            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(post?.price)}</span>
-                          </div>
-                          <div className='text-[#E03C31] font-[500]'>
-                            <span>{post?.squareMeters} m²</span>
-                          </div>
-                        </div>
-                        <div className='flex justify-start items-center mt-[5px]'>
-                          <IoLocationOutline className='text-[30px]'/>
-                          <span className='text-sm ml-[5px] font-[0]'>{post?.address}</span>
-                        </div>
-                        <div className='flex justify-between items-center mt-[10px]'>
-                          <span className='text-[14px] text-gray-400'>Đăng vào {new Date(post?.createdAt).toLocaleDateString()}</span>
-                          <HoverCard>
-                            <HoverCardTrigger className='border p-[5px] rounded-[5px]'>
-                              <CiHeart className='font-bold text-[18px]' />
-                            </HoverCardTrigger>
-                            <HoverCardContent>Bấm để lưu tin</HoverCardContent>
-                          </HoverCard>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <CardItem post={post} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -101,13 +135,7 @@ function BdsForU() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default BdsForU
-
-
-
-
-
-
+export default BdsForU;

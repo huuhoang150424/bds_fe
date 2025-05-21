@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, Edit } from 'lucide-react';
+import { ArrowUpDown, Eye, Edit, Trash2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -224,12 +224,8 @@ export const columns: ColumnDef<PricingPackage>[] = [
     cell: ({ row }) => {
       return (
         <div className='flex items-center gap-2'>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Eye className='h-4 w-4' />
-          </Button>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Edit className='h-4 w-4' />
-          </Button>
+          <Eye className='h-4 w-4' />
+          <Trash2 className='h-4 w-4' />
         </div>
       );
     },
