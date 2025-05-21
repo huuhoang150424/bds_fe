@@ -16,11 +16,19 @@ import RequireAgentRole from './require-agent-role';
 import Guideline from '@/page/agent/post/page/instruct';
 import Sample from '@/page/agent/post/page/sample-instructions';
 import MyPricing from '@/page/agent/vip/page/my-pricing';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/redux/authReducer';
+import LockedAccountModal from '@/page/user/home/components/lock';
 //
 
 export default function AgentRouter() {
+  const user = useSelector(selectUser);
   return (
-    <Routes>
+    <>
+      {user?.isLock ? (
+        <LockedAccountModal />
+      ) : (
+        <Routes>
       <Route path='' element={<AgentLayout />}>
         <Route element={<RequireAgentRole />}>
           <Route path='/overview' element={<Overview />} />
@@ -40,5 +48,7 @@ export default function AgentRouter() {
         <Route path='/chat' element={<Chat />} />
       </Route>
     </Routes>
+      )}
+    </>
   );
 }
