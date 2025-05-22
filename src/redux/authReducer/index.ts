@@ -11,6 +11,7 @@ interface User {
   phone: string;
   balance:number;
   score:number;
+  isLock: boolean;
 
   isLock: boolean;
 
