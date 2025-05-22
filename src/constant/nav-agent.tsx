@@ -18,7 +18,7 @@ export const data = {
       title: "Bài đăng",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Tạo mới bài đăng",
@@ -38,7 +38,7 @@ export const data = {
       title: "Khách hàng",
       url: "",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Quản lí lịch hẹn khách hàng",
@@ -54,7 +54,7 @@ export const data = {
       title: "Tài khoản cá nhân",
       url: "profile",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Thông tin cá nhân",
@@ -71,20 +71,23 @@ export const data = {
       title: "Thống kê",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Thống kê lượng người xem",
           url: "statistical",
         },
-        
+        {
+          title: "Thống kê lịch hẹn",
+          url: "statistical-apponitment",
+        },
       ],
     },
     {
       title: "Gói hội viên",
       url: "#",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "Đăng ký mua",

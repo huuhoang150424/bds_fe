@@ -1,11 +1,42 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, Edit } from 'lucide-react';
+import { ArrowUpDown, Eye } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useState } from 'react';
+import { CancelPackageModal } from './cancel-package';
+interface ActionsCellProps {
+  packageName: string;
+  packageId: string;
+  status: 'completed' | 'pending' | 'expired';
+}
 
+export const ActionsCell = ({ packageName, packageId, status }: ActionsCellProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <div className="flex items-center gap-2">
+      <Eye className="h-4 w-4 cursor-pointer" />
+      <Button
+        variant="outline"
+        size="sm"
+        className="text-[14px] h-6 px-2"
+        onClick={() => setIsModalOpen(true)}
+        disabled={status !== 'completed'}
+      >
+        Hủy
+      </Button>
+      <CancelPackageModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        packageName={packageName}
+        packageId={packageId}
+      />
+    </div>
+  );
+};
 // Define the data type
 export type PricingPackage = {
   id: string;
@@ -95,61 +126,53 @@ export const columns: ColumnDef<PricingPackage>[] = [
   },
   {
     accessorKey: 'pricing.name',
-    header: ({ column }) => {
-      return (
-        <div className='flex items-center'>
-          Gói VIP
-          <Button
-            variant='ghost'
-            size='sm'
-            className='ml-1 h-4 w-4 p-0'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            <ArrowUpDown className='h-4 w-4' />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return <div className='font-medium'>{row.original.pricing.name}</div>;
-    },
+    header: ({ column }) => (
+      <div className='flex items-center'>
+        Gói VIP
+        <Button
+          variant='ghost'
+          size='sm'
+          className='ml-1 h-4 w-4 p-0'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown className='h-4 w-4' />
+        </Button>
+      </div>
+    ),
+    cell: ({ row }) => <div className='font-medium'>{row.original.pricing.name}</div>,
   },
   {
     accessorKey: 'pricing.price',
-    header: ({ column }) => {
-      return (
-        <div className='flex items-center'>
-          Giá
-          <Button
-            variant='ghost'
-            size='sm'
-            className='ml-1 h-4 w-4 p-0'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            <ArrowUpDown className='h-4 w-4' />
-          </Button>
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div className='flex items-center'>
+        Giá
+        <Button
+          variant='ghost'
+          size='sm'
+          className='ml-1 h-4 w-4 p-0'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown className='h-4 w-4' />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => formatCurrency(row.original.pricing.price),
   },
   {
     accessorKey: 'startDate',
-    header: ({ column }) => {
-      return (
-        <div className='flex items-center'>
-          Ngày bắt đầu
-          <Button
-            variant='ghost'
-            size='sm'
-            className='ml-1 h-4 w-4 p-0'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            <ArrowUpDown className='h-4 w-4' />
-          </Button>
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div className='flex items-center'>
+        Ngày bắt đầu
+        <Button
+          variant='ghost'
+          size='sm'
+          className='ml-1 h-4 w-4 p-0'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown className='h-4 w-4' />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => formatDate(row.original.startDate),
   },
   {
@@ -159,21 +182,19 @@ export const columns: ColumnDef<PricingPackage>[] = [
   },
   {
     accessorKey: 'remainingPosts',
-    header: ({ column }) => {
-      return (
-        <div className='flex items-center'>
-          Bài còn lại
-          <Button
-            variant='ghost'
-            size='sm'
-            className='ml-1 h-4 w-4 p-0'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            <ArrowUpDown className='h-4 w-4' />
-          </Button>
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div className='flex items-center'>
+        Bài còn lại
+        <Button
+          variant='ghost'
+          size='sm'
+          className='ml-1 h-4 w-4 p-0'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown className='h-4 w-4' />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => row.original.remainingPosts,
   },
   {
@@ -221,17 +242,12 @@ export const columns: ColumnDef<PricingPackage>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      return (
-        <div className='flex items-center gap-2'>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Eye className='h-4 w-4' />
-          </Button>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Edit className='h-4 w-4' />
-          </Button>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <ActionsCell
+        packageName={row.original.pricing.name}
+        packageId={row.original.id}
+        status={row.original.status}
+      />
+    ),
   },
 ];

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ListingType } from '../listing-wizard';
-import {  LoadingSpinner } from '@/components/common';
+import { LoadingSpinner } from '@/components/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useAddPost } from '../../hooks/use-add-post';
@@ -713,7 +713,12 @@ export default function ListingDetailsStep({
                   <FormItem>
                     <FormLabel>Mô tả</FormLabel>
                     <FormControl>
-                      <Ckeditor value={field.value || ''} onChange={field.onChange} />
+                      <Ckeditor
+                        isPost={true}
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        formData={form.getValues()}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

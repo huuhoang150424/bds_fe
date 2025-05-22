@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { columns } from './columns';
 import { Pagination } from '@/components/user/pagination';
 import { useGetAllPost } from '../hooks/use-get-all-post';
-import { useBulkAiApprovePosts } from '../hooks/use-approve-posts';
+import { useBulkAiApprovePosts } from '../hooks/use-approveai-posts';
 import { Loading } from '@/components/common';
 import ConfirmBatchVerifyDialog from './bulk-approve';
 import ConfirmBatchDeleteDialog from './confirm-batch-delete';
@@ -166,7 +166,7 @@ export function PostsManagement() {
           <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
       )}
-      <Card>
+      <Card className="border-none ">
         <CardHeader className="p-0">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -265,57 +265,57 @@ export function PostsManagement() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="ml-auto">
-                    Xác minh <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuCheckboxItem
-                    checked={
-                      table.getColumn('verified')?.getFilterValue() === undefined ||
-                      (table.getColumn('verified')?.getFilterValue() as string[])?.includes('true')
-                    }
-                    onCheckedChange={(checked) => {
-                      const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
-                      if (checked) {
-                        table.getColumn('verified')?.setFilterValue([...filterValues, 'true']);
-                      } else {
-                        table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'true'));
-                      }
-                    }}
-                  >
-                    Đã xác minh
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={(table.getColumn('verified')?.getFilterValue() as string[])?.includes('false')}
-                    onCheckedChange={(checked) => {
-                      const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
-                      if (checked) {
-                        table.getColumn('verified')?.setFilterValue([...filterValues, 'false']);
-                      } else {
-                        table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'false'));
-                      }
-                    }}
-                  >
-                    Chưa xác minh
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={(table.getColumn('verified')?.getFilterValue() as string[])?.includes('rejected')}
-                    onCheckedChange={(checked) => {
-                      const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
-                      if (checked) {
-                        table.getColumn('verified')?.setFilterValue([...filterValues, 'rejected']);
-                      } else {
-                        table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'rejected'));
-                      }
-                    }}
-                  >
-                    Đã bị từ chối
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline" className="ml-auto">
+      Xác minh <ChevronDown className="ml-2 h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <DropdownMenuCheckboxItem
+      checked={
+        table.getColumn('verified')?.getFilterValue() === undefined ||
+        (table.getColumn('verified')?.getFilterValue() as string[])?.includes('true')
+      }
+      onCheckedChange={(checked) => {
+        const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
+        if (checked) {
+          table.getColumn('verified')?.setFilterValue([...filterValues, 'true']);
+        } else {
+          table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'true'));
+        }
+      }}
+    >
+      Đã xác minh
+    </DropdownMenuCheckboxItem>
+    <DropdownMenuCheckboxItem
+      checked={(table.getColumn('verified')?.getFilterValue() as string[])?.includes('false')}
+      onCheckedChange={(checked) => {
+        const filterValues = (table.getColumn('verified')?.getFilterValue() as string[]) || [];
+        if (checked) {
+          table.getColumn('verified')?.setFilterValue([...filterValues, 'false']);
+        } else {
+          table.getColumn('verified')?.setFilterValue(filterValues.filter((value) => value !== 'false'));
+        }
+      }}
+    >
+      Chưa xác minh
+    </DropdownMenuCheckboxItem>
+    <DropdownMenuCheckboxItem
+      checked={(table.getColumn('isRejected')?.getFilterValue() as string[])?.includes('true')}
+      onCheckedChange={(checked) => {
+        const filterValues = (table.getColumn('isRejected')?.getFilterValue() as string[]) || [];
+        if (checked) {
+          table.getColumn('isRejected')?.setFilterValue([...filterValues, 'true']);
+        } else {
+          table.getColumn('isRejected')?.setFilterValue(filterValues.filter((value) => value !== 'true'));
+        }
+      }}
+    >
+      Đã bị từ chối
+    </DropdownMenuCheckboxItem>
+  </DropdownMenuContent>
+</DropdownMenu>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

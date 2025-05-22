@@ -188,7 +188,7 @@ const Sidebar: React.FC = () => {
                 height={40}
               />
               <h1 className="dark:text-white uppercase text-[20px] font-[600] text-blue-950">
-                real east app
+                BatDongSanH
               </h1>
             </div>
           ) : (

@@ -7,6 +7,7 @@ import BannerSearch from './components/banner-search';
 import { Loading } from '@/components/common';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { PremiumSliderDialog } from '../banner/components/premium-slider-dialog';
+import LockedAccountModal from './components/lock';
 const NewsSection = lazy(() => import('./components/news-sections'));
 const PropertyListings = lazy(() => import('./components/property-listing'));
 const BusinessCarousel = lazy(() => import('./components/business-carousel'));
@@ -83,8 +84,8 @@ function Home() {
   const success = useSelector(selectSuccess);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectUser);
-  const [activeTab, setActiveTab] = useState('nha-dat-ban');
-
+  const [activeTab, setActiveTab] = useState('nha-dat-ban')
+  console.log(user?.isLock)
   useEffect(() => {
     if (success && message) {
       toast({
@@ -97,19 +98,24 @@ function Home() {
 
   return (
     <>
-      <PremiumSliderDialog banner={exampleBanner} />
-      <BannerSearch activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <LazySection Component={NewsSection} />
-      <div className='fixed '></div>
-      <LazySection Component={PropertyListings} />
-      <LazySection Component={PostOutStanding} />
-      <LazySection Component={LocationSection} />
-      <LazySection Component={NewsCarousel} />
-      <LazySection Component={UtilitySection} />
-      <LazySection Component={BusinessCarousel} />
-      <LazySection Component={InfoSection} />
-    </>
+    {user?.isLock ? (
+      <LockedAccountModal />
+    ) : (
+      <>
+        <PremiumSliderDialog banner={exampleBanner} />
+        <BannerSearch activeTab={activeTab} setActiveTab={setActiveTab} />
+        <LazySection Component={NewsSection} />
+        <div className="fixed"></div>
+        <LazySection Component={PropertyListings} />
+        <LazySection Component={PostOutStanding} />
+        <LazySection Component={LocationSection} />
+        <LazySection Component={NewsCarousel} />
+        <LazySection Component={UtilitySection} />
+        <LazySection Component={BusinessCarousel} />
+        <LazySection Component={InfoSection} />
+      </>
+    )}
+  </>
   );
 }
 
