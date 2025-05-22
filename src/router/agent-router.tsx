@@ -16,6 +16,7 @@ import RequireAgentRole from './require-agent-role';
 import Guideline from '@/page/agent/post/page/instruct';
 import Sample from '@/page/agent/post/page/sample-instructions';
 import MyPricing from '@/page/agent/vip/page/my-pricing';
+import Apponitment from '@/page/agent/statistical/page/apponitment';
 //
 
 export default function AgentRouter() {
@@ -31,6 +32,7 @@ export default function AgentRouter() {
           <Route path='/customer-infor' element={<CustomersPage />} />
           <Route path='/finance' element={<Finance />} />
           <Route path='/statistical' element={<Statistical />} />
+          <Route path='/statistical-apponitment' element={<Apponitment />} />
           <Route path='/draft-post' element={<DraftPost />} />
           <Route path='/guideline' element={<Guideline />} />
           <Route path='/sample' element={<Sample />} />

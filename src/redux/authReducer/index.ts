@@ -15,6 +15,7 @@ interface User {
   isLock: boolean;
 
   emailVerified: boolean ;
+  isProfessional: boolean;
 
 }
 
@@ -84,7 +85,12 @@ const authSlice = createSlice({
       state.token=action.payload.token;
       state.user = action.payload.user;
       state.isAuthenticated=true;
-    }
+    },
+    updateProfessionalStatus: (state, action: PayloadAction<boolean>) => {
+      if (state.user) {
+        state.user.isProfessional = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -109,7 +115,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore,updateRole,setAuth,updateBalance} = authSlice.actions;
+export const { logout,updateToken ,resetAuthState,updateAuth,updateProfessionalStatus,updateVerifiedMail,updatePhoneStore,updateRole,setAuth,updateBalance} = authSlice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;

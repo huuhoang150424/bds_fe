@@ -1,6 +1,4 @@
-"use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   Card,
@@ -64,25 +62,25 @@ export function PostByMonth() {
           <BarChart
             accessibilityLayer
             data={charDataMonth}
-            width={500} // Thu nhỏ chiều rộng
-            height={200} // Thu nhỏ chiều cao
+            width={500} 
+            height={200}
           >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
-              tickMargin={5} // Giảm khoảng cách để vừa với biểu đồ nhỏ
+              tickMargin={5}
               axisLine={false}
-              tickFormatter={(value) => value.replace("Tháng ", "T")} // Hiển thị "T1", "T2", ...
+              tickFormatter={(value) => value.replace("Tháng ", "T")} 
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tickMargin={5} // Giảm khoảng cách
-              width={30} // Giảm chiều rộng trục Y cho gọn
+              tickMargin={5} 
+              width={30} 
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="post" fill="red" radius={4} /> {/* Giảm radius cho nhỏ gọn */}
+            <Bar dataKey="post" fill="red" radius={4} /> 
           </BarChart>
         </ChartContainer>
       </CardContent>
