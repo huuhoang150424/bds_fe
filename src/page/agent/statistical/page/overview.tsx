@@ -1,17 +1,17 @@
-import React from 'react';
 import { DashboardCharts } from '../components/chart-overview';
-import { Card, CardContent } from '@/components/ui/card';
+
 import StatCard from '../components/stats-card';
-import { quickStatistics, featuredProperties } from '@/constant/const-dashboard';
-import { RegionsChart } from '../components/pie-chart-overview';
+import { quickStatistics } from '@/constant/const-dashboard';
+import { RegionsChart } from '../components/pie-chart';
 import { RecentListings } from '../components/recent-listing';
 import { Prominent } from '../components/prominent-news';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+
 import VIPRequired from '../../vip/components/have-vip';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function Overview ()
 {
+    useScrollToTopOnMount();
   const isHaveVip = true;
 
   return (

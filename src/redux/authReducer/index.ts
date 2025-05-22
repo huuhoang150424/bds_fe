@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { loginAuth } from '../action/auth'
 
 interface User {
-  id: number;
+  id: string;
   fullname: string;
   email: string;
   avatar: string;
@@ -67,8 +67,22 @@ const authSlice = createSlice({
       if (state.user) {
         state.user.phone=action.payload.phone;
       }
+    },
+    updateBalance: (state,action)=>{
+      if (state.user) {
+        state.user.balance+=action.payload.balance;
+      }
+    },
+    updateRole: (state,action)=>{
+      if (state.user) {
+        state.user.roles=action.payload.roles;
+      }
+    },
+    setAuth: (state,action)=>{
+      state.token=action.payload.token;
+      state.user = action.payload.user;
+      state.isAuthenticated=true;
     }
-    
   },
   extraReducers: (builder) => {
     builder
@@ -93,7 +107,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore} = authSlice.actions;
+export const { logout,updateToken ,resetAuthState,updateAuth,updateVerifiedMail,updatePhoneStore,updateRole,setAuth,updateBalance} = authSlice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;

@@ -7,17 +7,17 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import {useGetSatisticalByViewAddress } from '../hooks/use-get-statical-by-growth';
 
 export function RegionsChart() {
-  const data = [
-    { name: 'Đống Đa', value: 25 },
-    { name: 'Cầu Giấy', value: 20 },
-    { name: 'Hà Đông', value: 15 },
-    { name: 'Thanh Xuân', value: 18 },
-    { name: 'Long Biên', value: 22 },
-  ];
-
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const {data : dataPie ,isLoading, isError} = useGetSatisticalByViewAddress();
+  const dataPieChart = dataPie?.map((item: any) => {
+    return {
+      name: item.region,
+      value: item.viewCount,
+    };
+  }); 
 
   return (
     <Card className="border rounded-[10px]  border-gray-200 ">
@@ -28,7 +28,7 @@ export function RegionsChart() {
         <ResponsiveContainer width="100%" height={285}>
           <PieChart>
             <Pie
-              data={data}
+              data={dataPieChart}
               cx="50%"
               cy="50%"
               labelLine={true}
@@ -37,7 +37,7 @@ export function RegionsChart() {
               dataKey="value"
               label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
             >
-              {data.map((entry, index) => (
+                {dataPieChart?.map((entry: { name: string; value: number }, index: number) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

@@ -11,17 +11,32 @@ interface FilterParams {
   listingTypeIds?: string[];
   propertyTypeIds?: string[];
   minPrice?: number;
-  maxPrice?: number;
-  minArea?: number;
   maxArea?: number;
   floor?: number;
-  direction?: string;
+  directions?: string;
+  isProfessional?: boolean;
+  ratings?: number[];
+  status?: string[] | undefined;
+  tags?:string[];
+  isFurniture?:boolean
 }
 
-export const useGetPostByFilter = (filters: FilterParams) => {
+export const useGetPostByFilter = (filters: FilterParams,options = {}) => {
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
+  );
+  
+  const filtersStableRef = JSON.stringify(cleanFilters);
   return useQuery({
-    queryKey: ['filterPosts', filters],
+    queryKey: ['filterPosts', filtersStableRef],
     queryFn: () => fillPost(filters),
-    placeholderData: keepPreviousData
+    placeholderData: undefined,  
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    staleTime: 1,
+    gcTime: 1000,
+    retry: false,
+    notifyOnChangeProps: ['data', 'error', 'isLoading', 'isFetching'],
+    ...options
   });
 };

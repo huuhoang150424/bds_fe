@@ -21,7 +21,6 @@ import Share from './components/share';
 import Warning from './components/warning';
 import WishlistButton from './components/like';
 import InforBrokerPpost from './components/infor-broker-post';
-import { posts } from '../../../constant/constPostDetail';
 
 const Lightbox = lazy(() => import('react-image-lightbox'));
 const Chart = lazy(() => import('./components/line-chart'));
@@ -31,8 +30,10 @@ const PostCommentSection = lazy(() => import('./components/comment/post-comment-
 
 import 'react-image-lightbox/style.css';
 import { StarRating } from './components/star-rating';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function PostDetail() {
+  useScrollToTopOnMount();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,18 +62,18 @@ function PostDetail() {
         <div className='grid grid-cols-12 gap-6'>
           <div className='col-span-12 lg:col-span-9'>
             <div className='title mt-[40px]'>
-              <span className='text-2xl font-[500]'>{data.title}</span>
+              <span className='text-2xl font-[500]'>{data?.title}</span>
             </div>
             <div className='mt-[8px] flex items-center gap-[5px]'>
               <MapPin className='text-gray-500' size={15} />
-              <span className='text-sm font-normal text-gray-500'>{data.address}</span>
-              <StarRating commentsSectionId='comments' postId={data.id} />
+              <span className='text-sm font-normal text-gray-500'>{data?.address}</span>
+              <StarRating commentsSectionId='comments' postId={data?.id} />
             </div>
             <div className='image relative mt-[30px]'>
-              <div className='w-full'>
+              <div className='w-full relative'>
                 <Carousel options={OPTIONS} className='relative' isAutoPlay={false}>
                   <SliderContainer className='gap-2'>
-                    {data.images.map((src: { image_url: string }, index: number) => (
+                    {data?.images.map((src: { image_url: string }, index: number) => (
                       <SliderItem
                         key={index}
                         src={src.image_url}
@@ -81,6 +82,7 @@ function PostDetail() {
                           setCurrentIndex(index);
                           setIsOpen(true);
                         }}
+                        countImg={data?.images?.length}
                       />
                     ))}
                   </SliderContainer>
@@ -104,20 +106,25 @@ function PostDetail() {
                     <ThumsSlider />
                   </div>
                 </Carousel>
-                {isOpen && data.images.length > 0 && (
+                {isOpen && data?.images?.length > 0 && (
                   <Suspense fallback={<Loading className='mx-auto my-[100px] ' />}>
                     <Lightbox
-                      mainSrc={data.images[currentIndex].image_url}
-                      nextSrc={data.images[(currentIndex + 1) % data.images.length].image_url}
-                      prevSrc={data.images[(currentIndex + data.images.length - 1) % data.images.length].image_url}
+                      mainSrc={data?.images[currentIndex]?.image_url}
+                      nextSrc={data?.images[(currentIndex + 1) % data.images.length]?.image_url}
+                      prevSrc={
+                        data?.images[(currentIndex + data?.images?.length - 1) % data?.images?.length]?.image_url
+                      }
                       onCloseRequest={() => setIsOpen(false)}
                       onMovePrevRequest={() =>
-                        setCurrentIndex((currentIndex + data.images.length - 1) % data.images.length)
+                        setCurrentIndex((currentIndex + data?.images?.length - 1) % data?.images?.length)
                       }
-                      onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data.images.length)}
+                      onMoveNextRequest={() => setCurrentIndex((currentIndex + 1) % data?.images?.length)}
                     />
                   </Suspense>
                 )}
+                <div className='absolute top-[70%] right-2 bg-black/60 text-white text-sm px-2 py-1 rounded-md'>
+                  {data?.images?.length}
+                </div>
               </div>
             </div>
 
@@ -132,7 +139,7 @@ function PostDetail() {
                   {' '}
                   ~
                   {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                    data.price / data.squareMeters,
+                    data?.price / data?.squareMeters,
                   )}{' '}
                   /m²
                 </span>
@@ -148,7 +155,7 @@ function PostDetail() {
               <div className='icon flex items-center justify-center gap-4'>
                 <Share />
                 <AuthGuard actionType='warning'>
-                  <Warning />
+                  <Warning postId={postId} />
                 </AuthGuard>
                 <AuthGuard actionType='like'>
                   <WishlistButton postId={postId} />
@@ -270,7 +277,7 @@ function PostDetail() {
               <div className='my-[20px]'>
                 <span className='text-2xl font-[500] '>Xem trên bản đồ</span>
               </div>
-              <div className='w-[800px] h-[300px] z-0'>
+              <div className='w-[800px] h-[300px] z-0 mb-[30px]'>
                 <Suspense fallback={<Loading className='mx-auto my-[100px] ' />}>
                   <MapComponent address={data?.address} />
                 </Suspense>
@@ -298,7 +305,7 @@ function PostDetail() {
               </div>
               <div className='flex flex-col gap-2 items-start'>
                 <span className='text-sm text-gray-500'>mã tin</span>
-                <span className='font-[500]'>{posts.id}</span>
+                <span className='font-[500]'></span>
               </div>
             </div>
             <div className='border border-gray-100 my-[10px]'></div>
@@ -327,14 +334,13 @@ function PostDetail() {
                 <h3 className='font-semibold text-lg'>Bình luận</h3>
                 <AuthGuard actionType='comment'>
                   <PostCommentSection postId={postId} />
-
                 </AuthGuard>
               </div>
             </div>
           </div>
           <div className='col-span-12 lg:col-span-3 ml-[15px]'>
             <div className='rounded-lg mt-[30px] p-2 lg:sticky lg:top-[100px] border-gray-200 border'>
-              <InforBrokerPpost user={data?.user} />
+              <InforBrokerPpost user={data?.user} postId={postId} />
             </div>
           </div>
         </div>

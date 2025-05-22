@@ -2,12 +2,6 @@ import { urlLocal } from '@/constant/baseUrl';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-interface User {
-  id: string;
-  fullname: string;
-  avatar: string;
-}
-
 interface AppContextType {
   socket: Socket;
   connectSocket: () => void;

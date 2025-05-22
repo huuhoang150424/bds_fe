@@ -1,13 +1,11 @@
 import * as React from "react";
 import { NavMain } from "@/components/agent/nav-main";
-import { NavProjects } from "@/components/agent/nav-projects";
 import { TeamSwitcher } from "@/components/agent/team-switcher";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { data } from "@/constant/nav-agent";
@@ -23,7 +21,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavOverview overview={data.overview} />
         <NavMain items={data.navMain} />
+
       </SidebarContent>
+      <SidebarFooter>
+        <img src="../../../public/gif_nen.gif" alt="" className="w-[120px] h-[90px] self-start object-cover" />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

@@ -25,7 +25,7 @@ export const data = {
           url: "create-post",
         },
         {
-          title: "Bài đăng nháp",
+          title: "Quản lí bài đăng nháp",
           url: "draft-post",
         },
         {
@@ -41,7 +41,7 @@ export const data = {
       isActive: true,
       items: [
         {
-          title: "Quản lí khách hàng",
+          title: "Quản lí lịch hẹn khách hàng",
           url: "customer-infor",
         },
         {
@@ -59,10 +59,6 @@ export const data = {
         {
           title: "Thông tin cá nhân",
           url: "profile",
-        },
-        {
-          title: "Chỉnh sửa thông tin cá nhân",
-          url: "manage-account",
         },
         {
           title: "Tài chính cá nhân",
@@ -93,6 +89,10 @@ export const data = {
         {
           title: "Đăng ký mua",
           url: "vip",
+        },
+        {
+          title: "Gói đã mua",
+          url: "my-pricing",
         },
       ],
     },

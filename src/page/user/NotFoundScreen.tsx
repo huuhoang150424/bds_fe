@@ -1,12 +1,10 @@
-'use client';
-
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 export default function ErrorPage() {
-  
-
+  useScrollToTopOnMount();
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-[#fff] text-white text-center px-4">
       <img

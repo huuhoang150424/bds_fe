@@ -1,420 +1,387 @@
-'use client';
-
-import { useState } from 'react';
-
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  MoreHorizontal,
-  Phone,
-  Search,
-  Star,
-  User,
-  UserPlus,
-} from 'lucide-react';
-import { customers } from '@/constant/const-agent-customer-infor';
-// Dữ liệu mẫu khách hàng - thêm nhiều khách hàng hơn để kiểm tra phân trang
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MoreHorizontal, FileText, Phone, Calendar, RefreshCw, Trash2 } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { format } from 'date-fns';
+import { Pagination } from '@/components/user/pagination';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/redux/authReducer';
+import UpdateAppointmentDialog from './components/update-appointment';
+import DeleteAppointmentDialog from './components/delete-appointment';
+import { useGetMyAppointments } from './hook/use-get-appoinment';
+import UpdateAppointmentStatusDialog from './components/confirm-appointment';
+import ViewAppointmentDetails from './components/view-appointment-details';
 
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'potential':
-      return (
-        <Badge variant='outline' className='text-blue-500 border-blue-500'>
-          Tiềm năng
-        </Badge>
-      );
-    case 'active':
-      return <Badge className='bg-green-500'>Đang giao dịch</Badge>;
-    case 'purchased':
-      return <Badge variant='secondary'>Đã mua</Badge>;
-    default:
-      return <Badge variant='outline'>{status}</Badge>;
-  }
-};
+interface Appointment {
+  id: string;
+  post: { id: string; title: string };
+  requester: { id: string; fullname: string; avatar: string };
+  receiver: { id: string; fullname: string; avatar: string };
+  status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'cancelled' | 'rescheduled';
+  appointmentTime: string;
+  message?: string;
+  duration: number;
+}
 
-export default function CustomersPage() {
-  // Thêm state để quản lý phân trang
-  const [currentPage, setCurrentPage] = useState(1);
-  const customersPerPage = 10;
+export default function AppointmentsManagement() {
+  useScrollToTopOnMount();
+  const user = useSelector(selectUser);
+  const [activeRow, setActiveRow] = useState<string | null>(null);
+  const [pageSentByOthers, setPageSentByOthers] = useState(1);
+  const [pageSentByMe, setPageSentByMe] = useState(1);
+  const pageSize = 10;
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const { data, isLoading } = useGetMyAppointments(pageSentByOthers, pageSize);
 
-  // Tính toán tổng số trang
-  const totalPages = Math.ceil(customers.length / customersPerPage);
+  const appointments: Appointment[] = data?.data?.data || [];
+  const totalItems = data?.data?.totalItems || 0;
+  const totalPages = data?.data?.totalPages || 1;
+  const currentPage = data?.data?.currentPage || 1;
 
-  // Lấy danh sách khách hàng cho trang hiện tại
-  const getCurrentPageCustomers = () => {
-    const startIndex = (currentPage - 1) * customersPerPage;
-    const endIndex = startIndex + customersPerPage;
-    return customers.slice(startIndex, endIndex);
-  };
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveRow(null);
+    };
 
-  // Xử lý chuyển trang
-  const goToPage = (page: number) => {
-    setCurrentPage(page);
-  };
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
-  const goToFirstPage = () => {
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    if (!isUpdateDialogOpen && !isStatusDialogOpen && !isDeleteDialogOpen && !isDetailsDialogOpen && activeRow) {
+      setActiveRow(null);
+    }
+  }, [isUpdateDialogOpen, isStatusDialogOpen, isDeleteDialogOpen,isDetailsDialogOpen]);
 
-  const goToLastPage = () => {
-    setCurrentPage(totalPages);
-  };
+  const appointmentsSentByOthers = appointments.filter((appt) => appt.receiver.id === user?.id);
+  const appointmentsSentByMe = appointments.filter((appt) => appt.requester.id === user?.id);
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return (
+          <Badge variant='outline' className='bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'>
+            Chờ xử lý
+          </Badge>
+        );
+      case 'confirmed':
+        return (
+          <Badge variant='outline' className='bg-green-50 text-green-600 border-green-200 hover:bg-green-100'>
+            Đã xác nhận
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge variant='outline' className='bg-red-50 text-red-600 border-red-200 hover:bg-red-100'>
+            Đã từ chối
+          </Badge>
+        );
+      case 'completed':
+        return (
+          <Badge variant='outline' className='bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'>
+            Hoàn thành
+          </Badge>
+        );
+      case 'cancelled':
+        return (
+          <Badge variant='outline' className='bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'>
+            Đã hủy
+          </Badge>
+        );
+      case 'rescheduled':
+        return (
+          <Badge variant='outline' className='bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100'>
+            Đã dời lịch
+          </Badge>
+        );
+      default:
+        return <Badge variant='outline'>{status}</Badge>;
     }
   };
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   };
 
-  // Tạo mảng các số trang để hiển thị
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxPagesToShow = 5;
+  const getAvatarColor = (id: string) => {
+    const colors = [
+      'bg-red-100 text-red-800',
+      'bg-green-100 text-green-800',
+      'bg-blue-100 text-blue-800',
+      'bg-yellow-100 text-yellow-800',
+      'bg-purple-100 text-purple-800',
+      'bg-pink-100 text-pink-800',
+      'bg-indigo-100 text-indigo-800',
+      'bg-gray-100 text-gray-800',
+    ];
+    const index = Number.parseInt(id.replace(/[^0-9]/g, '')) % colors.length;
+    return colors[index];
+  };
 
-    if (totalPages <= maxPagesToShow) {
-      // Hiển thị tất cả các trang nếu tổng số trang ít hơn hoặc bằng maxPagesToShow
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
+  const handleChangePage = (newPage: number, tab: 'sentByOthers' | 'sentByMe') => {
+    if (tab === 'sentByOthers') {
+      setPageSentByOthers(newPage);
     } else {
-      // Hiển thị một phần các trang với trang hiện tại ở giữa
-      let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      let endPage = startPage + maxPagesToShow - 1;
-
-      if (endPage > totalPages) {
-        endPage = totalPages;
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(i);
-      }
+      setPageSentByMe(newPage);
     }
-
-    return pageNumbers;
   };
+
+  const handleOpenUpdateDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsUpdateDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleOpenStatusDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsStatusDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleOpenDeleteDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsDeleteDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleDropdownOpen = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenDropdown(openDropdown === id ? null : id);
+    setActiveRow(id);
+  };
+
+  const handleOpenViewDialog = (appointment: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAppointment(appointment);
+    setIsDetailsDialogOpen(true);
+    setOpenDropdown(null);
+  };
+
+  const handleModalClose = () => {
+    setIsUpdateDialogOpen(false);
+    setIsStatusDialogOpen(false);
+    setIsDeleteDialogOpen(false);
+    setIsDetailsDialogOpen(false);
+    setSelectedAppointment(null);
+    setActiveRow(null);
+  };
+
+  const renderAppointmentTable = (appointments: Appointment[], page: number, tab: 'sentByOthers' | 'sentByMe') => (
+    <>
+      <div className='overflow-x-auto'>
+        <Table className='text-xs rounded-md'>
+          <TableHeader className='bg-gray-50'>
+            <TableRow className='hover:bg-gray-50/80'>
+              <TableHead className='w-[80px] font-medium'>Mã cuộc hẹn</TableHead>
+              <TableHead className='w-[180px] font-medium'>Bài đăng</TableHead>
+              <TableHead className='w-[180px] font-medium'>Người yêu cầu</TableHead>
+              <TableHead className='w-[180px] font-medium'>Người nhận</TableHead>
+              <TableHead className='w-[120px] font-medium'>Trạng thái</TableHead>
+              <TableHead className='w-[120px] font-medium'>Thời gian</TableHead>
+              <TableHead className='w-[80px] font-medium text-right'>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className='text-center'>
+                  Đang tải...
+                </TableCell>
+              </TableRow>
+            ) : appointments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className='text-center'>
+                  Không có cuộc hẹn nào
+                </TableCell>
+              </TableRow>
+            ) : (
+              appointments.map((appointment) => (
+                <TableRow
+                  key={appointment.id}
+                  className={cn('h-14 hover:bg-gray-50/80', activeRow === appointment.id && 'bg-blue-50/50')}
+                >
+                  <TableCell className='font-medium'>{appointment.id}</TableCell>
+                  <TableCell>{appointment.post.title}</TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Avatar className={cn('h-7 w-7', getAvatarColor(appointment.requester.id))}>
+                        <AvatarFallback className='text-xs'>
+                          {getInitials(appointment.requester.fullname)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{appointment.requester.fullname}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Avatar className={cn('h-7 w-7', getAvatarColor(appointment.receiver.id))}>
+                        <AvatarFallback className='text-xs'>
+                          {getInitials(appointment.receiver.fullname)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{appointment.receiver.fullname}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(appointment.status)}</TableCell>
+                  <TableCell>{format(new Date(appointment.appointmentTime), 'dd/MM/yyyy HH:mm')}</TableCell>
+                  <TableCell className='text-right'>
+                    <DropdownMenu
+                      open={openDropdown === appointment.id}
+                      onOpenChange={(open) => {
+                        if (!open) setOpenDropdown(null);
+                      }}
+                    >
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          className='h-8 w-8 p-0'
+                          onClick={(e) => handleDropdownOpen(appointment.id, e)}
+                        >
+                          <span className='sr-only'>Mở menu</span>
+                          <MoreHorizontal className='h-4 w-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align='end'
+                        className='w-[180px]'
+                        onCloseAutoFocus={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <DropdownMenuItem className='text-xs' onSelect={(e) => e.preventDefault()} onClick={(e) => handleOpenViewDialog(appointment, e)} >
+                          <FileText className='mr-2 h-3.5 w-3.5' />
+                          <span>Xem chi tiết</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='text-xs' onSelect={(e) => e.preventDefault()}>
+                          <Phone className='mr-2 h-3.5 w-3.5' />
+                          <span>Liên hệ</span>
+                        </DropdownMenuItem>
+                        {user?.id === appointment?.requester?.id && (
+                          <DropdownMenuItem
+                            className='text-xs'
+                            onSelect={(e) => e.preventDefault()}
+                            onClick={(e) => handleOpenUpdateDialog(appointment, e)}
+                          >
+                            <Calendar className='mr-2 h-3.5 w-3.5' />
+                            <span>Sửa lịch hẹn</span>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className='text-xs'
+                          onSelect={(e) => e.preventDefault()}
+                          onClick={(e) => handleOpenStatusDialog(appointment, e)}
+                        >
+                          <RefreshCw className='mr-2 h-3.5 w-3.5' />
+                          <span>Cập nhật trạng thái</span>
+                        </DropdownMenuItem>
+                        
+                        {user?.id === appointment?.requester?.id && (
+                          <DropdownMenuItem
+                            className='text-xs'
+                            onSelect={(e) => e.preventDefault()}
+                            onClick={(e) => handleOpenDeleteDialog(appointment, e)}
+                          >
+                            <Trash2 className='mr-2 h-3.5 w-3.5' />
+                            <span>Xóa cuộc hẹn</span>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className='flex items-center justify-between px-4 py-3 border-t w-full'>
+        <div className='text-xs text-gray-500'>Hiển thị trong tổng số {totalItems} lịch hẹn</div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage) => handleChangePage(newPage, tab)}
+          className='mt-0'
+        />
+      </div>
+    </>
+  );
 
   return (
-    <div className='flex flex-col min-h-screen'>
-      <header className='sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6'>
-        <div className='flex-1'>
-          <h1 className='text-lg font-semibold'>Quản Lý Khách Hàng</h1>
-        </div>
-      </header>
-      <main className='flex-1 p-4 sm:p-6'>
-        <div className='flex flex-col gap-4'>
-          <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
-            <div className='relative w-full sm:w-72'>
-              <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
-              <Input
-                type='search'
-                placeholder='Tìm kiếm khách hàng...'
-                className='w-full pl-8 py-[5px] flex items-center '
-              />
-            </div>
-            <div className='flex gap-2 w-full sm:w-auto'></div>
+    <div className='container mx-auto py-8 px-4 max-w-[1380px]'>
+      <div className='mb-6'>
+        <h1 className='text-xl font-semibold text-gray-700'>Quản Lý Cuộc Hẹn</h1>
+        <p className='text-sm text-gray-500 mt-1'>Quản lý thông tin và theo dõi các cuộc hẹn</p>
+      </div>
+
+      <Tabs defaultValue='sentByOthers' className='w-full'>
+        <TabsList className='grid w-full grid-cols-2 mb-4 border border-gray-200 bg-transparent p-[5px]'>
+          <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white' value='sentByOthers'>
+            Lịch hẹn người khác gửi
+          </TabsTrigger>
+          <TabsTrigger className='data-[state=active]:bg-red-500 data-[state=active]:text-white' value='sentByMe'>
+            Lịch hẹn mình gửi
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value='sentByOthers'>
+          <div className='rounded-md border border-gray-200 shadow-sm'>
+            {renderAppointmentTable(appointmentsSentByOthers, pageSentByOthers, 'sentByOthers')}
           </div>
+        </TabsContent>
 
-          <Tabs defaultValue='all'>
-            <TabsList>
-              <TabsTrigger value='all'>Tất cả khách hàng</TabsTrigger>
-              <TabsTrigger value='potential'>Khách tiềm năng</TabsTrigger>
-              <TabsTrigger value='active'>Khách đang giao dịch</TabsTrigger>
-              <TabsTrigger value='purchased'>Khách đã mua</TabsTrigger>
-            </TabsList>
-            <TabsContent value='all' className='mt-2'>
-              <Card>
-                <CardContent className='p-0'>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Mã KH</TableHead>
-                        <TableHead>Họ tên</TableHead>
-                        <TableHead>Liên hệ</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead>Liên hệ gần nhất</TableHead>
-                        <TableHead>Quan tâm</TableHead>
+        <TabsContent value='sentByMe'>
+          <div className='rounded-md border border-gray-200 shadow-sm'>
+            {renderAppointmentTable(appointmentsSentByMe, pageSentByMe, 'sentByMe')}
+          </div>
+        </TabsContent>
+      </Tabs>
 
-                        <TableHead className='text-right'>Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getCurrentPageCustomers().map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell className='font-medium'>{customer.id}</TableCell>
-                          <TableCell>{customer.name}</TableCell>
-                          <TableCell>
-                            <div>{customer.email}</div>
-                            <div className='text-sm text-muted-foreground'>{customer.phone}</div>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                          <TableCell>{customer.lastContact}</TableCell>
-                          <TableCell>
-                            <div className='flex flex-wrap gap-1'>
-                              {customer.interests.map((interest) => (
-                                <Badge key={interest} variant='outline'>
-                                  {interest}
-                                </Badge>
-                              ))}
-                            </div>
-                          </TableCell>
-
-                          <TableCell className='text-right'>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant='ghost' size='icon'>
-                                  <MoreHorizontal className='h-4 w-4' />
-                                  <span className='sr-only'>Mở menu</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align='end'>
-                                <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                                <DropdownMenuItem>
-                                  <User className='mr-2 h-4 w-4' />
-                                  Xem hồ sơ
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Phone className='mr-2 h-4 w-4' />
-                                  Liên hệ khách hàng
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Calendar className='mr-2 h-4 w-4' />
-                                  Đặt lịch hẹn
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                  <Star className='mr-2 h-4 w-4' />
-                                  Cập nhật trạng thái
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-
-                  {/* Phân trang */}
-                  <div className='flex items-center justify-between px-4 py-4 border-t'>
-                    <div className='text-sm text-muted-foreground'>
-                      Hiển thị {(currentPage - 1) * customersPerPage + 1} đến{' '}
-                      {Math.min(currentPage * customersPerPage, customers.length)} trong tổng số {customers.length}{' '}
-                      khách hàng
-                    </div>
-                    <div className='flex items-center space-x-2'>
-                      <Button variant='outline' size='icon' onClick={goToFirstPage} disabled={currentPage === 1}>
-                        <ChevronsLeft className='h-4 w-4' />
-                        <span className='sr-only'>Trang đầu</span>
-                      </Button>
-                      <Button variant='outline' size='icon' onClick={goToPreviousPage} disabled={currentPage === 1}>
-                        <ChevronLeft className='h-4 w-4' />
-                        <span className='sr-only'>Trang trước</span>
-                      </Button>
-
-                      {getPageNumbers().map((pageNumber) => (
-                        <Button
-                          key={pageNumber}
-                          variant={currentPage === pageNumber ? 'default' : 'outline'}
-                          size='icon'
-                          onClick={() => goToPage(pageNumber)}
-                        >
-                          {pageNumber}
-                        </Button>
-                      ))}
-
-                      <Button
-                        variant='outline'
-                        size='icon'
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages}
-                      >
-                        <ChevronRight className='h-4 w-4' />
-                        <span className='sr-only'>Trang sau</span>
-                      </Button>
-                      <Button
-                        variant='outline'
-                        size='icon'
-                        onClick={goToLastPage}
-                        disabled={currentPage === totalPages}
-                      >
-                        <ChevronsRight className='h-4 w-4' />
-                        <span className='sr-only'>Trang cuối</span>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value='potential' className='mt-2'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Khách hàng tiềm năng</CardTitle>
-                  <CardDescription>Khách hàng đã thể hiện sự quan tâm nhưng chưa mua</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    
-                    <Table>
-                      <thead>
-                        <TableRow>
-                          <TableHead>Mã KH</TableHead>
-                          <TableHead>Họ tên</TableHead>
-                          <TableHead>Liên hệ</TableHead>
-                          <TableHead>Liên hệ gần nhất</TableHead>
-                          <TableHead>Quan tâm</TableHead>
-                        </TableRow>
-                      </thead>
-                      <TableBody>
-                        {customers
-                          .filter((customer) => customer.status === 'potential')
-                          .map((customer) => (
-                            <TableRow key={customer.id}>
-                              <TableCell className='font-medium'>{customer.id}</TableCell>
-                              <TableCell className='font-medium'>{customer.name}</TableCell>
-                              <TableCell>
-                                <div>{customer.email}</div>
-                                <div className='text-sm '>{customer.phone}</div>
-                              </TableCell>
-                              <TableCell>{customer.lastContact || 'Chưa có'}</TableCell>
-                              <TableCell>
-                                <div className='flex flex-wrap gap-1'>
-                                  {customer.interests && customer.interests.length > 0
-                                    ? customer.interests.map((interest) => (
-                                        <Badge key={interest} variant='outline'>
-                                          {interest}
-                                        </Badge>
-                                      ))
-                                    : 'Chưa có'}
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value='active' className='mt-2'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Khách hàng đang giao dịch</CardTitle>
-                  <CardDescription>Khách hàng đang tích cực tìm kiếm để mua</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <thead>
-                      <TableRow>
-                        <TableHead>Mã khách hàng</TableHead>
-                        <TableHead>Tên khách hàng</TableHead>
-                        <TableHead>Liên hệ</TableHead>
-                        <TableHead>Quan tâm</TableHead>
-                        <TableHead className='text-right'>Hành động</TableHead>
-                      </TableRow>
-                    </thead>
-                    <TableBody>
-                      {customers
-                        .filter((customer) => customer.status === 'active')
-                        .map((customer) => (
-                          <TableRow key={customer.id}>
-                            <TableCell className='font-medium '>{customer.id}</TableCell>
-                            <TableCell className='font-medium '>{customer.name}</TableCell>
-                            <TableCell>
-                              <div className='text-sm '>{customer.email}</div>
-                              <div className='text-sm '>{customer.phone}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className='flex flex-wrap gap-1 '>
-                                {customer.interests.map((interest) => (
-                                  <Badge key={interest} variant='outline'>
-                                    {interest}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </TableCell>
-                            <TableCell className='text-right'>
-                              <Button size='sm'>Xem bất động sản</Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value='purchased' className='mt-2'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Khách hàng đã mua</CardTitle>
-                  <CardDescription>Khách hàng đã mua bất động sản</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <thead>
-                      <TableRow>
-                        <TableHead>Mã khách hàng</TableHead>
-                        <TableHead>Tên khách hàng</TableHead>
-                        <TableHead>Liên hệ</TableHead>
-                        <TableHead>Quan tâm</TableHead>
-                        <TableHead className='text-right'>Hành động</TableHead>
-                      </TableRow>
-                    </thead>
-                    <TableBody>
-                      {customers
-                        .filter((customer) => customer.status === 'active')
-                        .map((customer) => (
-                          <TableRow key={customer.id}>
-                            <TableCell className='font-medium'>{customer.id}</TableCell>
-                            <TableCell className='font-medium'>{customer.name}</TableCell>
-                            <TableCell>
-                              <div className='text-sm '>{customer.email}</div>
-                              <div className='text-sm '>{customer.phone}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className='flex flex-wrap gap-1'>
-                                {customer.interests.map((interest) => (
-                                  <Badge key={interest} variant='outline'>
-                                    {interest}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </TableCell>
-                            <TableCell className='text-right'>
-                              <Button size='sm'>Xem bất động sản</Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
+      <UpdateAppointmentDialog
+        isOpen={isUpdateDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <UpdateAppointmentStatusDialog
+        isOpen={isStatusDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <DeleteAppointmentDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
+      <ViewAppointmentDetails
+        isOpen={isDetailsDialogOpen}
+        onOpenChange={handleModalClose}
+        appointment={selectedAppointment}
+      />
     </div>
   );
 }

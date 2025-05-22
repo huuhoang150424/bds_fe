@@ -5,7 +5,8 @@ import type { AppDispatch } from '@/redux/store';
 import { toast } from '@/hooks/use-toast';
 import BannerSearch from './components/banner-search';
 import { Loading } from '@/components/common';
-
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
+import { PremiumSliderDialog } from '../banner/components/premium-slider-dialog';
 const NewsSection = lazy(() => import('./components/news-sections'));
 const PropertyListings = lazy(() => import('./components/property-listing'));
 const BusinessCarousel = lazy(() => import('./components/business-carousel'));
@@ -60,7 +61,24 @@ const LazySection = ({
   );
 };
 
+
+const exampleBanner = {
+  id: "1",
+  title: "Khuyến mãi đặc biệt! Giảm giá 50% cho tất cả sản phẩm mới",
+  imageUrls: [
+    "https://colour.vn/wp-content/uploads/ie%CC%82%CC%81t-ke%CC%82%CC%81-banner-ba%CC%82%CC%81t-do%CC%A3%CC%82ng-sa%CC%89n-de%CC%A3p.jpeg",
+    "https://img.pikbest.com/origin/10/07/18/49cpIkbEsTKvX.png!f305cw",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi3ZI61HObAqZBm5awlHRn3pvRSCp7aV2Y367X2xk9JoO4feeJz2P26FZAWJ6_n3CYhdU&usqp=CAU"
+  ],
+  targetUrl: "/promotions",
+  displayOrder: 1,
+  isActive: true,
+  startDate: new Date(Date.now() - 86400000).toISOString(),
+  endDate: new Date(Date.now() + 86400000 * 7).toISOString(),
+}
+
 function Home() {
+  useScrollToTopOnMount();
   const message = useSelector(selectMessage);
   const success = useSelector(selectSuccess);
   const dispatch = useDispatch<AppDispatch>();
@@ -79,6 +97,7 @@ function Home() {
 
   return (
     <>
+      <PremiumSliderDialog banner={exampleBanner} />
       <BannerSearch activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <LazySection Component={NewsSection} />

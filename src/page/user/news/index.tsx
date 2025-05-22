@@ -5,10 +5,11 @@ import NewsTitle from './components/news-title';
 import { Input } from '@/components/ui/input';
 import ListNewBySearch from './components/list-new-by-search';
 import { Button } from '@/components/ui/button';
-
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 
 function News() {
+  useScrollToTopOnMount();
   const [searchTerm, setSearchTerm] = useState(""); 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value); 

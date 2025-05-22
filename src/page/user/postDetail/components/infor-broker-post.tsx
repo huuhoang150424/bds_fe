@@ -1,13 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { posts } from '@/constant/constPostDetail';
 import { useAppContext } from '@/context/chat';
 import { selectUser } from '@/redux/authReducer';
 import { FaCircleCheck } from 'react-icons/fa6';
 import { FiPhoneCall } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
-function InforBrokerPpost(data: { user: any }) {
+function InforBrokerPpost(data: { user: any,postId:string }) {
   const user = useSelector(selectUser);
   const { setSelectedUser } = useAppContext();
   const navigate = useNavigate();
@@ -35,11 +34,11 @@ function InforBrokerPpost(data: { user: any }) {
       <div className='grid grid-cols-3 gap-2 sm:gap-4 mb-4 text-center'>
         <div className=''>
           <p className='text-xs sm:text-sm text-gray-500'>Tham gia BĐS</p>
-          <p className='font-medium mt-1 text-sm sm:text-base'>{posts?.author.time} năm</p>
+          <p className='font-medium mt-1 text-sm sm:text-base'> năm</p>
         </div>
         <div className=''>
           <p className='text-xs sm:text-sm text-gray-500'>Tin đăng</p>
-          <p className='font-medium mt-1 text-sm sm:text-base'>{posts?.author?.numberPost}</p>
+          <p className='font-medium mt-1 text-sm sm:text-base'></p>
         </div>
         <div className=''>
           <p className='text-xs sm:text-sm text-gray-500'>Chứng chỉ</p>
@@ -50,13 +49,15 @@ function InforBrokerPpost(data: { user: any }) {
       </div>
       <div className='flex flex-col gap-2 '>
         <Button
+          onClick={()=>navigate(`/business/${data?.user?.id}`,{ state: { postId:data.postId} })}
           variant={'outline'}
           className='w-full text-xs sm:text-sm text-gray-600 ] transition-colors duration-200 shadow-none'
         >
           Xem trang cá nhân →
         </Button>
-        <Button
-          className='w-full text-gray-600 font-[400] text-[15px] py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg border border-gray-200
+        <a
+          href={`https://zalo.me/${data?.user?.phone}`}
+          className='w-full text-gray-600 font-[400] text-[15px] py-2 sm:py-3 px-3 sm:px-4 rounded-lg border border-gray-200
                       bg-white hover:bg-gray-50 transition-colors duration-200
                       flex items-center justify-center gap-2  sm:text-base shadow-none'
         >
@@ -66,14 +67,14 @@ function InforBrokerPpost(data: { user: any }) {
             className='w-4 h-4 object-cover sm:w-5 sm:h-5'
           />
           Chat qua Zalo
-        </Button>
+        </a>
         <Button
           className='w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg
                       bg-[#E03C31] hover:bg-[#FF837A] text-white transition-colors duration-200
                       flex items-center justify-center gap-2 text-sm sm:text-base shadow-none'
         >
           <FiPhoneCall className='w-4 h-4 sm:w-5 sm:h-5' />
-          <span className='font-medium'>{data.user.phone}</span>
+          <span className='font-medium'>{data?.user?.phone}</span>
         </Button>
         {(user?.id === data?.user?.id || user===null) ? null : (
           <Button
