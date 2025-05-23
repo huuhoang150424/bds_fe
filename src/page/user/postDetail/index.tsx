@@ -344,7 +344,7 @@ function PostDetail() {
                 <span className="text-[22px] font-[500]">Thông tin mô tả</span>
               </div>
               <div className="">
-                <p className="text-[13px]">{data?.description}</p>
+                <p className="text-[13px]" dangerouslySetInnerHTML={{ __html: data?.description }}></p>
               </div>
             </div>
             <div className="characteristic">

@@ -13,7 +13,6 @@ interface User {
   score:number;
   isLock: boolean;
 
-  isLock: boolean;
 
   emailVerified: boolean ;
   isProfessional: boolean;
