@@ -127,14 +127,18 @@ export default function PropertyCard(post: Post) {
               </span>
             </div>
           </div>
-          <div className="text-gray-700 line-clamp-2 text-[13px] pt-1">
-            {post.description ||
-              `The Origami. Giải pháp tích sản thông minh, ai cũng có thể sở hữu. Liên hệ: ${
-                post.user?.phone || '0703 888 ***'
-              } (${post.user?.fullname || 'Ms Hanh'}). Căn ${post.bedroom}PN loại căn diện tích lớn ${
-                post.squareMeters
-              }m² giá chỉ ${(post.price / 1000000000).toFixed(2)} tỷ.`}
-          </div>
+          <div
+            className="text-gray-700 line-clamp-2 text-[13px] pt-1"
+            dangerouslySetInnerHTML={{
+              __html:
+                post.description ||
+                `The Origami. Giải pháp tích sản thông minh, ai cũng có thể sở hữu. Liên hệ: ${
+                  post.user?.phone || '0703 888 ***'
+                } (${post.user?.fullname || 'Ms Hanh'}). Căn ${post.bedroom}PN loại căn diện tích lớn ${
+                  post.squareMeters
+                }m² giá chỉ ${(post.price / 1000000000).toFixed(2)} tỷ.`,
+            }}
+          />
         </div>
         <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -179,4 +183,3 @@ export default function PropertyCard(post: Post) {
     </Card>
   );
 }
-
