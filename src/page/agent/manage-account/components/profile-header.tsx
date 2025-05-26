@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit2Icon, MapPinIcon, MoreHorizontalIcon, LockIcon, PhoneIcon, Sparkles, ChevronRight } from 'lucide-react';
+import { Edit2Icon, MapPinIcon, MoreHorizontalIcon, LockIcon, PhoneIcon, Sparkles, ChevronRight, Shield } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -15,10 +15,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ChangePasswordModal from './change-password';
 import UpdateProfileModal from './update-profile';
-import ChangePhoneModal from './changep-phone';
 import Conditions from './conditions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import TwoFactorModal from './two-factor';
+import ChangePhoneModal from './changep-phone';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/redux/authReducer';
+
 interface ProfileHeaderProps {
   user: any;
 }
@@ -27,9 +31,10 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isChangePhoneOpen, setIsChangePhoneOpen] = useState(false);
   const [isUpdateProfileOpen, setIsUpdateProfileOpen] = useState(false);
+  const [isTwoFactorOpen, setIsTwoFactorOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const userSelectIs=useSelector(selectUser);
   const handleOpenChangePhone = useCallback(() => {
     setIsChangePhoneOpen(true);
   }, []);
@@ -52,6 +57,14 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
   const handleCloseUpdateProfile = useCallback(() => {
     setIsUpdateProfileOpen(false);
+  }, []);
+
+  const handleOpenTwoFactor = useCallback(() => {
+    setIsTwoFactorOpen(true);
+  }, []);
+
+  const handleCloseTwoFactor = useCallback(() => {
+    setIsTwoFactorOpen(false);
   }, []);
 
   return (
@@ -206,6 +219,17 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                     onSelect={(e) => {
                       e.preventDefault();
                       setIsDropdownOpen(false);
+                      handleOpenTwoFactor();
+                    }}
+                  >
+                    <Shield className='h-3 w-3 mr-2' />
+                    {user.is2FAEnabled ? 'Tắt xác thực hai bước' : 'Bật xác thực hai bước'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className='text-xs cursor-pointer'
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsDropdownOpen(false);
                     }}
                   >
                     <svg className='h-3 w-3 mr-2' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -232,6 +256,9 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
       {isChangePhoneOpen && <ChangePhoneModal open={isChangePhoneOpen} onOpenChange={handleCloseChangePhone} />}
       {isUpdateProfileOpen && (
         <UpdateProfileModal open={isUpdateProfileOpen} onOpenChange={handleCloseUpdateProfile} userSelect={user} />
+      )}
+      {isTwoFactorOpen && (
+        <TwoFactorModal open={isTwoFactorOpen} onOpenChange={handleCloseTwoFactor} is2FAEnabled={userSelectIs?.is2FAEnabled || false} />
       )}
     </div>
   );

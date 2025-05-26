@@ -12,10 +12,10 @@ interface User {
   balance:number;
   score:number;
   isLock: boolean;
-
-
+  is2FAEnabled: boolean;
   emailVerified: boolean ;
   isProfessional: boolean;
+  twoFactorSecret:string | null;
 
 }
 
@@ -97,13 +97,20 @@ const authSlice = createSlice({
       .addCase(loginAuth.pending, (state) => {
         state.loading = true;
       })
-      .addCase(loginAuth.fulfilled, (state, action: PayloadAction<{  message: string; data: any }>) => {
-        state.isAuthenticated = true;
-        state.success = true;
+      .addCase(loginAuth.fulfilled, (state, action: PayloadAction<{ message: string; data: any }>) => {
         state.loading = false;
-        state.token = action.payload.data.accessToken;
         state.message = action.payload.message;
-        state.user = action.payload.data.user;
+        if (action.payload.data.twoFactorRequired) {
+          // Handle 2FA case
+          state.success = false; // Prevent premature success
+          state.isAuthenticated = false;
+        } else {
+          // Handle successful login without 2FA
+          state.isAuthenticated = true;
+          state.success = true;
+          state.token = action.payload.data.accessToken;
+          state.user = action.payload.data.user;
+        }
       })
       .addCase(loginAuth.rejected, (state,action:any) => {
         console.log(action.payload)

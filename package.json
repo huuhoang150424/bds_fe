@@ -85,6 +85,7 @@
     "react-image-lightbox": "^5.1.4",
     "react-leaflet": "^5.0.0",
     "react-leaflet-markercluster": "^5.0.0-rc.0",
+    "react-qr-code": "^2.0.15",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
     "recharts": "^2.15.1",

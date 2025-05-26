@@ -36,7 +36,7 @@ export default function AgentRouter() {
           <Route path='/vip' element={<Vip />} />
           <Route path='/vip-required' element={<VIPRequired />} />
           <Route path='/manage-post' element={<ManagePost />} />
-          <Route path='/customer-infor' element={<CustomersPage />} />
+
           <Route path='/finance' element={<Finance />} />
           <Route path='/statistical' element={<Statistical />} />
           <Route path='/statistical-apponitment' element={<Apponitment />} />
@@ -45,6 +45,7 @@ export default function AgentRouter() {
           <Route path='/sample' element={<Sample />} />
           <Route path='/my-pricing' element={<MyPricing />} />
         </Route>
+        <Route path='/customer-infor' element={<CustomersPage />} />
         <Route path='/profile' element={<UserProfile />} />
         <Route path='/chat' element={<Chat />} />
       </Route>
