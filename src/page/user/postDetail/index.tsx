@@ -442,7 +442,7 @@ function PostDetail() {
               </div>
               <div className="border border-gray-100 my-[10px]"></div>
               <div className="my-[20px]">
-                <span className="text-[22px] font-[500]">Lịch sử bán {data?.title}</span>
+                <span className="text-[22px] font-[500]">Lịch sử thay đổi giá {data?.title}</span>
               </div>
               <div className="w-full h-[400px]">
                 <Suspense fallback={<Loading className="mx-auto my-[100px]" />}>
