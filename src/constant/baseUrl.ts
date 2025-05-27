@@ -1,3 +1,3 @@
-export const urlLocal = 'http://82.180.155.122:3000/';
+export const urlLocal =  import.meta.env.VITE_URL_API;
 
-export const urlTinhThanh = 'https://esgoo.net/api-tinhthanh';
+export const urlTinhThanh = import.meta.env.VITE_URL_PROVINCE;
