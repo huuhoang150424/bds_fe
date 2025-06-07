@@ -8,7 +8,7 @@ export const useCreateAppointments = ( ) => {
     mutationFn: (data:any)=>createAppointments(data),
     onSuccess: (data)=>{
       toast({
-        title: 'Đặt lịch hẹn thành công',
+        title: 'Lịch hẹn của bạn đã được đặt thành công. Bạn sẽ nhận được xác nhận sớm.',
         variant: 'success'
       })
       queryClient.invalidateQueries({ queryKey: ['myAppointments'] });

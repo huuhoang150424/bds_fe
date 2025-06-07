@@ -214,11 +214,11 @@ export function ReportDetail({ report, onClose }: ReportDetailProps) {
                           <span className="mr-2">⚠️</span> Nội dung không phù hợp
                         </div>
                       </SelectItem>
-                      <SelectItem value={SeverityStatus.AIFlagged}>
+                      {/* <SelectItem value={SeverityStatus.AIFlagged}>
                         <div className="flex items-center">
                           <span className="mr-2">🤖</span> AI phát hiện
                         </div>
-                      </SelectItem>
+                      </SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>

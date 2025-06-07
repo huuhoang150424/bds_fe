@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useState } from 'react';
 import { CancelPackageModal } from './cancel-package';
+
 interface ActionsCellProps {
   packageName: string;
   packageId: string;
@@ -37,7 +38,7 @@ export const ActionsCell = ({ packageName, packageId, status }: ActionsCellProps
     </div>
   );
 };
-// Define the data type
+
 export type PricingPackage = {
   id: string;
   createdAt: string;
@@ -50,7 +51,7 @@ export type PricingPackage = {
   boostDays: number;
   endDate: string;
   status: 'completed' | 'pending' | 'expired';
-  pricing: {
+  pricing?: {
     id: string;
     name: string;
     price: number;
@@ -84,7 +85,7 @@ export type VIPPackage = {
   boostDays: number;
   endDate: string;
   status: 'completed' | 'pending' | 'expired';
-  pricing: {
+  pricing?: {
     id: string;
     name: string;
     price: number;
@@ -111,65 +112,67 @@ export const columns: ColumnDef<PricingPackage>[] = [
       <Checkbox
         checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
+        aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
+        aria-label="Select row"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: 'pricing.name',
+    accessorKey: 'pricingName', // Changed from 'pricing.name' to a unique ID
+    accessorFn: (row) => row.pricing?.name || 'N/A', // Handle missing pricing
     header: ({ column }) => (
-      <div className='flex items-center'>
+      <div className="flex items-center">
         Gói VIP
         <Button
-          variant='ghost'
-          size='sm'
-          className='ml-1 h-4 w-4 p-0'
+          variant="ghost"
+          size="sm"
+          className="ml-1 h-4 w-4 p-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          <ArrowUpDown className='h-4 w-4' />
+          <ArrowUpDown className="h-4 w-4" />
         </Button>
       </div>
     ),
-    cell: ({ row }) => <div className='font-medium'>{row.original.pricing.name}</div>,
+    cell: ({ row }) => <div className="font-medium">{row.original.pricing?.name || 'N/A'}</div>,
   },
   {
-    accessorKey: 'pricing.price',
+    accessorKey: 'pricingPrice', // Changed from 'pricing.price' to a unique ID
+    accessorFn: (row) => row.pricing?.price ?? 0, // Handle missing pricing
     header: ({ column }) => (
-      <div className='flex items-center'>
+      <div className="flex items-center">
         Giá
         <Button
-          variant='ghost'
-          size='sm'
-          className='ml-1 h-4 w-4 p-0'
+          variant="ghost"
+          size="sm"
+          className="ml-1 h-4 w-4 p-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          <ArrowUpDown className='h-4 w-4' />
+          <ArrowUpDown className="h-4 w-4" />
         </Button>
       </div>
     ),
-    cell: ({ row }) => formatCurrency(row.original.pricing.price),
+    cell: ({ row }) => formatCurrency(row.original.pricing?.price ?? 0),
   },
   {
     accessorKey: 'startDate',
     header: ({ column }) => (
-      <div className='flex items-center'>
+      <div className="flex items-center">
         Ngày bắt đầu
         <Button
-          variant='ghost'
-          size='sm'
-          className='ml-1 h-4 w-4 p-0'
+          variant="ghost"
+          size="sm"
+          className="ml-1 h-4 w-4 p-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          <ArrowUpDown className='h-4 w-4' />
+          <ArrowUpDown className="h-4 w-4" />
         </Button>
       </div>
     ),
@@ -183,15 +186,15 @@ export const columns: ColumnDef<PricingPackage>[] = [
   {
     accessorKey: 'remainingPosts',
     header: ({ column }) => (
-      <div className='flex items-center'>
+      <div className="flex items-center">
         Bài còn lại
         <Button
-          variant='ghost'
-          size='sm'
-          className='ml-1 h-4 w-4 p-0'
+          variant="ghost"
+          size="sm"
+          className="ml-1 h-4 w-4 p-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          <ArrowUpDown className='h-4 w-4' />
+          <ArrowUpDown className="h-4 w-4" />
         </Button>
       </div>
     ),
@@ -234,17 +237,20 @@ export const columns: ColumnDef<PricingPackage>[] = [
       }
 
       return (
-        <Badge variant='outline' className={badgeClass}>
+        <Badge variant="outline" className={badgeClass}>
           {statusText}
         </Badge>
       );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
   {
     id: 'actions',
     cell: ({ row }) => (
       <ActionsCell
-        packageName={row.original.pricing.name}
+        packageName={row.original.pricing?.name || 'N/A'}
         packageId={row.original.id}
         status={row.original.status}
       />

@@ -2,16 +2,13 @@ import { useEffect, useRef } from 'react';
 import Router from './router/Router';
 import { Toaster } from './components/ui/toaster';
 import { AppProvider } from '@/context/chat';
+
 function App() {
   const cursorMouse = useRef<HTMLDivElement | null>(null);
   const smallDot = useRef<HTMLDivElement | null>(null);
   const mousePosition = useRef({ x: 0, y: 0 });
   const lastMousePosition = useRef({ x: 0, y: 0 });
-  //update Color
 
-  if (typeof global === "undefined") {
-    window.global = window;
-  }
 
   const updateCursorPosition = () => {
     const { x, y } = mousePosition.current;
@@ -39,22 +36,23 @@ function App() {
     };
   }, []);
 
-  
   return (
-    <div className=''>
-      <Toaster/>
-      <div
-        ref={cursorMouse}
-        className='w-[40px] h-[40px] rounded-full bg-transparent border-[2px] border-primaryColor absolute left-0 top-0 z-[999998] transition-transform duration-1000 ease-out pointer-events-none'
-      ></div>
-      <div
-        ref={smallDot}
-        className='w-2 h-2 rounded-full bg-primaryColor absolute left-[17px] top-[17px] z-[999999] transition-transform duration-500 ease-out pointer-events-none'
-      ></div>
-      <AppProvider>
-        <Router />
-      </AppProvider>
-    </div>
+      <div className="">
+        {/* {isLoading && <LoadingInit />} */}
+        <Toaster />
+        <div
+          ref={cursorMouse}
+          className="w-[40px] h-[40px] rounded-full bg-transparent border-[2px] border-primaryColor absolute left-0 top-0 z-[999998] transition-transform duration-1000 ease-out pointer-events-none"
+        ></div>
+        <div
+          ref={smallDot}
+          className="w-2 h-2 rounded-full bg-primaryColor absolute left-[17px] top-[17px] z-[999999] transition-transform duration-500 ease-out pointer-events-none"
+        ></div>
+        <AppProvider>
+          <Router />
+        </AppProvider>
+      </div>
   );
 }
+
 export default App;

@@ -1,6 +1,6 @@
 import { handleApi } from '@/service';
 
-export const cancelPricing = async () => {
+export const cancelPricing = async (packageId: string) => {
   try {
     const response = await handleApi('/pricing/cancelPricing', null, 'POST');
     return response.data;

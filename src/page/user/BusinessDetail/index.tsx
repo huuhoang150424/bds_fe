@@ -8,22 +8,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppointmentDialog } from './components/appointment-dialog';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useProfileUsers } from './hooks/use-get-profile';
 import { usePostTarget } from './hooks/use-get-post-target';
 import { Loading } from '@/components/common';
 import PropertyCard from './components/property-card';
+import { useAppContext } from '@/context/chat';
 
 function BusinessDetail() {
   useScrollToTopOnMount();
   const location = useLocation();
   const postId = location.state?.postId;
   const [activeTab, setActiveTab] = useState('listings');
-
+  const navigate=useNavigate();
   const { id } = useParams();
   const { data: profileData, isLoading: isLoadingProfile } = useProfileUsers(id || '');
   const { data: postTargetData, isLoading: isLoadingPostTarget } = usePostTarget(id || '');
-
+  const { setSelectedUser } = useAppContext();
   const allPosts = postTargetData?.data || [];
   const deliveredPosts = postTargetData?.data?.filter((post: any) => post.status === 'Đã bàn giao') || [];
 
@@ -82,7 +83,9 @@ function BusinessDetail() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Button className="bg-red-500 hover:bg-red-600 text-xs">
+              <Button onClick={()=> {navigate('/agent/chat'); setSelectedUser(profileData?.data);}
+                // navigate(`/business/${}`,{ state: { postId:data.postId} })
+                } className="bg-red-500 hover:bg-red-600 text-xs">
                 <MessageSquare className="mr-1 h-3.5 w-3.5" /> Nhắn tin
               </Button>
               <AppointmentDialog receiverId={id || ''} postId={postId} receiverName={profileData?.data?.fullname} />

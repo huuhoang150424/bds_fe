@@ -8,6 +8,43 @@ import { useGetPricings } from '@/page/admin/pricing/hooks/use-get-pricings';
 import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 import { useGetPurchasedPackages } from '../hooks/use-get-my-pricing';
 
+const SkeletonCard = () => {
+  return (
+    <Card className="h-full border border-gray-200 rounded-[8px] shadow-md">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-center mb-1">
+          <div className="p-2 rounded-full bg-gray-200 w-12 h-12 animate-pulse"></div>
+        </div>
+        <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mt-2 animate-pulse"></div>
+      </CardHeader>
+      <CardContent className="pb-3">
+        <div className="mb-4">
+          <div className="flex items-baseline">
+            <div className="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4 ml-2 animate-pulse"></div>
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mt-2 animate-pulse"></div>
+        </div>
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+          <ul className="space-y-2">
+            {[...Array(5)].map((_, index) => (
+              <li key={index} className="flex items-start">
+                <div className="h-3 w-3 bg-gray-200 rounded-full mr-1.5 mt-0.5 shrink-0 animate-pulse"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <div className="h-8 bg-gray-200 rounded w-full animate-pulse"></div>
+      </CardFooter>
+    </Card>
+  );
+};
+
 export default function PricingTable() {
   useScrollToTopOnMount();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -38,10 +75,13 @@ export default function PricingTable() {
   };
 
   const isPlanPurchasedAndActive = (pricingId: string) => {
+    if (!purchased || purchased.length === 0) {
+      return false;
+    }
     return purchased.some(
       (pkg: any) =>
-        pkg.pricing.id === pricingId &&
-        new Date(pkg.endDate) > new Date() 
+        pkg?.pricing?.id === pricingId &&
+        new Date(pkg.endDate) > new Date()
     );
   };
 
@@ -99,7 +139,6 @@ export default function PricingTable() {
       description: plan.description,
       price: formatCurrency(plan.price),
       originalPrice: formatCurrency(originalPrice),
-      discount: discountPercent > 0 ? `-${discountPercent}%` : '',
       savings: savings > 0 ? `Tiết kiệm ${formatCurrency(savings)}đ mỗi tháng` : '',
       color: colorData.color,
       hoverColor: colorData.hoverColor,
@@ -120,7 +159,13 @@ export default function PricingTable() {
   };
 
   if (isPricingsLoading || isPurchasedLoading) {
-    return <div className="text-center">Đang tải...</div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, index) => (
+          <SkeletonCard key={index} />
+        ))}
+      </div>
+    );
   }
 
   return (

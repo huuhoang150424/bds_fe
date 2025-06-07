@@ -46,7 +46,7 @@ export function ReportsAdminDashboard() {
   };
   const { data: summaryData, isLoading: isLoadingSummary } = useGetSummary();
   const reportsAll=allReports?.data?.data || [];
-  
+
   const filterReportsByStatus = (reports: any[], status: string) => {
     if (!reports) {
       setFilteredReports([]);
@@ -62,7 +62,7 @@ export function ReportsAdminDashboard() {
 
 
   const reportDetail = reportsAll.find((report: any) => report.id === selectedReport);
-
+  console.log(summaryData?.data)
   const handleTabChange = (value: string) => {
     console.log(value)
     setActiveTab(value);

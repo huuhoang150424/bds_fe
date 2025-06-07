@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import type { Post } from './columns';
 import { useApprovePosts } from '../hooks/use-approve-post';
+import { useSendNotification } from '../../notification/hooks/use-send-notification';
 
 interface ApprovePostProps {
   post: Post;
@@ -11,14 +12,32 @@ interface ApprovePostProps {
 
 export function ApprovePost({ post, open, onOpenChange }: ApprovePostProps) {
   const { mutate: approvePosts, isPending: isProcessing } = useApprovePosts();
+  const { mutate: sendNotification, isPending: isSendingNotification } = useSendNotification();
 
   const handleApprove = () => {
     approvePosts(
       [post.id],
       {
         onSuccess: () => {
-          onOpenChange(false);
-        }
+          const priorityMap: { [key: string]: number } = {
+            low: 1,
+            normal: 2,
+            high: 3,
+          };
+
+          const notificationData = {
+            userId: post.userId,
+            message: `Bài đăng "${post.title}" của bạn đã được duyệt và hiện đang hiển thị công khai.`,
+            priority: priorityMap['normal'],
+            endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          };
+
+          sendNotification(notificationData, {
+            onSuccess: () => {
+              onOpenChange(false);
+            },
+          });
+        },
       }
     );
   };
@@ -42,7 +61,7 @@ export function ApprovePost({ post, open, onOpenChange }: ApprovePostProps) {
             variant="outline"
             className="text-xs h-8 bg-white hover:bg-white text-gray-700"
             onClick={() => onOpenChange(false)}
-            disabled={isProcessing}
+            disabled={isProcessing || isSendingNotification}
           >
             Hủy
           </Button>
@@ -51,9 +70,9 @@ export function ApprovePost({ post, open, onOpenChange }: ApprovePostProps) {
             size="sm"
             className="text-xs h-8 bg-green-500 hover:bg-green-600 text-white"
             onClick={handleApprove}
-            disabled={isProcessing}
+            disabled={isProcessing || isSendingNotification}
           >
-            {isProcessing ? 'Đang duyệt...' : 'Duyệt'}
+            {isProcessing || isSendingNotification ? 'Đang xử lý...' : 'Duyệt'}
           </Button>
         </DialogFooter>
       </DialogContent>

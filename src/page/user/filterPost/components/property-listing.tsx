@@ -79,7 +79,7 @@ export default function PropertyListings({
           ) : (
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-col">
+                <div className="flex flex-col w-[500px] ">
                   <div className="bg-red-50 w-full md:w-[50%] p-3 rounded-lg mb-4 flex items-center gap-2">
                     <img
                       src="https://i.pinimg.com/originals/fc/3e/4f/fc3e4f219110231f1942b213c3c2eea2.gif"
@@ -89,7 +89,7 @@ export default function PropertyListings({
                     <span className="text-[14px] font-medium">Có {data?.data?.total} kết quả trả về.</span>
                   </div>
                   <h1 className="text-[18px] font-[500] text-gray-800 mb-2">
-                    Mua Bán Nhà Đất Hồ Chí Minh Giá Rẻ Mới Nhất {convertDate(new Date().toDateString())}
+                    Danh sách bất động sản tìm kiếm
                   </h1>
                   <p className="text-gray-600 mb-6">Hiện có 60.605 bất động sản.</p>
                 </div>

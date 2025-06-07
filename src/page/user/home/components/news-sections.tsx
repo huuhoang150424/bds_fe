@@ -4,6 +4,7 @@ import TabsUser from '@/components/user/tab';
 import { format } from 'date-fns';
 import { useLatestNews } from '../hook/use-get-laster-news';
 import type { NewsItem } from '../service/get-laster-news';
+import { Link } from 'react-router-dom';
 
 export default function NewsSection() {
   const [featuredNewsIndex, setFeaturedNewsIndex] = useState(0); 
@@ -59,20 +60,20 @@ export default function NewsSection() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredNews[featuredNewsIndex] && (
           <Card
-            className="col-span-1 md:col-span-2 border-none shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer rounded-lg overflow-hidden"
+            className="col-span-1 md:col-span-2 border border-gray-200 duration-300 cursor-pointer rounded-lg overflow-hidden "
             onClick={() => handleNewsClick(featuredNewsIndex)}
           >
-            <CardContent className="p-0">
-              <div className="relative h-80">
+            <CardContent className="p-0  overflow-hidden shadow-none">
+              <Link to={`/new/${filteredNews[featuredNewsIndex].slug}`} className="relative p-[16px] flex items-center justify-center rounded-lg h-30">
                 <img
                   src={filteredNews[featuredNewsIndex].imageUrl || '/placeholder.svg'}
                   alt={filteredNews[featuredNewsIndex].title}
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  className=" object-cover transition-transform duration-300 rounded-lg w-full h-full"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              </div>
+                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div> */}
+              </Link>
               <div className="p-4">
-                <h2 className="text-[18px] text-gray-800  font-[600] mb-2 hover:text-red-500 transition-colors duration-200">
+                <h2 className="text-[16px] text-gray-800  font-[600] mb-2 hover:text-red-500 transition-colors duration-200">
                   {filteredNews[featuredNewsIndex].title}
                 </h2>
                 <p className="text-[14px] text-gray-400 flex items-center mb-4">

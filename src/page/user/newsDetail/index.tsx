@@ -3,8 +3,10 @@ import { useGetNewsDetail } from './hooks/use-get-new-detail';
 import { useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import NewsPopular from '../news/components/news-popular';
+import useScrollToTopOnMount from '@/hooks/use-scroll-top';
 
 function NewsArticle() {
+  useScrollToTopOnMount();
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useGetNewsDetail(slug || '');
 

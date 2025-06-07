@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { CalendarIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,14 +27,13 @@ interface AppointmentDialogProps {
 
 export function AppointmentDialog({ receiverId, postId, receiverName }: AppointmentDialogProps) {
   const [open, setOpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const { mutate, isPending } = useCreateAppointments();
 
   const form = useForm<FormCreateAppointment>({
     resolver: zodResolver(formCreateAppointment),
     defaultValues: {
       postId: postId || '',
-      appointmentTime: '2025-04-30T14:00:00Z',
+      appointmentTime: new Date().toISOString(),
       receiverId: receiverId || '',
       duration: 30,
       message: '',
@@ -52,17 +47,26 @@ export function AppointmentDialog({ receiverId, postId, receiverName }: Appointm
     { value: '60', label: '60 phút' },
   ];
 
-  const onSubmit = (values: FormCreateAppointment) => {
-    console.log(values);
-    mutate(values);
-    setOpen(false);
+  const formatDateTimeLocal = (isoString: string) => {
+    const date = new Date(isoString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().slice(0, 16);
   };
 
-  const handleDateChange = (date: Date | undefined) => {
-    if (date) {
-      form.setValue('appointmentTime', date.toISOString());
-      setCalendarOpen(false); 
-    }
+  const parseLocalDateTime = (localDateTime: string) => {
+    if (!localDateTime) return '';
+    const date = new Date(localDateTime);
+    return date.toISOString();
+  };
+
+  const onSubmit = (values: FormCreateAppointment) => {
+    mutate(values, {
+      onSuccess: () => {
+        setOpen(false); // Chỉ đóng dialog khi thành công
+        form.reset(); // Reset form sau khi thành công
+      },
+    });
   };
 
   return (
@@ -82,109 +86,103 @@ export function AppointmentDialog({ receiverId, postId, receiverName }: Appointm
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            <FormField
-              control={form.control}
-              name='appointmentTime'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Ngày và giờ</FormLabel>
-                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={'outline'}
+            <div className={cn('space-y-4', isPending && 'opacity-50 pointer-events-none')}>
+              <FormField
+                control={form.control}
+                name='appointmentTime'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Ngày và giờ</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <input
+                          type='datetime-local'
                           className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
+                            'w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500',
                             !field.value && 'text-muted-foreground',
                           )}
-                          onClick={() => setCalendarOpen(true)}
-                        >
-                          {field.value ? (
-                            format(new Date(field.value), 'PPP', { locale: vi })
-                          ) : (
-                            <span>Chọn thời gian</span>
-                          )}
-
-                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent 
-                      className='w-auto p-0 z-[999999] '
-                      align="start"
-                      side="bottom"
-                      sideOffset={4}
-                    >
-                      <Calendar
-                        mode='single'
-                        selected={field.value ? new Date(field.value) : undefined}
-                        onSelect={handleDateChange}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
+                          value={field.value ? formatDateTimeLocal(field.value) : ''}
+                          onChange={(e) => {
+                            const isoString = parseLocalDateTime(e.target.value);
+                            field.onChange(isoString);
+                          }}
+                          min={formatDateTimeLocal(new Date().toISOString())}
+                        />
+                        <CalendarIcon className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none' />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='duration'
+                render={({ field }) => (
+                  <FormItem className='flex-1'>
+                    <FormLabel>Thời lượng:</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value?.toString() || '30'}
+                        onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder='Chọn thời lượng' />
+                        </SelectTrigger>
+                        <SelectContent className='z-[9999]'>
+                          {durationOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='message'
+                render={({ field }) => (
+                  <FormItem className='flex-1'>
+                    <FormLabel>Ghi chú:</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='Nhập ghi chú hoặc lý do cuộc hẹn'
+                        className='resize-none'
+                        rows={3}
+                        {...field}
                       />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='duration'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel>Thời lượng:</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field.value?.toString() || '30'}
-                      onValueChange={(value) => field.onChange(parseInt(value, 10))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='Chọn thời lượng' />
-                      </SelectTrigger>
-                      <SelectContent className='z-[9999] '>
-                        {durationOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='message'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel>Ghi chú:</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder='Nhập ghi chú hoặc lý do cuộc hẹn'
-                      className='resize-none'
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <DialogFooter className='flex justify-end gap-2 pt-4'>
-              <Button type='button' variant='outline' onClick={() => setOpen(false)}>
+              <Button 
+                type='button' 
+                variant='outline' 
+                onClick={() => setOpen(false)}
+                disabled={isPending}
+              >
                 Hủy
               </Button>
               <Button
                 type='submit'
                 disabled={isPending || !form.formState.isValid}
-                className='bg-red-500 hover:bg-red-600 text-white'
+                className='bg-red-500 hover:bg-red-600 text-white disabled:opacity-50'
               >
-                {isPending ? 'Đang xử lý...' : 'Xác nhận'}
+                {isPending ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  'Xác nhận'
+                )}
               </Button>
             </DialogFooter>
           </form>

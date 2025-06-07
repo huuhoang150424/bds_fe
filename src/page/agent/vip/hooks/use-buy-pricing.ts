@@ -12,14 +12,10 @@ export function useBuyPricing() {
     mutationFn: (pricingId: string) => buyPricing(pricingId),
     onSuccess: (response) => {
       console.log('Buy Pricing Response:', response);
-      if (response.success) {
-        // Calculate price with 10% VAT
-        const price = response.pricing.price;
-        const totalPrice = price * 1.1;
-        // Deduct totalPrice from balance
+      if (response.data.success) {
+        const price = response.data.pricing.price;
+        const totalPrice = price;
         dispatch(updateBalance({ balance: -totalPrice }));
-
-        // Invalidate and refetch purchasedPackages queries
         queryClient.invalidateQueries({
           predicate: (query) => query.queryKey[0] === 'purchasedPackages',
         });

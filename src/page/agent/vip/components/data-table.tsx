@@ -36,8 +36,8 @@ export function DataTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
-  const tableData = data?.data?.data|| [];
+  console.log('data ',data)
+  const tableData = data?.data?.data || [];
   const totalItems = data?.totalItems || 0;
   const totalPages = data?.totalPages || 1;
   const currentPage = data?.currentPage || 1;
@@ -75,8 +75,8 @@ export function DataTable() {
         <div className="flex items-center gap-2">
           <Input
             placeholder="Lọc theo gói VIP..."
-            value={(table.getColumn('pricing.name')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('pricing.name')?.setFilterValue(event.target.value)}
+            value={(table.getColumn('pricingName')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('pricingName')?.setFilterValue(event.target.value)}
             className="text-[14px] text-gray-700 outline-none px-[16px] py-[6px] rounded-[8px]"
           />
           <DropdownMenu>
@@ -91,7 +91,7 @@ export function DataTable() {
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 className="text-xs"
-                checked={table.getColumn('status')?.getFilterValue() === 'completed'}
+                checked={(table.getColumn('status')?.getFilterValue() as string) === 'completed'}
                 onCheckedChange={() => {
                   table.getColumn('status')?.setFilterValue('completed');
                 }}
@@ -100,7 +100,7 @@ export function DataTable() {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 className="text-xs"
-                checked={table.getColumn('status')?.getFilterValue() === 'pending'}
+                checked={(table.getColumn('status')?.getFilterValue() as string) === 'pending'}
                 onCheckedChange={() => {
                   table.getColumn('status')?.setFilterValue('pending');
                 }}
@@ -109,7 +109,7 @@ export function DataTable() {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 className="text-xs"
-                checked={table.getColumn('status')?.getFilterValue() === 'expired'}
+                checked={(table.getColumn('status')?.getFilterValue() as string) === 'expired'}
                 onCheckedChange={() => {
                   table.getColumn('status')?.setFilterValue('expired');
                 }}
@@ -154,7 +154,7 @@ export function DataTable() {
         </div>
       </div>
       {isLoading ? (
-        <Loading className='my-[200px] '/>
+        <Loading className="my-[200px] " />
       ) : (
         <div className="rounded-md border border-gray-200">
           <div className="relative max-h-[500px] overflow-auto">

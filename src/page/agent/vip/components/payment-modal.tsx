@@ -23,6 +23,7 @@ interface PaymentModalProps {
 export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProps) {
   const { mutate, isPending, isSuccess, error, data } = useBuyPricing();
   const [userBalance, setUserBalance] = useState<number>(0);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
 
   const user = useSelector(selectUser);
 
@@ -42,8 +43,16 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
 
   const price = Number.parseInt(plan.price.replace(/\./g, '')); 
   const totalPrice = price * 1.1; 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBalanceError(null); // Clear any previous error
+
+    if (userBalance < totalPrice) {
+      setBalanceError('Số dư tài khoản không đủ để thực hiện giao dịch. Vui lòng nạp thêm tiền.');
+      return;
+    }
+
     mutate(plan.id);
   };
 
@@ -53,6 +62,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
       onOpenChange={(open) => {
         if (!open) {
           setTimeout(() => {}, 300);
+          setBalanceError(null); // Clear error when closing
         }
         onClose();
       }}
@@ -108,7 +118,11 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
                       <span>Tổng cộng</span>
                       <span>{totalPrice.toLocaleString()}đ</span>
                     </div>
-                    {error && <p className='text-xs text-red-500 mt-2'>{error.message}</p>}
+                    {(error || balanceError) && (
+                      <p className='text-xs text-red-500 mt-2'>
+                        {balanceError || (error as Error)?.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -119,7 +133,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: PaymentModalProp
                   <Button
                     type='submit'
                     className='bg-red-500 hover:bg-red-600 text-xs relative overflow-hidden'
-                    disabled={isPending}
+                    disabled={isPending || userBalance < totalPrice}
                   >
                     {isPending ? (
                       <span className='flex items-center'>

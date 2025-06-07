@@ -29,12 +29,12 @@ import { formatCurrency } from '@/page/admin/pricing/components/column';
 
 const ProjectCardSkeleton = () => {
   return (
-    <div className="group animate-pulse">
-      <div className="relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm bg-gray-200" />
-      <div className="h-5 w-3/4 bg-gray-200 rounded mt-2" />
-      <div className="flex items-center mt-1">
-        <MapPin className="h-3 w-3 mr-0.5 text-gray-400" />
-        <div className="h-4 w-1/2 bg-gray-200 rounded" />
+    <div className='group animate-pulse'>
+      <div className='relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm bg-gray-200' />
+      <div className='h-5 w-3/4 bg-gray-200 rounded mt-2' />
+      <div className='flex items-center mt-1'>
+        <MapPin className='h-3 w-3 mr-0.5 text-gray-400' />
+        <div className='h-4 w-1/2 bg-gray-200 rounded' />
       </div>
     </div>
   );
@@ -42,49 +42,49 @@ const ProjectCardSkeleton = () => {
 
 const AgentCardSkeleton = () => {
   return (
-    <div className="rounded-xl overflow-hidden shadow-md bg-white border border-gray-200 animate-pulse">
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/4 p-[10px] flex justify-center">
-          <div className="relative w-24 h-24 md:w-full md:h-36 bg-gray-200 rounded-lg" />
+    <div className='rounded-xl overflow-hidden shadow-md bg-white border border-gray-200 animate-pulse'>
+      <div className='flex flex-col md:flex-row'>
+        <div className='w-full md:w-1/4 p-[10px] flex justify-center'>
+          <div className='relative w-24 h-24 md:w-full md:h-36 bg-gray-200 rounded-lg' />
         </div>
-        <div className="w-full md:w-3/4 p-[10px] flex flex-col md:flex-row">
-          <div className="flex-1 mb-4 md:mb-0">
-            <div className="flex items-center mb-0.5">
-              <div className="h-6 w-1/2 bg-gray-200 rounded" />
-              <div className="h-4 w-12 bg-gray-200 rounded ml-2" />
+        <div className='w-full md:w-3/4 p-[10px] flex flex-col md:flex-row'>
+          <div className='flex-1 mb-4 md:mb-0'>
+            <div className='flex items-center mb-0.5'>
+              <div className='h-6 w-1/2 bg-gray-200 rounded' />
+              <div className='h-4 w-12 bg-gray-200 rounded ml-2' />
             </div>
-            <div className="h-4 w-1/3 bg-gray-200 rounded mb-0.5" />
-            <div className="h-4 w-1/4 bg-gray-200 rounded mb-2" />
-            <div className="flex items-center gap-1 mb-3">
-              <Phone className="h-3 w-3 text-gray-400" />
-              <div className="h-4 w-1/3 bg-gray-200 rounded" />
+            <div className='h-4 w-1/3 bg-gray-200 rounded mb-0.5' />
+            <div className='h-4 w-1/4 bg-gray-200 rounded mb-2' />
+            <div className='flex items-center gap-1 mb-3'>
+              <Phone className='h-3 w-3 text-gray-400' />
+              <div className='h-4 w-1/3 bg-gray-200 rounded' />
             </div>
-            <div className="h-6 w-20 bg-gray-200 rounded" />
+            <div className='h-6 w-20 bg-gray-200 rounded' />
           </div>
-          <div className="flex-1">
-            <div className="h-5 w-1/3 bg-gray-200 rounded mb-1" />
-            <div className="space-y-0.5">
-              <div className="flex items-start gap-0.5">
-                <ChevronRight className="h-4 w-4 text-gray-400" />
-                <div className="h-4 w-2/3 bg-gray-200 rounded" />
+          <div className='flex-1'>
+            <div className='h-5 w-1/3 bg-gray-200 rounded mb-1' />
+            <div className='space-y-0.5'>
+              <div className='flex items-start gap-0.5'>
+                <ChevronRight className='h-4 w-4 text-gray-400' />
+                <div className='h-4 w-2/3 bg-gray-200 rounded' />
               </div>
-              <div className="flex items-start gap-0.5">
-                <ChevronRight className="h-4 w-4 text-gray-400" />
-                <div className="h-4 w-1/2 bg-gray-200 rounded" />
+              <div className='flex items-start gap-0.5'>
+                <ChevronRight className='h-4 w-4 text-gray-400' />
+                <div className='h-4 w-1/2 bg-gray-200 rounded' />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="flex border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-        <div className="flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100">
-          <div className="h-4 w-16 bg-gray-200 rounded" />
+      <div className='flex border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white'>
+        <div className='flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100'>
+          <div className='h-4 w-16 bg-gray-200 rounded' />
         </div>
-        <div className="flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100">
-          <div className="h-4 w-20 bg-gray-200 rounded" />
+        <div className='flex-1 flex items-center justify-center gap-[6px] p-2 border-r border-gray-100'>
+          <div className='h-4 w-20 bg-gray-200 rounded' />
         </div>
-        <div className="flex-1 flex items-center justify-center gap-[6px] p-2">
-          <div className="h-4 w-16 bg-gray-200 rounded" />
+        <div className='flex-1 flex items-center justify-center gap-[6px] p-2'>
+          <div className='h-4 w-16 bg-gray-200 rounded' />
         </div>
       </div>
     </div>
@@ -100,16 +100,16 @@ export default function RealEstateAgentDirectory() {
   const [isSearching, setIsSearching] = useState(false);
   const limit = 5;
 
-  const { data: defaultData, isLoading: isDefaultLoading, error: defaultError } = useGetProfessionalAgents(
-    currentPage,
-    limit
-  );
-  const { data: searchData, isLoading: isSearchLoading, error: searchError } = useSearchProfessionalAgents(
-    committedQuery,
-    currentPage,
-    limit,
-    isSearching
-  );
+  const {
+    data: defaultData,
+    isLoading: isDefaultLoading,
+    error: defaultError,
+  } = useGetProfessionalAgents(currentPage, limit);
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    error: searchError,
+  } = useSearchProfessionalAgents(committedQuery, currentPage, limit, isSearching);
   const { data: topPosts, isLoading: isTopPostsLoading, error: topPostsError } = useTopPosts();
 
   const data = isSearching ? searchData : defaultData;
@@ -123,7 +123,7 @@ export default function RealEstateAgentDirectory() {
     setCurrentPage(page);
     window.scrollTo(0, 0);
   };
-
+  console.log(agents);
   const handleSearch = () => {
     if (searchQuery.trim()) {
       setCommittedQuery(searchQuery);
@@ -144,353 +144,390 @@ export default function RealEstateAgentDirectory() {
       handleSearch();
     }
   };
+  const realEstateExpertise = [
+    'Nhà đất',
+    'Chung cư',
+    'Biệt thự',
+    'Đất nền',
+    'Nhà phố',
+    'Căn hộ cao cấp',
+    'Bất động sản nghỉ dưỡng',
+    'Shophouse',
+    'Đất nông nghiệp',
+    'Bất động sản công nghiệp',
+  ];
 
+  const getAgentExpertise = (agentId: string | number) => {
+    const seed =
+      typeof agentId === 'string' ? agentId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) : agentId;
+    const pseudoRandom = (seed * 9301 + 49297) % 233280;
+    const rnd = pseudoRandom / 233280;
+    const shuffled = [...realEstateExpertise];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(((((seed + i) * 9301 + 49297) % 233280) / 233280) * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const count = 3 + Math.floor(rnd * 3);
+    return shuffled.slice(0, count);
+  };
   return (
-    <div className="mx-auto py-4 px-[60px]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex-1">
-          <h1 className="text-lg font-[600] text-red-500">Danh sách môi giới uy tín hàng đầu</h1>
-          <p className="text-xs text-gray-500">Tìm kiếm môi giới viên</p>
+    <div className='mx-auto py-4 px-[60px]'>
+      <div className='flex items-center justify-between mb-4'>
+        <div className='flex-1'>
+          <h1 className='text-lg font-[600] text-red-500'>Danh sách môi giới uy tín hàng đầu</h1>
+          <p className='text-xs text-gray-500'>Tìm kiếm môi giới viên</p>
         </div>
-        <div className="flex space-x-1">
-          <div className="relative">
+        <div className='flex space-x-1'>
+          <div className='relative'>
             <Input
-              placeholder="Tìm kiếm theo tên, email, số điện thoại..."
-              className="outline-none px-[28px] py-[9px] rounded-[6px] w-48 text-xs"
+              placeholder='Tìm kiếm theo tên, email, số điện thoại...'
+              className='outline-none px-[28px] py-[9px] rounded-[6px] w-48 text-xs'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <Search className="absolute left-2 top-2 h-5 w-3 text-gray-400" />
+            <Search className='absolute left-2 top-2 h-5 w-3 text-gray-400' />
             {searchQuery && (
               <button
                 onClick={handleClearSearch}
-                className="absolute right-2 top-2 h-5 w-5 text-gray-400 hover:text-gray-600"
+                className='absolute right-2 top-2 h-5 w-5 text-gray-400 hover:text-gray-600'
               >
-                <X className="h-4 w-4" />
+                <X className='h-4 w-4' />
               </button>
             )}
           </div>
           <Button
             onClick={handleSearch}
-            className="bg-red-500 hover:bg-red-600 transition-all duration-300 ease-in-out text-xs py-1 px-3"
+            className='bg-red-500 hover:bg-red-600 transition-all duration-300 ease-in-out text-xs py-1 px-3'
             disabled={!searchQuery.trim()}
           >
             Tìm kiếm
           </Button>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-6 mt-[20px]">
-        <div className="w-full lg:w-3/4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-[600] text-gray-700 flex items-center">
+      <div className='flex flex-col lg:flex-row gap-6 mt-[20px]'>
+        <div className='w-full lg:w-3/4'>
+          <div className='flex justify-between items-center mb-6'>
+            <h2 className='text-lg font-[600] text-gray-700 flex items-center'>
               Danh bạ nhà môi giới
-              <span className="ml-2 px-2 py-[1px] bg-gradient-to-r from-red-500 via-red-600 to-red-500 text-white text-[11px] rounded-full shadow-sm">
+              <span className='ml-2 px-2 py-[1px] bg-gradient-to-r from-red-500 via-red-600 to-red-500 text-white text-[11px] rounded-full shadow-sm'>
                 {totalItems} môi giới
               </span>
             </h2>
-            <div className="flex items-center gap-1">
-              <span className="text-[13px] text-gray-600 font-medium">Sắp xếp theo:</span>
-              <Select defaultValue="newest">
-                <SelectTrigger className="w-[140px] focus:ring-0 bg-white border border-gray-200 text-xs">
-                  <SelectValue placeholder="Mới nhất" />
+            <div className='flex items-center gap-1'>
+              <span className='text-[13px] text-gray-600 font-medium'>Sắp xếp theo:</span>
+              <Select defaultValue='newest'>
+                <SelectTrigger className='w-[140px] focus:ring-0 bg-white border border-gray-200 text-xs'>
+                  <SelectValue placeholder='Mới nhất' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest" className="text-xs">Mới nhất</SelectItem>
-                  <SelectItem value="oldest" className="text-xs">Cũ nhất</SelectItem>
-                  <SelectItem value="name" className="text-xs">Theo tên</SelectItem>
-                  <SelectItem value="rating" className="text-xs">Đánh giá cao nhất</SelectItem>
+                  <SelectItem value='newest' className='text-xs'>
+                    Mới nhất
+                  </SelectItem>
+                  <SelectItem value='oldest' className='text-xs'>
+                    Cũ nhất
+                  </SelectItem>
+                  <SelectItem value='name' className='text-xs'>
+                    Theo tên
+                  </SelectItem>
+                  <SelectItem value='rating' className='text-xs'>
+                    Đánh giá cao nhất
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {isLoading ? (
-            <div className="space-y-6">
+            <div className='space-y-6'>
               {/* Render multiple skeleton cards to mimic loading state */}
               {Array.from({ length: limit }).map((_, index) => (
                 <AgentCardSkeleton key={index} />
               ))}
             </div>
           ) : error ? (
-            <div className="text-center text-red-500 text-xs">Đã xảy ra lỗi: {error.message}</div>
+            <div className='text-center text-red-500 text-xs'>Đã xảy ra lỗi: {error.message}</div>
           ) : (
-            <div className="space-y-6">
+            <div className='space-y-6'>
               {agents.length === 0 ? (
-                <div className="text-center text-gray-500 text-xs">
+                <div className='text-center text-gray-500 text-xs'>
                   {isSearching ? 'Không tìm thấy môi giới nào khớp với tìm kiếm' : 'Không có dữ liệu'}
                 </div>
               ) : (
-                agents.map((agent: any) => (
-                  <div
-                    key={agent.id}
-                    className={cn(
-                      'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 bg-white border border-gray-200',
-                      hoveredAgent === agent.id ? 'ring-1 ring-red-400 ring-offset-2' : ''
-                    )}
-                    onMouseEnter={() => setHoveredAgent(agent.id)}
-                    onMouseLeave={() => setHoveredAgent(null)}
-                  >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="w-full md:w-1/4 p-[10px] flex justify-center relative overflow-hidden group">
-                        <div className="relative w-24 h-24 md:w-full md:h-36 overflow-hidden rounded-lg shadow-sm">
-                          <img
-                            src={agent.avatar}
-                            alt={agent.fullname}
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-red-600/80 via-red-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
-                        <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center md:text-left">
-                          <span className="bg-gradient-to-r from-red-600 to-red-500 px-2 py-0.5 rounded-full text-[10px] font-[500] shadow-sm">
-                            Chuyên gia BĐS
-                          </span>
-                        </div>
-                      </div>
-                      <div className="w-full md:w-3/4 p-[10px] flex flex-col md:flex-row">
-                        <div className="flex-1 mb-4 md:mb-0">
-                          <div className="flex items-center mb-0.5">
-                            <Link
-                              to={`/business/${agent.id}`}
-                              className="text-lg font-[500] text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-600 mr-1"
-                            >
-                              {agent.fullname}
-                            </Link>
-                            <Badge
-                              variant="outline"
-                              className="bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm text-[10px]"
-                            >
-                              <Star className="h-2.5 w-2.5 fill-yellow-500 text-yellow-500 mr-0.5" />
-                              {agent.totalScore}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-600 mb-0.5 font-medium text-xs">Chuyên viên tư vấn</p>
-                          <p className="text-gray-500 text-xs mb-2">{agent.ratingCount} đánh giá</p>
-                          <div className="flex items-center gap-1 mb-3 text-gray-700">
-                            <Phone className="h-3 w-3 text-red-500" />
-                            <span className="font-medium text-xs">{agent.phone}</span>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="outline"
-                              className="border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full px-3 text-xs shadow-sm hover:shadow transition-all duration-300"
-                            >
-                              <Mail className="h-3 w-3 mr-0.5" />
-                              Gửi Email
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-[600] mb-1 text-gray-700 text-[14px] flex items-center">
-                            <span className="w-1.5 h-4 bg-gradient-to-b from-red-500 to-red-400 rounded-full mr-1"></span>
-                            Chuyên môn
-                          </h4>
-                          <ul className="space-y-0.5">
-                            {(JSON.parse(agent.expertise || '[]') as string[]).map((area: string, i: number) => (
-                              <li key={i} className="flex items-start gap-0.5 group/item">
-                                <ChevronRight className="h-4 w-4 text-red-500 flex-shrink-0 transition-transform duration-300 group-hover/item:translate-x-0.5" />
-                                <span className="text-gray-700 group-hover/item:text-red-600 transition-colors duration-300 text-xs">
-                                  {area}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
+                agents.map((agent: any) => {
+                  const agentExpertise = getAgentExpertise(agent?.id);
 
-                    <div className="flex border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                      <div className="flex-1 flex items-center justify-center gap-[6px] p-2 text-center border-r border-gray-100 group">
-                        <div className="text-xs text-gray-500 flex items-center justify-center gap-0.5">
-                          <TrendingUp className="h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <span>Lượt yêu thích</span>
+                  return (
+                    <div
+                      key={agent?.id}
+                      className={cn(
+                        'rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 bg-white border border-gray-200',
+                        hoveredAgent === agent?.id ? 'ring-1 ring-red-400 ring-offset-2' : '',
+                      )}
+                      onMouseEnter={() => setHoveredAgent(agent?.id)}
+                      onMouseLeave={() => setHoveredAgent(null)}
+                    >
+                      <div className='flex flex-col md:flex-row'>
+                        <div className='w-full md:w-1/4 p-[10px] flex justify-center relative overflow-hidden group'>
+                          <div className='relative w-24 h-24 md:w-full md:h-36 overflow-hidden rounded-lg shadow-sm'>
+                            <img
+                              src={agent?.avatar}
+                              alt={agent?.fullname}
+                              className='object-cover transition-transform duration-500 group-hover:scale-105'
+                            />
+                            <div className='absolute inset-0 bg-gradient-to-t from-red-600/80 via-red-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
+                          </div>
+                          <div className='absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center md:text-left'>
+                            <span className='bg-gradient-to-r from-red-600 to-red-500 px-2 py-0.5 rounded-full text-[10px] font-[500] shadow-sm'>
+                              Chuyên gia BĐS
+                            </span>
+                          </div>
                         </div>
-                        <div className="font-bold text-gray-800 text-xs">{agent.wishlistCount}</div>
+                        <div className='w-full md:w-3/4 p-[10px] flex flex-col md:flex-row'>
+                          <div className='flex-1 mb-4 md:mb-0'>
+                            <div className='flex items-center mb-0.5'>
+                              <Link
+                                to={`/business/${agent?.id}`}
+                                className='text-lg font-[500] text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-600 mr-1'
+                              >
+                                {agent?.fullname}
+                              </Link>
+                              <Badge
+                                variant='outline'
+                                className='bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm text-[10px]'
+                              >
+                                <Star className='h-2.5 w-2.5 fill-yellow-500 text-yellow-500 mr-0.5' />
+                                {agent?.totalScore}
+                              </Badge>
+                            </div>
+                            <p className='text-gray-600 mb-0.5 font-medium text-xs'>Chuyên viên tư vấn</p>
+                            <p className='text-gray-500 text-xs mb-2'>{agent?.ratingCount} đánh giá</p>
+                            <div className='flex items-center gap-1 mb-3 text-gray-700'>
+                              <Phone className='h-3 w-3 text-red-500' />
+                              <span className='font-medium text-xs'>{agent?.phone}</span>
+                            </div>
+                            <div className='flex gap-1'>
+                              <Button
+                                variant='outline'
+                                className='border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full px-3 text-xs shadow-sm hover:shadow transition-all duration-300'
+                              >
+                                <Mail className='h-3 w-3 mr-0.5' />
+                                Môi giới
+                              </Button>
+                            </div>
+                          </div>
+                          <div className='flex-1'>
+                            <h4 className='font-[600] mb-1 text-gray-700 text-[14px] flex items-center'>
+                              <span className='w-1.5 h-4 bg-gradient-to-b from-red-500 to-red-400 rounded-full mr-1'></span>
+                              Chuyên môn
+                            </h4>
+                            <ul className='space-y-0.5'>
+                              {agentExpertise.map((area: string, i: number) => (
+                                <li key={i} className='flex items-start gap-0.5 group/item'>
+                                  <ChevronRight className='h-4 w-4 text-red-500 flex-shrink-0 transition-transform duration-300 group-hover/item:translate-x-0.5' />
+                                  <span className='text-gray-700 group-hover/item:text-red-600 transition-colors duration-300 text-xs'>
+                                    {area}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 flex items-center justify-center gap-[6px] p-2 text-center border-r border-gray-100 group">
-                        <div className="text-xs text-gray-500 flex items-center justify-center gap-0.5">
-                          <Home className="h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <span>Địa chỉ</span>
+
+                      <div className='flex border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white'>
+                        <div className='flex-1 flex items-center justify-center gap-[6px] p-2 text-center border-r border-gray-100 group'>
+                          <div className='text-xs text-gray-500 flex items-center justify-center gap-0.5'>
+                            <TrendingUp className='h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity' />
+                            <span>Lượt yêu thích</span>
+                          </div>
+                          <div className='font-bold text-gray-800 text-xs'>{agent?.wishlistCount}</div>
                         </div>
-                        <div className="font-bold text-gray-800 text-xs">{agent.address}</div>
-                      </div>
-                      <div className="flex-1 flex items-center justify-center gap-[6px] p-2 text-center group">
-                        <div className="text-xs text-gray-500 flex items-center justify-center gap-0.5">
-                          <Calendar className="h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <span>Kinh nghiệm</span>
+                        <div className='flex-1 flex items-center justify-center gap-[6px] p-2 text-center border-r border-gray-100 group'>
+                          <div className='text-xs text-gray-500 flex items-center justify-center gap-0.5'>
+                            <Home className='h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity' />
+                            <span>Địa chỉ</span>
+                          </div>
+                          <div className='font-bold text-gray-800 text-xs'>{agent?.address}</div>
                         </div>
-                        <div className="font-bold text-gray-800 text-xs">{agent.experience_years} năm</div>
+                        <div className='flex-1 flex items-center justify-center gap-[6px] p-2 text-center group'>
+                          <div className='text-xs text-gray-500 flex items-center justify-center gap-0.5'>
+                            <Calendar className='h-3 w-3 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity' />
+                            <span>Kinh nghiệm</span>
+                          </div>
+                          <div className='font-bold text-gray-800 text-xs'>{agent?.experience_years} năm</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
 
           {totalPages > 1 && (
-            <div className="mt-6">
+            <div className='mt-6'>
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
-                className="mt-0"
+                className='mt-0'
               />
             </div>
           )}
         </div>
 
-        <div className="w-full lg:w-1/4">
-          <div className="rounded-xl p-3 border border-gray-200 bg-Seperator bg-white relative overflow-hidden">
-            <div className="absolute -top-16 -right-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
-            <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
+        <div className='w-full lg:w-1/4'>
+          <div className='rounded-xl p-3 border border-gray-200 bg-Seperator bg-white relative overflow-hidden'>
+            <div className='absolute -top-16 -right-16 w-32 h-32 bg-red-100 rounded-full opacity-50' />
+            <div className='absolute -bottom-16 -left-16 w-32 h-32 bg-red-100 rounded-full opacity-50' />
 
-            <h2 className="text-lg font-[600] mb-3 text-center relative inline-block">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-600">
+            <h2 className='text-lg font-[600] mb-3 text-center relative inline-block'>
+              <span className='text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-600'>
                 Dự án nổi bật
               </span>
             </h2>
 
             {isTopPostsLoading ? (
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 <ProjectCardSkeleton />
                 <ProjectCardSkeleton />
                 <ProjectCardSkeleton />
               </div>
             ) : topPostsError ? (
-              <div className="text-center text-red-500 text-xs">Đã xảy ra lỗi: {topPostsError.message}</div>
+              <div className='text-center text-red-500 text-xs'>Đã xảy ra lỗi: {topPostsError.message}</div>
             ) : topPosts && topPosts.length > 0 ? (
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {topPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="group cursor-pointer hover:translate-y-[-3px] transition-all duration-300"
+                    className='group cursor-pointer hover:translate-y-[-3px] transition-all duration-300'
                   >
-                    <div className="relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300">
+                    <div className='relative h-36 mb-2 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300'>
                       <img
                         src={post.images[0]?.image_url || 'https://via.placeholder.com/300x150'}
                         alt={post.title}
-                        className="object-cover transition-transform duration-500 group-hover:scale-105 w-full h-full"
+                        className='object-cover transition-transform duration-500 group-hover:scale-105 w-full h-full'
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
 
-                      <div className="absolute inset-0 flex flex-col justify-end p-3 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <span className="bg-gradient-to-r from-red-600 to-red-500 px-1.5 py-0.5 rounded-md text-[10px] text-white shadow-sm mb-1 w-fit">
+                      <div className='absolute inset-0 flex flex-col justify-end p-3 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300'>
+                        <span className='bg-gradient-to-r from-red-600 to-red-500 px-1.5 py-0.5 rounded-md text-[10px] text-white shadow-sm mb-1 w-fit'>
                           {post.tagPosts[0]?.tag.tag_name || 'Nổi bật'}
                         </span>
-                        <div className="text-white font-bold text-xs mb-0.5">
+                        <div className='text-white font-bold text-xs mb-0.5'>
                           {formatCurrency(post.price)} {post.priceUnit}
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex space-x-1">
-                            <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
-                              <Heart className="h-3 w-3 text-white" />
+                        <div className='flex justify-between items-center'>
+                          <div className='flex space-x-1'>
+                            <button className='bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors'>
+                              <Heart className='h-3 w-3 text-white' />
                             </button>
-                            <button className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors">
-                              <Eye className="h-3 w-3 text-white" />
+                            <button className='bg-white/20 p-1 rounded-full hover:bg-white/30 transition-colors'>
+                              <Eye className='h-3 w-3 text-white' />
                             </button>
                           </div>
-                          <div className="flex flex-col items-end">
-                            <span className="text-white/80 text-[10px]">{post.squareMeters} m²</span>
-                            <span className="text-white/80 text-[10px]">
+                          <div className='flex flex-col items-end'>
+                            <span className='text-white/80 text-[10px]'>{post.squareMeters} m²</span>
+                            <span className='text-white/80 text-[10px]'>
                               Hết hạn: {new Date(post.expiredDate).toLocaleDateString('vi-VN')}
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <h3 className="font-[600] text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-sm">
+                    <h3 className='font-[600] text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-sm'>
                       {post.title}
                     </h3>
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-3 w-3 mr-0.5 text-red-500" />
-                      <span className="text-xs">{post.address}</span>
+                    <div className='flex items-center text-gray-600'>
+                      <MapPin className='h-3 w-3 mr-0.5 text-red-500' />
+                      <span className='text-xs'>{post.address}</span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-500 text-xs">Không có dự án nổi bật</div>
+              <div className='text-center text-gray-500 text-xs'>Không có dự án nổi bật</div>
             )}
 
-            <Button className="w-full mt-6 bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-700 hover:to-red-600 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group text-xs">
+            <Button className='w-full mt-6 bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-700 hover:to-red-600 rounded-full shadow-sm hover:shadow-md transition-all duration-300 group text-xs'>
               <span>Xem tất cả dự án</span>
-              <span className="absolute right-3 opacity-0 group-hover:opacity-100 transform translate-x-1 group-hover:translate-x-0 transition-all duration-300">
-                <ArrowRight className="h-3 w-3" />
+              <span className='absolute right-3 opacity-0 group-hover:opacity-100 transform translate-x-1 group-hover:translate-x-0 transition-all duration-300'>
+                <ArrowRight className='h-3 w-3' />
               </span>
             </Button>
           </div>
 
-          <div className="mt-6 rounded-xl p-4 shadow-md bg-gradient-to-br from-red-500 via-red-600 to-red-500 text-white relative overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-16 h-16 bg-white/10 rounded-full" />
-            <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-white/10 rounded-full" />
+          <div className='mt-6 rounded-xl p-4 shadow-md bg-gradient-to-br from-red-500 via-red-600 to-red-500 text-white relative overflow-hidden'>
+            <div className='absolute -top-8 -right-8 w-16 h-16 bg-white/10 rounded-full' />
+            <div className='absolute -bottom-8 -left-8 w-16 h-16 bg-white/10 rounded-full' />
 
-            <h3 className="font-bold mb-3 flex items-center text-sm">
-              <Star className="h-4 w-4 mr-1 fill-yellow-300 text-yellow-300" />
+            <h3 className='font-bold mb-3 flex items-center text-sm'>
+              <Star className='h-4 w-4 mr-1 fill-yellow-300 text-yellow-300' />
               Thống kê nổi bật
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300">
-                <div className="text-[10px] text-white/80">Tổng môi giới</div>
-                <div className="text-lg font-bold">1,248</div>
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300'>
+                <div className='text-[10px] text-white/80'>Tổng môi giới</div>
+                <div className='text-lg font-bold'>1,248</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300">
-                <div className="text-[10px] text-white/80">Giao dịch tháng</div>
-                <div className="text-lg font-bold">3,842</div>
+              <div className='bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300'>
+                <div className='text-[10px] text-white/80'>Giao dịch tháng</div>
+                <div className='text-lg font-bold'>3,842</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300">
-                <div className="text-[10px] text-white/80">Dự án mới</div>
-                <div className="text-lg font-bold">24</div>
+              <div className='bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300'>
+                <div className='text-[10px] text-white/80'>Dự án mới</div>
+                <div className='text-lg font-bold'>24</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300">
-                <div className="text-[10px] text-white/80">Đánh giá</div>
-                <div className="text-lg font-bold">4.8/5</div>
+              <div className='bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300'>
+                <div className='text-[10px] text-white/80'>Đánh giá</div>
+                <div className='text-lg font-bold'>4.8/5</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl p-4 shadow-md bg-white relative overflow-hidden">
-            <div className="absolute -top-16 -right-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
-            <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-red-100 rounded-full opacity-50" />
+          <div className='mt-6 rounded-xl p-4 shadow-md bg-white relative overflow-hidden'>
+            <div className='absolute -top-16 -right-16 w-32 h-32 bg-red-100 rounded-full opacity-50' />
+            <div className='absolute -bottom-16 -left-16 w-32 h-32 bg-red-100 rounded-full opacity-50' />
 
-            <h3 className="font-bold mb-3 text-gray-800 flex items-center text-sm">
-              <span className="w-1.5 h-4 bg-gradient-to-b from-red-500 to-red-400 rounded-full mr-1"></span>
+            <h3 className='font-bold mb-3 text-gray-800 flex items-center text-sm'>
+              <span className='w-1.5 h-4 bg-gradient-to-b from-red-500 to-red-400 rounded-full mr-1'></span>
               Lọc nhanh
             </h3>
 
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Button
-                variant="outline"
-                className="w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs"
+                variant='outline'
+                className='w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs'
               >
-                <MapPin className="h-3 w-3 mr-1 text-red-500" />
+                <MapPin className='h-3 w-3 mr-1 text-red-500' />
                 Quận Hoàng Mai
               </Button>
               <Button
-                variant="outline"
-                className="w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs"
+                variant='outline'
+                className='w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs'
               >
-                <MapPin className="h-3 w-3 mr-1 text-red-500" />
+                <MapPin className='h-3 w-3 mr-1 text-red-500' />
                 Quận Cầu Giấy
               </Button>
               <Button
-                variant="outline"
-                className="w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs"
+                variant='outline'
+                className='w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs'
               >
-                <MapPin className="h-3 w-3 mr-1 text-red-500" />
+                <MapPin className='h-3 w-3 mr-1 text-red-500' />
                 Quận Long Biên
               </Button>
               <Button
-                variant="outline"
-                className="w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs"
+                variant='outline'
+                className='w-full justify-start border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md shadow-sm text-xs'
               >
-                <MapPin className="h-3 w-3 mr-1 text-red-500" />
+                <MapPin className='h-3 w-3 mr-1 text-red-500' />
                 Quận Hà Đông
               </Button>
             </div>
 
-            <Button className="w-full mt-3 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md shadow-sm text-xs">
+            <Button className='w-full mt-3 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md shadow-sm text-xs'>
               Xem tất cả khu vực
             </Button>
           </div>

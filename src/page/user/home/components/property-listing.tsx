@@ -22,7 +22,7 @@ export default function PropertyListings() {
       </div>
     </div>
   );
-
+  console.log('data',data)
   return (
     <div className='bg-gray-100 w-full px-[60px] pt-[30px] pb-[60px]'>
       <div className='content mx-auto max-w-6xl px-[60px]'>
@@ -43,7 +43,6 @@ export default function PropertyListings() {
         </div>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]'>
           {isLoading || isError || !data?.posts ? (
-            // Render 8 skeleton cards to match the number of posts per page
             Array.from({ length: 8 }).map((_, index) => <SkeletonCard key={`skeleton-${index}`} />)
           ) : (
             data?.posts?.map((post: any) => <CardItem post={post} key={post?.id} />)

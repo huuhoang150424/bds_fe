@@ -59,12 +59,12 @@ export const getSeverityBadge = (severity: string) => {
           🚫 Nội dung không phù hợp
         </Badge>
       );
-    case SeverityStatus.AIFlagged:
-      return (
-        <Badge variant='outline' className='bg-purple-100 text-purple-800'>
-          🤖 AI phát hiện
-        </Badge>
-      );
+    // case SeverityStatus.AIFlagged:
+    //   return (
+    //     <Badge variant='outline' className='bg-purple-100 text-purple-800'>
+    //       🤖 AI phát hiện
+    //     </Badge>
+    //   );
     default:
       return null;
   }

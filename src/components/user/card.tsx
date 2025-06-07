@@ -1,35 +1,58 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { Link } from "react-router-dom"
-import { AiOutlinePicture } from "react-icons/ai"
-import { IoLocationOutline } from "react-icons/io5"
-import { CiHeart } from "react-icons/ci"
-import { formatRelativeTime } from "@/lib/convert-date"
+import { Card, CardContent } from "@/components/ui/card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Link } from "react-router-dom";
+import { AiOutlinePicture } from "react-icons/ai";
+import { IoLocationOutline } from "react-icons/io5";
+import { CiHeart } from "react-icons/ci";
+import { formatRelativeTime } from "@/lib/convert-date";
 
 export default function CardItem({ post }: { post: any }) {
+  const getPriorityBadge = (priority: number) => {
+    if (priority < 1 || priority > 3) return null; 
+    const styles = {
+      1: "bg-blue-500 text-white", 
+      2: "bg-green-500 text-white",
+      3: "bg-red-500 text-white",
+    };
+    return (
+      <span
+        className={`absolute top-2 left-2 text-xs font-semibold px-2 py-1 rounded-full ${
+          styles[priority as 1 | 2 | 3]
+        } shadow-sm`}
+      >
+        VIP {priority}
+      </span>
+    );
+  };
+
   return (
     <Link key={`${post?.id}-index`} to={`/post/${post?.slug}`}>
       <Card className="rounded-[16px] overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-[400px]">
         <CardContent className="p-3 relative flex flex-col h-full">
-          <div className="overflow-hidden w-full rounded-[12px] mb-3 relative h-[180px]">
+          <div className="overflow-hidden w-full rounded-[12px] mb-3 relative h-[140px]">
             <img
-              src={post?.images[0]?.image_url}
-              alt="Placeholder Image"
-              className="w-full h-full object-cover"
+              src={post?.images?.[0]?.image_url} 
+              alt={post?.title || "Ảnh bất động sản"}
+              className="w-full h-[140px] object-cover"
             />
             <div className="absolute top-2 right-2 flex items-center bg-black/50 rounded-full px-2 py-1">
               <AiOutlinePicture className="text-white text-[16px]" />
-              <p className="text-white text-[14px] ml-1">{post?.images?.length}</p>
+              <p className="text-white text-[14px] ml-1">{post?.images?.length || 0}</p>
             </div>
+            {getPriorityBadge(post?.priority)}
           </div>
           <div className="flex-grow">
             <span className="font-[600] text-[#2C2C2C] text-base">{post?.title}</span>
             <div className="flex items-center mt-1">
               <div className="text-[#E03C31] font-[600] text-base">
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(post?.price)}
+                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                  post?.price
+                )}
               </div>
               <div className="text-gray-500 font-[400] text-[14px] ml-2 line-through">
-                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(post?.price * 1.15)}
+                {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                  post?.price * 1.15
+                )}
               </div>
             </div>
             <div className="flex justify-start items-center mt-2">
@@ -39,7 +62,9 @@ export default function CardItem({ post }: { post: any }) {
           </div>
           <div className="flex justify-between items-center mt-auto pt-2 border-t border-gray-100">
             <div className="flex flex-col">
-              <span className="text-[14px] text-gray-500">{formatRelativeTime(post?.createdAt)}</span>
+              <span className="text-[14px] text-gray-500">
+                {formatRelativeTime(post?.created_at)}
+              </span>
               <div className="flex items-center mt-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -68,5 +93,5 @@ export default function CardItem({ post }: { post: any }) {
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }

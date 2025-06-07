@@ -68,100 +68,96 @@ export default function ViewAppointmentDetailsDialog({ isOpen, onOpenChange, app
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-xl rounded-xl shadow-lg'>
-        <DialogHeader>
+      <DialogContent className='max-w-xl max-h-[80vh] rounded-xl shadow-lg flex flex-col'>
+        <DialogHeader className='flex-shrink-0'>
           <DialogTitle className='text-2xl font-semibold'>📋 Chi tiết lịch hẹn</DialogTitle>
         </DialogHeader>
 
-        <div className='space-y-6 py-4'>
-          {/* Mã cuộc hẹn */}
-          <div className='space-y-2'>
-            <Label htmlFor='appointmentId' className='text-base font-medium'>Mã cuộc hẹn</Label>
-            <Input
-              id='appointmentId'
-              value={appointment?.id || ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+        <div className='flex-1 overflow-y-auto py-4 pr-2'>
+          <div className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='appointmentId' className='text-sm font-medium'>Mã cuộc hẹn</Label>
+              <Input
+                id='appointmentId'
+                value={appointment?.id || ''}
+                disabled
+                className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+              />
+            </div>
 
-          {/* Bài đăng */}
-          <div className='space-y-2'>
-            <Label htmlFor='postTitle' className='text-base font-medium'>Bài đăng</Label>
-            <Input
-              id='postTitle'
-              value={appointment?.post.title || ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+            <div className='space-y-2'>
+              <Label htmlFor='postTitle' className='text-sm font-medium'>Bài đăng</Label>
+              <Input
+                id='postTitle'
+                value={appointment?.post.title || ''}
+                disabled
+                className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+              />
+            </div>
 
-          {/* Người yêu cầu */}
-          <div className='space-y-2'>
-            <Label htmlFor='requesterName' className='text-base font-medium'>Người yêu cầu</Label>
-            <Input
-              id='requesterName'
-              value={appointment?.requester.fullname || ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='requesterName' className='text-sm font-medium'>Người yêu cầu</Label>
+                <Input
+                  id='requesterName'
+                  value={appointment?.requester.fullname || ''}
+                  disabled
+                  className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+                />
+              </div>
 
-          {/* Người nhận */}
-          <div className='space-y-2'>
-            <Label htmlFor='receiverName' className='text-base font-medium'>Người nhận</Label>
-            <Input
-              id='receiverName'
-              value={appointment?.receiver.fullname || ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+              <div className='space-y-2'>
+                <Label htmlFor='receiverName' className='text-sm font-medium'>Người nhận</Label>
+                <Input
+                  id='receiverName'
+                  value={appointment?.receiver.fullname || ''}
+                  disabled
+                  className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+                />
+              </div>
+            </div>
 
-          {/* Trạng thái */}
-          <div className='space-y-2'>
-            <Label className='text-base font-medium'>Trạng thái</Label>
-            <div>{appointment ? getStatusBadge(appointment.status) : <Badge variant='outline'>Không có</Badge>}</div>
-          </div>
+            <div className='space-y-2'>
+              <Label className='text-sm font-medium'>Trạng thái</Label>
+              <div>{appointment ? getStatusBadge(appointment.status) : <Badge variant='outline'>Không có</Badge>}</div>
+            </div>
 
-          {/* Thời gian cuộc hẹn */}
-          <div className='space-y-2'>
-            <Label htmlFor='appointmentTime' className='text-base font-medium'>Thời gian</Label>
-            <Input
-              id='appointmentTime'
-              value={appointment ? format(new Date(appointment.appointmentTime), 'dd/MM/yyyy HH:mm') : ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='appointmentTime' className='text-sm font-medium'>Thời gian</Label>
+                <Input
+                  id='appointmentTime'
+                  value={appointment ? format(new Date(appointment.appointmentTime), 'dd/MM/yyyy HH:mm') : ''}
+                  disabled
+                  className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+                />
+              </div>
 
-          {/* Thời lượng */}
-          <div className='space-y-2'>
-            <Label htmlFor='duration' className='text-base font-medium'>Thời lượng (phút)</Label>
-            <Input
-              id='duration'
-              value={appointment?.duration || ''}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
-          </div>
+              <div className='space-y-2'>
+                <Label htmlFor='duration' className='text-sm font-medium'>Thời lượng (phút)</Label>
+                <Input
+                  id='duration'
+                  value={appointment?.duration || ''}
+                  disabled
+                  className='w-full outline-none rounded-[6px] px-3 py-2 bg-gray-100 text-sm'
+                />
+              </div>
+            </div>
 
-          {/* Tin nhắn */}
-          <div className='space-y-2'>
-            <Label htmlFor='message' className='text-base font-medium'>Tin nhắn</Label>
-            <Input
-              id='message'
-              value={appointment?.message || 'Không có tin nhắn'}
-              disabled
-              className='w-full outline-none rounded-[6px] px-[12px] py-[8px] bg-gray-100'
-            />
+            <div className='space-y-2'>
+              <Label htmlFor='message' className='text-sm font-medium'>Tin nhắn</Label>
+              <div className='min-h-[80px] p-3 bg-gray-100 rounded-[6px] text-sm text-gray-700 border'>
+                {appointment?.message || 'Không có tin nhắn'}
+              </div>
+            </div>
           </div>
         </div>
 
-        <DialogFooter className='pt-4'>
+        <DialogFooter className='flex-shrink-0 pt-4 border-t'>
           <Button
             variant={'outline'}
             onClick={() => onOpenChange(false)}
+            className='min-w-[80px]'
           >
             Đóng
           </Button>
